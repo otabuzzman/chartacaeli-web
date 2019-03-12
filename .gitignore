@@ -1,0 +1,6 @@
+*.class
+*.jar
+*.ttf
+!web/lib/chartacaeli-webfont.ttf
+*.zip
+!lab/chartacaeli-webfont.zip

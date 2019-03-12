@@ -1,0 +1,8 @@
+*		text=auto
+*.pdf	-text
+*.sh	eol=lf
+*.ico	binary
+*.png	binary
+*.ttf	binary
+*.xcf	binary
+*.zip	binary
