@@ -4,3 +4,7 @@
 !web/lib/chartacaeli-webfont.ttf
 *.zip
 !lab/chartacaeli-webfont.zip
+jquery-*
+xonomy
+# temporary files
+_*

@@ -14,7 +14,7 @@ public class ChartaCaeliAPI {
 	public String definition() {
 		return( "null" ) ;
 	}
-	
+
 	// sync:
 	// make, post defn[/ pref] in mulitipart body, return pdf
 	// async:
@@ -22,5 +22,5 @@ public class ChartaCaeliAPI {
 	// stat, id in query param, return true/ false
 	// take, id in query param, return pdf
 	// wipe, id in query param
-	
+
 }
