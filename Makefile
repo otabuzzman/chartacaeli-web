@@ -57,8 +57,8 @@ GNG = ccGallery_general-features-selection.png \
 
 .PHONY: all clean lclean rclean tidy pdf png gng
 
-vpath %.xml lab
-vpath %.preferences lab
+vpath %.xml $(docdir)/lab
+vpath %.preferences $(docdir)/lab
 
 # top-level folder of core app (as seen from web service)
 appdir = ../chartacaeli
@@ -66,7 +66,7 @@ appdir = ../chartacaeli
 webdir = ../chartacaeli-web
 
 .xml.pdf:
-	( export _JAVA_OPTIONS=-Duser.language=en ; cd $(appdir) ; make $@ VPATH=$(webdir)/lab)
+	( export _JAVA_OPTIONS=-Duser.language=en ; cd $(appdir) ; make $@ VPATH=$(webdir)/$(docdir)/lab)
 	@test -f $(appdir)/$@ && mv $(appdir)/$@ .
 
 .pdf.png:

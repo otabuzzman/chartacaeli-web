@@ -1,11 +1,12 @@
-window.addEventListener('load', init) ;
+window.addEventListener('load', function(event) {
+	initXonElement('ccXonomy') ;
+}) ;
 
-function init(event) {
-	initXonDiv('ccXonDiv') ;
-}
+var chartD8N ;
+var chartP9S ;
 
-/* init Xonomy */
-function initXonDiv(id) {
+/* init Xonomy element */
+function initXonElement(id) {
 	var xonDiv = document.getElementById(id) ;
 	Xonomy.setMode("laic") ;
 	Xonomy.render(chartS11N.defdef, xonDiv, chartS11N.Xonomy) ;
@@ -15,7 +16,7 @@ function initXonDiv(id) {
 document.addEventListener('DOMContentLoaded', function(event) {
 
 	/* addEventListener doesn't work with Bootstrap (SO #24211185) */
-	$('#ccGalleryCarousel').on('slid.bs.carousel', updateBtnHref) ;
+	$('#ccGalleryCarousel').on('slid.bs.carousel', updateBtnConf) ;
 
 	document.addEventListener('scroll', fadeCaptionOutro ) ;
 
@@ -61,7 +62,7 @@ function btnOpen(event) {
 }
 
 function btnNew(event) {
-	initXonDiv('ccXonDiv') ;
+	initXonElement('ccXonDiv') ;
 	$('#ccBtnExec').prop('disabled', true) ;
 	$('#ccBtnSave').prop('disabled', true) ;
 }
@@ -71,10 +72,12 @@ function btnToggleMenu(event) {
 	$(this).find('i').toggleClass('fa-bars fa-times') ;
 }
 
-/* load composer with files from data-edit- attributes of active carosuel item */
+/* load composer with files defined by active carosuel item */
 function btnLoad(event) {
-	var chart = $('.carousel .active').attr('data-edit-chart') ;
-	var prefs = $('.carousel .active').attr('data-edit-prefs') ;
+	var chart = $('.carousel .active').attr('data-load-chart') ;
+	var prefs = $('.carousel .active').attr('data-load-prefs') ;
+	$.ajax({url: chart, success: function(data) {console.log(data)}}) ;
+	$.ajax({url: prefs, success: function(data) {console.log(data)}}) ;
 }
 
 function smoothScrollToAnchor(event) {
@@ -99,8 +102,8 @@ function fadeCaptionOutro(event) {
 	$('.caption-outro').css('opacity', 1-$(window).scrollTop()/480) ;
 }
 
-/* update href of VIEW and INFO buttons from data- attributes of active carousel item */
-function updateBtnHref(event) {
+/* update button configurations according to carousel state */
+function updateBtnConf(event) {
 	var view = $('.carousel .active').attr('data-view') ;
 	document.getElementById('ccBtnView').href = view ;
 	var info = $('.carousel .active').attr('data-info') ;

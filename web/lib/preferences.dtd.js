@@ -2,8 +2,10 @@
 var prefsS11N = {
 	// default preferences definition
 	defdef: "<preferences><root type='user'><map/></root></preferences>",
+
 	// XML declaration and any further required prolog
 	XMLdec: "<?xml version='1.0' encoding='UTF-8'?><!DOCTYPE preferences SYSTEM 'http://java.sun.com/dtd/preferences.dtd'>",
+
 	// specification (DTD) transformed to Xonomy
 	Xonomy: {
 		elements: {
