@@ -10,6 +10,7 @@ The project depends on the [repository](https://github.com/otabuzzman/chartacael
   ```
 
 - To rebuild the images (for instance to check if the core app works) run:
+
   ```
   # Windows
   export GS_FONTPATH=c:/users/jschuck/src/chartacaeli-web\;c:/users/jschuck/src/chartacaeli
@@ -50,8 +51,7 @@ for p in `xml sel -t -v "//xs:pattern/@value" chartacaeli.xsd | sort -u` ; do \
 	grep '0$'
 ```
 
-#### Content preparation
-Favicon creation
+#### Favicon creation
 - Icon sketched with Google Slides but defined with Microsoft Powerpoint because Slides lacks some GUI features (e.g. setting arbitrary linewidths, capstyles and numerical rotation angles).
 - Icon text in Justinian font made with Powerpoint. Set background transparent. Save text element as graphic via context menu.
 - Combine icon and text images with Slides.
@@ -75,9 +75,7 @@ Basic color palette and usage. Click on hex value to get derived palettes.
 Subordinate styles of buttons and links.
 
 #### Thoughts on links
-Purposes of links in running text is provision of background information or to give credit to the efforts of individual projects used by the site. Another reason is to ease access to sites which might somewhat tricky to find with Google even if propper keywords are given.
-
-*Rules of thumb*
+Purposes of links in running text is provision of background information or to give credit to the efforts of individual projects used by the site. Another reason is to ease access to sites which might somewhat tricky to find with Google even if propper keywords are given. Some general rules of thumb:
 - No reference of sites everbody knows (e.g. Amazon, Google, Micosoft).
 - Only one reference at first occurence.
 - URLs should be limited to the host part as site structures are subject to changes.
@@ -91,9 +89,19 @@ Purposes of links in running text is provision of background information or to g
 |URL in text (inline)|Same as for navigation menu entries. No text decorations.|
 
 #### REST setup
-Installation and configuration of Tomcat performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet. Create `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml` with content `<Context docBase="<appbase>" path="" reloadable="true"/>` and `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web`) to make Charta Caeli default (start on domain URL).
+Installation and configuration of Tomcat performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
 
-Charta Caeli web service REST API implementaion uses [Jersey](https://jersey.github.io/) RESTful Web Service framework.
+Create `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml` with content `<Context docBase="<appbase>" path="" reloadable="true"/>` and `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web`) to make Charta Caeli default (start on domain URL).
+
+- To start Tomcat on Windows enter these commands in `cmd.exe`:
+
+  ```
+  set "JAVA_HOME=C:\Program Files\Java\jdk1.8.0_151"
+  cd AppData\Local\Apache\apache-tomcat-8.5.37\bin
+  startup.bat
+  ```
+
+The REST API implementaion uses the [Jersey](https://jersey.github.io/) RESTful Web Service framework.
 
 #### Helpful links
 - [CSS reference]( https://www.w3schools.com/cssref/default.asp) on [w3schools.com](https://www.w3schools.com/)
