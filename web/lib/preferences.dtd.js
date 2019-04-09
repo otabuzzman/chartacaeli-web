@@ -1,7 +1,7 @@
-// preferences specification object
-var prefsS11N = {
+// preferences specification object (prototype of statP9S)
+var prefsS11N = Object.freeze({
 	// default preferences definition
-	defdef: "<preferences><root type='user'><map/></root></preferences>",
+	defdef: "<preferences EXTERNAL_XML_VERSION='1.0'><root type='user'><map/></root></preferences>",
 
 	// XML declaration and any further required prolog
 	XMLdec: "<?xml version='1.0' encoding='UTF-8'?><!DOCTYPE preferences SYSTEM 'http://java.sun.com/dtd/preferences.dtd'>",
@@ -84,6 +84,13 @@ var prefsS11N = {
 			},
 			"root": {
 				menu: [{
+					caption: "add \@@type",
+					action: Xonomy.newAttribute,
+					actionParameter: {name: "type"},
+					hideIf: function(jsElement) {
+						return jsElement.hasAttribute("type");
+					}
+				}, {
 					caption: "add <map>",
 					action: Xonomy.newElementChild,
 					actionParameter: "<map/>",
@@ -100,15 +107,24 @@ var prefsS11N = {
 					hideIf: function(jsElement) {
 						return jsElement.hasElements();
 					}
-				}]
+				}],
+				attributes: {
+					"type": {
+						asker: Xonomy.askOpenPicklist,
+						askerParameter: [
+							{value: "system"},
+							{value: "user"}
+						]
+					}
+				}
 			},
 			"preferences" : {
 				menu: [{
-					caption: "add \@@version",
+					caption: "add \@@EXTERNAL_XML_VERSION",
 					action: Xonomy.newAttribute,
-					actionParameter: {name: "version"},
+					actionParameter: {name: "EXTERNAL_XML_VERSION"},
 					hideIf: function(jsElement) {
-						return jsElement.hasAttribute("version");
+						return jsElement.hasAttribute("EXTERNAL_XML_VERSION");
 					}
 				}, {
 					caption: "add <root>",
@@ -125,7 +141,7 @@ var prefsS11N = {
 					}
 				}],
 				attributes: {
-					"version": {
+					"EXTERNAL_XML_VERSION": {
 						asker: Xonomy.askString,
 						menu: [{
 							caption: "delete",
@@ -136,10 +152,12 @@ var prefsS11N = {
 			}
 		},
 		onchange: function() {
-			console.log("document changed");
+			if (statThis && statThis.stat === State.CHANGED) {
+				return;
+			}
+			Transition[statThis.stat][Event.CHANGE]();
 		},
 		validate: function() {
-			console.log("validating...done");
 		}
 	}
-};
+});

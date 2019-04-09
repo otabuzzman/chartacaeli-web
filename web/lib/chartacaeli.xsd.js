@@ -11,8 +11,8 @@ another restriction regarding delete applies to mandatory elements when their
 minimum occurrences (minOcc) are reached.
  */
 
-// chart specification object
-var chartS11N = {
+// chart specification object (prototype of statD8N)
+var chartS11N = Object.freeze({
 	// default chart definition
 	defdef: "<ChartaCaeli xmlns='http://www.chartacaeli.eu/model' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.chartacaeli.eu/model chartacaeli.xsd'/>",
 
@@ -1874,7 +1874,21 @@ var chartS11N = {
 						}]
 					},
 					"value": {
-						asker: Xonomy.askString
+						asker: Xonomy.askString,
+						displayValue: function(jsAttribute) {
+							if (/[^\u0000-\u007F]/.test(jsAttribute.value)) {
+								var code, data = "";
+								for (var i=0 ; jsAttribute.value.length>i ; i++) {
+									if ((code = jsAttribute.value.charCodeAt(i))>0x7F) {
+										data += "&amp#x"+code.toString(16).toUpperCase()+";";
+									} else {
+										data += jsAttribute.value.charAt(i);
+									}
+								}
+								return data;
+							}
+							return jsAttribute.value;
+						}
 					},
 					"purpose": {
 						asker: Xonomy.askOpenPicklist,
@@ -4407,10 +4421,12 @@ var chartS11N = {
 			}
 		},
 		onchange: function() {
-			console.log("document changed");
+			if (statThis && statThis.stat === State.CHANGED) {
+				return;
+			}
+			Transition[statThis.stat][Event.CHANGE]();
 		},
 		validate: function() {
-			console.log("validating...done");
 		}
 	}
-};
+});

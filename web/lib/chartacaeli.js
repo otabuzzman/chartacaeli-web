@@ -1,16 +1,175 @@
 window.addEventListener('load', function(event) {
-	initXonElement('ccXonomy') ;
+	initComposer() ;
 }) ;
 
-var chartD8N ;
-var chartP9S ;
-
-/* init Xonomy element */
-function initXonElement(id) {
-	var xonDiv = document.getElementById(id) ;
-	Xonomy.setMode("laic") ;
-	Xonomy.render(chartS11N.defdef, xonDiv, chartS11N.Xonomy) ;
+function initComposer() {
+	/* init state object template*/
+	var statTmpl = {
+		stat: {
+			value: State.EMPTY,
+			writable: true, enumerable: true, configurable: false
+		},
+		open: {
+			value: null,
+			writable: true, enumerable: true, configurable: false
+		},
+		hold: {
+			value: null,
+			writable: true, enumerable: true, configurable: false
+		}
+	} ;
+	/* init definition state object */
+	statD8N = Object.create(chartS11N, statTmpl) ;
+	statThis = statD8N ;
+	statThis.open = statD8N.defdef ;
+	/* init preferences state object */
+	statP9S = Object.create(prefsS11N, statTmpl) ;
+	statExch = statP9S ;
+	statExch.open = statP9S.defdef ;
+	/* load Composer with current state object */
+	initXonomy() ;
+	loadXonomy('#ccXonomy') ;
 }
+
+function initXonomy() {
+	Xonomy.setMode("laic") ;
+}
+function loadXonomy(id) {
+	var xonDiv = $(id) ;
+	if (xonDiv.css('display') === 'none') {
+		return ;
+	}
+	Xonomy.render(statThis.open, xonDiv[0], statThis.Xonomy) ;
+}
+function grabXonomy(id) {
+	var xonDiv = $(id) ;
+	if (xonDiv.css('display') === 'none') {
+		return null ;
+	}
+	return Xonomy.harvest() ;
+}
+
+/* definition and preferences state objects */
+var statD8N ;
+var statP9S ;
+/* runtime state objects referencing D/P */
+var statThis ;
+var statExch ;
+
+/* state and event values enumerations */
+const State = Object.freeze({NONE: 0, EMPTY: 1, OPENED: 2, CHANGED: 3, WARNING: 4}) ;
+const Event = Object.freeze({NONE: 0, NEW: 1, OPEN: 2, CHANGE: 3, RETURN: 4}) ;
+/* transition table */
+const Transition = Object.freeze([
+	/*         Non,        New,        Opn,        Chg,        Ret,     */
+	/* Non */ [aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid],
+	/* Emp */ [aotInvalid, aotInvalid, aotEmpOpn,  aotEmpChg,  aotInvalid],
+	/* Opn */ [aotInvalid, aotOpnNew,  aotOpnOpn,  aotOpnChg,  aotInvalid],
+	/* Chg */ [aotInvalid, aotChgNew,  aotChgOpn,  aotChgChg,  aotInvalid],
+	/* Wrn */ [aotInvalid, aotWrnNew,  aotWrnOpn,  aotInvalid, aotWrnRet ]
+]) ;
+
+/* transition actions */
+function aotInvalid() {
+	console.log("INV") ;
+}
+function aotEmpOpn() {
+	statThis.open = statThis.hold ;
+	statThis.hold = null ;
+	loadXonomy('#ccXonomy') ;
+	statThis.stat = State.OPENED ;
+	StateSetter[statThis.stat]() ;
+	console.log("Emp/Opn") ;
+}
+function aotEmpChg() {
+	statThis.stat = State.CHANGED ;
+	StateSetter[statThis.stat]() ;
+	console.log("Emp/Chg") ;
+}
+function aotOpnNew() {
+	statThis.open = statThis.defdef ;
+	loadXonomy('#ccXonomy') ;
+	statThis.stat = State.EMPTY ;
+	StateSetter[statThis.stat]() ;
+	console.log("Opn/New") ;
+}
+function aotOpnOpn() {
+	statThis.open = statThis.hold ;
+	statThis.hold = null ;
+	loadXonomy('#ccXonomy') ;
+	statThis.stat = State.OPENED ;
+	StateSetter[statThis.stat]() ;
+	console.log("Opn/Opn") ;
+}
+function aotOpnChg() {
+	statThis.stat = State.CHANGED ;
+	StateSetter[statThis.stat]() ;
+	console.log("Opn/Chg") ;
+}
+function aotChgNew() {
+	/* memorize event for later use by mBtnWarn2nd */
+	$('#ccMBtnWarn2nd').data('event', Event.NEW) ;
+	$('#ccWarning').modal('toggle') ;
+	statThis.stat = State.WARNING ;
+	StateSetter[statThis.stat]() ;
+	console.log("Chg/New") ;
+}
+function aotChgOpn() {
+	/* memorize event for later use by mBtnWarn2nd */
+	$('#ccMBtnWarn2nd').data('event', Event.OPEN) ;
+	$('#ccWarning').modal('toggle') ;
+	statThis.stat = State.WARNING ;
+	StateSetter[statThis.stat]() ;
+	console.log("Chg/Opn") ;
+}
+function aotChgChg() {
+	statThis.stat = State.CHANGED ;
+	StateSetter[statThis.stat]() ;
+	console.log("Chg/Chg") ;
+}
+function aotWrnNew() {
+	statThis.open = statThis.defdef ;
+	loadXonomy('#ccXonomy') ;
+	statThis.stat = State.EMPTY ;
+	StateSetter[statThis.stat]() ;
+	console.log("Wrn/New") ;
+}
+function aotWrnOpn() {
+	statThis.open = statThis.hold ;
+	statThis.hold = null ;
+	loadXonomy('#ccXonomy') ;
+	statThis.stat = State.OPENED ;
+	StateSetter[statThis.stat]() ;
+	console.log("Wrn/Opn") ;
+}
+function aotWrnRet() {
+	statThis.stat = State.CHANGED ;
+	StateSetter[statThis.stat]() ;
+	console.log("Wrn/Ret") ;
+}
+
+/* button states setter functions table */
+var StateSetter = Object.freeze([
+	function () { // State.NONE
+	},
+	function () { // State.EMPTY
+		$('#ccBtnNew').prop('disabled', true) ;
+		$('#ccBtnOpen').prop('disabled', false) ;
+		$('#ccBtnExec').prop('disabled', true) ;
+	},
+	function () { // State.OPENED
+		$('#ccBtnNew').prop('disabled', false) ;
+		$('#ccBtnOpen').prop('disabled', false) ;
+		$('#ccBtnExec').prop('disabled', false) ;
+	},
+	function () { // State.CHANGED
+		$('#ccBtnNew').prop('disabled', false) ;
+		$('#ccBtnOpen').prop('disabled', false) ;
+		$('#ccBtnExec').prop('disabled', false) ;
+	},
+	function () { // State.WARNING
+	}
+]) ;
 
 /* register events */
 document.addEventListener('DOMContentLoaded', function(event) {
@@ -29,42 +188,76 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	document.querySelector('.navbar-toggler').addEventListener('click', btnToggleMenu) ;
 	document.querySelector('#ccBtnNew').addEventListener('click', btnNew) ;
 	document.querySelector('#ccBtnOpen').addEventListener('click', btnOpen) ;
+	document.querySelector('#ccInpOpen').addEventListener('change', inpOpen) ;
 	document.querySelector('#ccBtnExec').addEventListener('click', btnExec) ;
-	document.querySelector('#ccBtnSave').addEventListener('click', btnSave) ;
-	document.querySelector('#ccBtnLast').addEventListener('click', btnLast) ;
 	document.querySelector('#ccBtnTglP').addEventListener('click', btnTglP) ;
 	document.querySelector('#ccBtnTglD').addEventListener('click', btnTglD) ;
+	document.querySelector('#ccMBtnWarn1st').addEventListener('click', mBtnWarn1st) ;
+	document.querySelector('#ccMBtnWarn2nd').addEventListener('click', mBtnWarn2nd) ;
 }) ;
+
+function mBtnWarn2nd(event) {
+	Transition[statThis.stat][$(this).data('event')]() ;
+	$('#ccWarning').modal('toggle') ;
+}
+function mBtnWarn1st(event) {
+	Transition[statThis.stat][Event.RETURN]() ;
+	$('#ccWarning').modal('toggle') ;
+}
 
 /* toggle to definition button */
 function btnTglD(event) {
-	$(this).toggleClass('d-md-block') ;
-	$('#ccBtnTglP').toggleClass('d-md-block') ;
+	$(this)
+	.toggleClass('d-md-block')
+	.prop('disabled', true) ;
+	$('#ccBtnTglP')
+	.toggleClass('d-md-block')
+	.prop('disabled', false) ;
+	/* save current Composer */
+	statThis.open = grabXonomy() ;
+	/* toggle runtime state objects */
+	statThis = statD8N ;
+	statExch = statP9S ;
+	/* load Composer from toggled state object */
+	loadXonomy('#ccXonomy') ;
+	StateSetter[statThis.stat]() ;
 }
 
 /* toggle to preferences button */
 function btnTglP(event) {
-	$(this).toggleClass('d-md-block') ;
-	$('#ccBtnTglD').toggleClass('d-md-block') ;
-}
-
-function btnLast(event) {
-}
-
-function btnSave(event) {
-	$('#ccBtnLast').prop('disabled', false) ;
+	$(this)
+	.toggleClass('d-md-block')
+	.prop('disabled', true) ;
+	$('#ccBtnTglD')
+	.toggleClass('d-md-block')
+	.prop('disabled', false) ;
+	/* save current Composer */
+	statThis.open = grabXonomy() ;
+	/* toggle runtime state objects */
+	statThis = statP9S ;
+	statExch = statD8N ;
+	/* load Composer from toggled state object */
+	loadXonomy('#ccXonomy') ;
+	StateSetter[statThis.stat]() ;
 }
 
 function btnExec(event) {
 }
 
 function btnOpen(event) {
+	$('#ccInpOpen').focus().trigger('click') ;
+}
+function inpOpen(event) {
+	var file = new FileReader() ;
+	file.onload = function (e) {
+		statThis.hold = e.target.result.replace(/(\r?\n|\r)\s*/g, "") ;
+		Transition[statThis.stat][Event.OPEN]() ;
+	} ;
+	file.readAsText($(this)[0].files[0]) ;
 }
 
 function btnNew(event) {
-	initXonElement('ccXonDiv') ;
-	$('#ccBtnExec').prop('disabled', true) ;
-	$('#ccBtnSave').prop('disabled', true) ;
+	Transition[statThis.stat][Event.NEW]() ;
 }
 
 /* toggle burger and cross icons */
@@ -72,12 +265,28 @@ function btnToggleMenu(event) {
 	$(this).find('i').toggleClass('fa-bars fa-times') ;
 }
 
-/* load composer with files defined by active carosuel item */
+/* load Composer with files defined by active carosuel item */
 function btnLoad(event) {
-	var chart = $('.carousel .active').attr('data-load-chart') ;
-	var prefs = $('.carousel .active').attr('data-load-prefs') ;
-	$.ajax({url: chart, success: function(data) {console.log(data)}}) ;
-	$.ajax({url: prefs, success: function(data) {console.log(data)}}) ;
+	var href, chart, prefs ;
+	/* fetch definition */
+	href = $('.carousel .active').attr('data-load-chart') ;
+	$.ajax({url: href,
+		dataType: 'text',
+		dataFilter: function(data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
+		success: function(data) {
+			chart = data ;
+			/* fetch preferences */
+			href = $('.carousel .active').attr('data-load-prefs') ;
+			if (href) {
+				$.ajax({url: href,
+					dataType: 'text',
+					dataFilter: function(data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
+					success: function(data) {
+						prefs = data ;
+					}}) ;
+			} else {
+			}
+		}}) ;
 }
 
 function smoothScrollToAnchor(event) {
@@ -108,4 +317,10 @@ function updateBtnConf(event) {
 	document.getElementById('ccBtnView').href = view ;
 	var info = $('.carousel .active').attr('data-info') ;
 	document.getElementById('ccBtnInfo').href = info ;
+	var load = $('.carousel .active').attr('data-load-chart') ;
+	if (load) {
+		$('#ccBtnLoad')	.removeClass('disabled') ;
+	} else {
+		$('#ccBtnLoad')	.addClass('disabled') ;
+	}
 }

@@ -80,6 +80,7 @@
 							<h3 class="d-none d-md-block">General features selection</h3>
 						</div>
 					</div>
+					<!-- first item -->
 					<div class="carousel-item active" data-view="scientific-star-chart.pdf" data-info="#ccInfoSci" data-load-chart="lab/scientific-star-chart.xml" data-load-prefs="lab/scientific-star-chart.preferences">
 						<img class="d-block w-100" src="ccGallery_scientific-star-chart.png" alt="Scientific star chart">
 						<div class="carousel-caption">
@@ -92,7 +93,7 @@
 							<h3 class="d-none d-md-block">Artistic star chart</h3>
 						</div>
 					</div>
-					<div class="carousel-item" data-view="artistic-star-chart--toppage.pdf" data-info="#ccInfoArt" data-load-chart="lab/artistic-star-chart--toppage.xml" data-load-prefs="lab/artistic-star-chart--toppage.preferences">
+					<div class="carousel-item" data-view="artistic-star-chart--toppage.pdf" data-info="#ccInfoArt" data-load-chart="lab/artistic-star-chart--toppage.xml" data-load-prefs="">
 						<img class="d-block w-100" src="ccGallery_artistic-star-chart--toppage.png" alt="Only the chart from artistic star chart">
 						<div class="carousel-caption">
 							<h3 class="d-none d-md-block">Artistic star chart overlay</h3>
@@ -111,7 +112,7 @@
 				<div class="d-inline-block">
 					<a id="ccBtnView" class="btn btn-lg btn-outline-primary" role="button" href="scientific-star-chart.pdf" target="_blank" title="Open PDF"><i class="far fa-file-pdf"></i></a>
 					<a id="ccBtnInfo" class="btn btn-lg btn-outline-primary" role="button" href="#ccInfoSci" title="Show details"><i class="fas fa-info"></i></a>
-					<a id="ccBtnLoad" class="btn btn-lg btn-outline-primary" role="button" href="#ccComposer" title="Load into composer"><i class="fas fa-pen"></i></a>
+					<a id="ccBtnLoad" class="btn btn-lg btn-outline-primary" role="button" href="#ccComposer" title="Load Composer"><i class="fas fa-pen"></i></a>
 				</div>
 			</div>
 		</div>
@@ -250,17 +251,36 @@
 				<div class="d-inline-block">
 					<div>
 						<button class="ccBtnTglP btn btn-outline-secondary d-sm-block d-md-none" type="button" title="Toggle to preferences" disabled>toggle to <strong>preferences</strong></button>
-						<button id="ccBtnTglP" class="btn btn-outline-primary d-none d-md-block" type="button" title="Toggle to preferences" disabled>toggle to <strong>preferences</strong></button>
-						<button id="ccBtnTglD" class="btn btn-outline-primary d-none" type="button" title="Toggle to preferences" disabled>toggle to <strong>definition</strong></button>
+						<button id="ccBtnTglP" class="btn btn-outline-primary d-none d-md-block" type="button" title="Toggle to preferences">toggle to <strong>preferences</strong></button>
+						<button id="ccBtnTglD" class="btn btn-outline-primary d-none" type="button" title="Toggle to definition" disabled>toggle to <strong>definition</strong></button>
 					</div>
-					<button class="ccBtnNew btn btn-outline-secondary d-sm-inline d-md-none" type="button" title="New" disabled><i class="far fa-file"></i></button>
-					<button id="ccBtnNew" class="btn btn-outline-primary d-none d-md-inline" type="button" title="New"><i class="far fa-file"></i></button>
-					<button id="ccBtnOpen" class="btn btn-outline-primary" type="button" title="Open"><i class="far fa-folder-open"></i></button>
+					<button class="ccBtnNew btn btn-outline-secondary d-sm-inline d-md-none" type="button" title="New" disabled><i class="fas fa-file"></i></button>
+					<button id="ccBtnNew" class="btn btn-outline-primary d-none d-md-inline" type="button" title="New" disabled><i class="fas fa-file"></i></button>
+					<button id="ccBtnOpen" class="btn btn-outline-primary" type="button" title="Open"><i class="fas fa-folder-open"></i></button>
+					<input id="ccInpOpen" class="d-none" type="file">
 					<button id="ccBtnExec" class="btn btn-outline-primary" type="button" title="Execute" disabled><i class="ccwf-brandicon"></i></button>
-					<button class="ccBtnSave btn btn-outline-secondary d-sm-inline d-md-none" type="button" title="Save" disabled><i class="far fa-save"></i></button>
-					<button id="ccBtnSave" class="btn btn-outline-primary d-none d-md-inline" type="button" title="Save" disabled><i class="far fa-save"></i></button>
-					<button class="ccBtnLast btn btn-outline-secondary d-sm-inline d-md-none" type="button" title="Undo all" disabled><i class="fas fa-undo"></i></button>
-					<button id="ccBtnLast" class="btn btn-outline-primary d-none d-md-inline" type="button" title="Undo all" disabled><i class="fas fa-undo"></i></button>
+					<button id="ccBtnSave" class="btn btn-outline-primary d-none" type="button" title="Download"><svg xmlns="http://www.w3.org/2000/svg"><path d="M8 20h3v-5h2v5h3l-4 4-4-4zm11.479-12.908c-.212-3.951-3.473-7.092-7.479-7.092s-7.267 3.141-7.479 7.092c-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h3.5v-2h-3.5c-1.93 0-3.5-1.57-3.5-3.5 0-2.797 2.479-3.833 4.433-3.72-.167-4.218 2.208-6.78 5.567-6.78 3.453 0 5.891 2.797 5.567 6.78 1.745-.046 4.433.751 4.433 3.72 0 1.93-1.57 3.5-3.5 3.5h-3.5v2h3.5c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408z"/></svg></button>
+					<button class="ccBtnCapture btn btn-outline-secondary d-sm-inline d-md-none" type="button" title="Copy to clipboard" disabled><i class="far fa-clipboard"></i></button>
+					<button id="ccBtnCapture" class="btn btn-outline-primary d-none d-md-inline" type="button" title="Copy to clipboard" disabled><i class="fas fa-clipboard"></i></button>
+					<button class="ccBtnRestore btn btn-outline-secondary d-sm-inline d-md-none" type="button" title="Restore clipboard" disabled><i class="fas fa-paste"></i></button>
+					<button id="ccBtnRestore" class="btn btn-outline-primary d-none d-md-inline" type="button" title="Restore clipboard" disabled><i class="fas fa-paste"></i></button>
+				</div>
+			</div>
+		</div>
+		<div id="ccWarning" class="modal fade" role="dialog" tabindex="-1">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Unsaved changes pending</h4>
+						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
+					</div>
+					<div class="modal-body info-txt lead">
+						<p>Of course you know about your <strong>pending changes</strong> but anyway and at the risk of boring you: do you really want to proceed and discard your unsaved changes?</p>
+					</div>
+					<div class="modal-footer">
+						<button id="ccMBtnWarn2nd" class="btn btn-secondary btn-lg btn-block" type="button">Proceed and discard unsaved changes</button>
+						<button id="ccMBtnWarn1st" class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">Return and preserve unsaved changes</button>
+					</div>
 				</div>
 			</div>
 		</div>

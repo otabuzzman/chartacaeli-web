@@ -15,6 +15,13 @@ a:active { text-decoration: none ; color: #006adb!important ; }
 .section { margin-bottom: 4rem ; }
 .headline { padding-top: .8rem ; }
 [id ^= ccBtn], [class ^= ccBtn] { font-size: 22px ; width: 60px ; }
+svg { width: 24px ; height: 24px ; fill: currentColor ; }
+
+/* home */
+#ccHome { background-image: url("../starrysky.png") ; background-size: cover ; background-repeat: no-repeat ; background-position: center ; min-height: 100vh ; display: flex ; }
+.caption { color: #dadada ; }
+.caption-intro { padding-top: 6rem ; padding-left: 3.2rem ; }
+.caption-outro { margin-bottom: 2rem ; }
 
 /* navigation */
 .navbar { background: rgba(0, 0, 0, .75) ; font-size: 1.4rem ; font-weight: 500 ; letter-spacing: .125rem ; }
@@ -28,11 +35,6 @@ a:active { text-decoration: none ; color: #006adb!important ; }
 .navbar-nav .nav-link:active, .navbar-nav .nav-link.active { color: #006adb ; }
 /* position sections below .navbar */
 .navbar-offset::before { height: 4.4rem ; margin-top: -4.4rem ; content: "" ; display: block ; }
-
-#ccHome { background-image: url("../starrysky.png") ; background-size: cover ; background-repeat: no-repeat ; background-position: center ; min-height: 100vh ; display: flex ; }
-.caption { color: #dadada ; }
-.caption-intro { padding-top: 6rem ; padding-left: 3.2rem ; }
-.caption-outro { margin-bottom: 2rem ; }
 
 /* gallery */
 .carousel-caption { padding-bottom: 0 ; position: relative ; left: auto ; right: auto ; }
@@ -61,7 +63,9 @@ a:active { text-decoration: none ; color: #006adb!important ; }
 .xonomy.laic .element.collapsed > .connector > .plusminus { background-image: url(../xon-plus-primary.svg) ; background-color: #ffffff ; }
 .xonomy.laic .element.collapsed > .childrenCollapsed { font-size: 1.5rem ; color: #007bff ; }
 .xonomy.laic .element > .children { padding-left: 22px ; }
-#xonomyBubble.laic #xonomyBubbleContent input.textbox { font-size: 1.25rem ; }
+#xonomyBubble.laic #xonomyBubbleContent input.textbox, #xonomyBubble.laic #xonomyBubbleContent .techno { font-size: 1.25rem ; }
+.modal-footer { display: block ; }
+.modal-footer > :not(:first-child) { margin-left: 0 ; }
 
 /* concepts */
 .pragma-bg-headimg { background-image: url("../starchart.png") ; background-size: contain ; background-repeat: no-repeat ; background-position: left top ; transform: scale(-1, -1) ; min-height: 100vh ; display: flex ; }
@@ -82,23 +86,29 @@ a:active { text-decoration: none ; color: #006adb!important ; }
 	h3 { font-size: 2.2rem ; }
 	[id ^= ccBtn] { width: 80px ; }
 
+	/* home */
+	.caption-intro { padding-top: 9rem ; }
+	.caption-intro h1 { font-size: 3.8rem ; }
+	.caption-outro h1 { font-size: 3.8rem ; }
+	.caption-outro .btn { border-width: 3px ; border-radius: 8px ; }
+
 	/* navigation */
 	.navbar { font-size: 2rem ; }
 	.navbar-brand img { height: 3.8rem ; }
 	.navbar-toggler .fa-bars { font-size: 1.8rem ; }
 	.navbar-offset::before { height: 5.6rem ; margin-top: -5.6rem ; }
 	.navbar-toggler .fa-times { font-size: 2.1rem ; }
-
-	/* home */
-	.caption-intro { padding-top: 9rem ; }
-	.caption-intro h1 { font-size: 3.8rem ; }
-	.caption-outro h1 { font-size: 3.8rem ; }
-	.caption-outro .btn { border-width: 3px ; border-radius: 8px ; }
 }
 
 @media (min-width: 992px) and (orientation: portrait) {
 	/* general */
 	h2 { font-size: 3.8rem ; }
+
+	/* home */
+	.caption-intro { padding-left: 4rem ; }
+	.caption-intro h1 { font-size: 5.4rem ; }
+	.caption-outro h1 { font-size: 5.4rem ; }
+	.caption-outro .btn { border-width: 4px ; border-radius: 12px ; }
 
 	/* navigation */
 	.navbar { font-size: 2.6rem ; }
@@ -107,12 +117,6 @@ a:active { text-decoration: none ; color: #006adb!important ; }
 	.navbar-offset::before { height: 6.8rem ; margin-top: -6.8rem ; }
 	.navbar-toggler .fa-times { font-size: 2.8rem ; }
 
-	/* home */
-	.caption-intro { padding-left: 4rem ; }
-	.caption-intro h1 { font-size: 5.4rem ; }
-	.caption-outro h1 { font-size: 5.4rem ; }
-	.caption-outro .btn { border-width: 4px ; border-radius: 12px ; }
-
 	/* community */
 	#ccCommunity img.d-md-inline { height: 5.4rem ; }
 	#ccCommunity p { font-size: 2.3rem ; }
@@ -120,17 +124,17 @@ a:active { text-decoration: none ; color: #006adb!important ; }
 }
 
 @media (min-width: 1200px) {
-	/* navigation */
-	.navbar { font-size: 1.6rem ; }
-	.navbar-brand img { height: 3.8rem ; }
-	.navbar-toggler .fa-bars { font-size: 2.4rem ; }
-	.navbar-offset::before { height: 5.4rem ; margin-top: -5.4rem ; }
-
 	/* home */
 	.caption-intro { padding-left: 2rem ; }
 	.caption-intro h1 { font-size: 5.4rem ; }
 	.caption-outro h1 { font-size: 5.4rem ; }
 	.caption-outro .btn { border-width: 3px ; border-radius: 10px ; }
+
+	/* navigation */
+	.navbar { font-size: 1.6rem ; }
+	.navbar-brand img { height: 3.8rem ; }
+	.navbar-toggler .fa-bars { font-size: 2.4rem ; }
+	.navbar-offset::before { height: 5.4rem ; margin-top: -5.4rem ; }
 
 	/* community */
 	#ccCommunity img.d-md-inline { margin-top: 0 ; }
