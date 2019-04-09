@@ -1,5 +1,8 @@
 docdir = web
-libdir = $(docdir)/WEB-INF/lib
+libdir = $(docdir)/lib
+labdir = $(docdir)/lab
+# the (W)EB-INF l(ib) folder
+wibdir = $(docdir)/WEB-INF/lib
 
 JAXVER = 2.28
 JAXZIP = jaxrs-ri-$(JAXVER).zip
@@ -57,8 +60,8 @@ GNG = ccGallery_general-features-selection.png \
 
 .PHONY: all clean lclean rclean tidy pdf png gng
 
-vpath %.xml $(docdir)/lab
-vpath %.preferences $(docdir)/lab
+vpath %.xml $(labdir)
+vpath %.preferences $(labdir)
 
 # top-level folder of core app (as seen from web service)
 appdir = ../chartacaeli
@@ -73,7 +76,7 @@ webdir = ../chartacaeli-web
 	$${GS:-gs} -q -o - -r150 -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
 	magick convert png:- -background "rgb(255,255,255)" -flatten $@
 
-all: lab/$(JAXZIP) $(docdir)/lib/xonomy $(docdir)/lib/Justv2.ttf $(docdir)/lib/Justv22.ttf
+all: lab/$(JAXZIP) $(libdir)/xonomy $(libdir)/Justv2.ttf $(libdir)/Justv22.ttf
 
 pdf: $(PDF)
 png: $(PNG)
@@ -100,28 +103,25 @@ clean:
 
 # local clean
 lclean: clean
-	( for jar in $(JAXJAR) ; do rm -f $(libdir)/`basename $$jar` ; done )
-	rm -f $(docdir)/lib/Justv2.ttf $(docdir)/lib/Justv22.ttf
+	( for jar in $(JAXJAR) ; do rm -f $(wibdir)/`basename $$jar` ; done )
+	rm -f $(libdir)/Justv2.ttf $(libdir)/Justv22.ttf
 
 # real clean
 rclean: lclean
 	rm -f lab/$(JAXZIP)
 	rm -f lab/just.zip
-	rm -f $(docdir)/lib/jquery-1.10.2.min.js
-	rm -rf $(docdir)/lib/xonomy
+	rm -rf $(libdir)/xonomy
 
 tidy: rclean
 
 lab/$(JAXZIP):
 	wget -P $(@D) -q http://repo1.maven.org/maven2/org/glassfish/jersey/bundles/jaxrs-ri/$(JAXVER)/$(@F)
-	( for jar in $(JAXJAR) ; do unzip -joq -d $(libdir) $@ $$jar || rm -f $@ ; done )
+	( for jar in $(JAXJAR) ; do unzip -joq -d $(wibdir) $@ $$jar || rm -f $@ ; done )
 
-$(docdir)/lib/jquery-1.10.2.min.js:
-	wget -q -O $@ https://code.jquery.com/$(@F)
-$(docdir)/lib/xonomy: $(docdir)/lib/jquery-1.10.2.min.js
-	(cd $(docdir)/lib ; git clone https://github.com/michmech/xonomy.git)
+$(libdir)/xonomy:
+	(cd $(libdir) ; git clone https://github.com/michmech/xonomy.git)
 	(cd $@ ; git checkout 810057e13c671728d236f85579296188e93a9fb3)
 lab/just.zip:
 	wget -P lab -q http://www.iconian.com/fonts/just.zip
-$(docdir)/lib/Justv2.ttf $(docdir)/lib/Justv22.ttf: lab/just.zip
+$(libdir)/Justv2.ttf $(libdir)/Justv22.ttf: lab/just.zip
 	unzip -qod $(@D) $< $(@F)
