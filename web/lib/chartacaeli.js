@@ -12,10 +12,6 @@ function initComposer() {
 		open: {
 			value: null,
 			writable: true, enumerable: true, configurable: false
-		},
-		hold: {
-			value: null,
-			writable: true, enumerable: true, configurable: false
 		}
 	} ;
 	/* init definition state object */
@@ -74,12 +70,7 @@ function aotInvalid() {
 	console.log("INV") ;
 }
 function aotEmpOpn() {
-	statThis.open = statThis.hold ;
-	statThis.hold = null ;
-	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
-	statThis.stat = State.OPENED ;
-	StateSetter[statThis.stat]() ;
+	$('#ccInpOpen').focus().trigger('click') ;
 	console.log("Emp/Opn") ;
 }
 function aotEmpChg() {
@@ -96,12 +87,7 @@ function aotOpnNew() {
 	console.log("Opn/New") ;
 }
 function aotOpnOpn() {
-	statThis.open = statThis.hold ;
-	statThis.hold = null ;
-	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
-	statThis.stat = State.OPENED ;
-	StateSetter[statThis.stat]() ;
+	$('#ccInpOpen').focus().trigger('click') ;
 	console.log("Opn/Opn") ;
 }
 function aotOpnChg() {
@@ -139,12 +125,7 @@ function aotWrnNew() {
 	console.log("Wrn/New") ;
 }
 function aotWrnOpn() {
-	statThis.open = statThis.hold ;
-	statThis.hold = null ;
-	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
-	statThis.stat = State.OPENED ;
-	StateSetter[statThis.stat]() ;
+	$('#ccInpOpen').focus().trigger('click') ;
 	console.log("Wrn/Opn") ;
 }
 function aotWrnRet() {
@@ -258,13 +239,16 @@ function btnExec(event) {
 }
 
 function btnOpen(event) {
-	$('#ccInpOpen').focus().trigger('click') ;
+	Transition[statThis.stat][Event.OPEN]() ;
 }
 function inpOpen(event) {
 	var file = new FileReader() ;
 	file.onload = function (e) {
-		statThis.hold = this.result.replace(/(\r?\n|\r)\s*/g, "") ;
-		Transition[statThis.stat][Event.OPEN]() ;
+		statThis.open = this.result.replace(/(\r?\n|\r)\s*/g, "") ;
+		loadXonomy('#ccXonomy') ;
+		$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
+		statThis.stat = State.OPENED ;
+		StateSetter[statThis.stat]() ;
 	} ;
 	file.readAsText($(this)[0].files[0]) ;
 	/* allow to select same file several times in a row (SO #12030686) */ 
