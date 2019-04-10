@@ -9,10 +9,10 @@ import javax.ws.rs.core.MediaType;
 @Path("/")
 public class ChartaCaeliAPI {
 
-	@Path( "/make" )
+	@Path( "/exec" )
 	@GET @Produces( MediaType.TEXT_PLAIN ) 
 	public String definition() {
-		return( "null" ) ;
+		return( "exec" ) ;
 	}
 
 	// sync:

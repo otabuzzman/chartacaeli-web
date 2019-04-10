@@ -242,6 +242,12 @@ function btnTglP(event) {
 }
 
 function btnExec(event) {
+	var rest = $(this).attr('data-rest-api') ;
+	$.ajax({
+		url: rest
+	}).then(function(data) {
+		console.log(data) ;
+	}) ;
 }
 
 function btnOpen(event) {
@@ -324,8 +330,12 @@ function updateBtnConf(event) {
 	document.getElementById('ccBtnView').href = view ;
 	var info = $('.carousel .active').attr('data-info') ;
 	document.getElementById('ccBtnInfo').href = info ;
+	// enable Load if D8N available...
 	var load = $('.carousel .active').attr('data-load-chart') ;
-	if (load) {
+	// ...AND Composer NOT in state changed
+	var d8n = statD8N.stat === State.CHANGED ;
+	var p9s = statP9S.stat === State.CHANGED ;
+	if (load && !(d8n || p9s)) {
 		$('#ccBtnLoad')	.removeClass('disabled') ;
 	} else {
 		$('#ccBtnLoad')	.addClass('disabled') ;
