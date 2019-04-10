@@ -277,6 +277,7 @@ function btnLoad(event) {
 		dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
 		success: function (data) {
 			chart = data ;
+			statD8N.open = chart ;
 			/* fetch preferences */
 			href = $('.carousel .active').attr('data-load-prefs') ;
 			if (href) {
@@ -285,10 +286,14 @@ function btnLoad(event) {
 					dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
 					success: function (data) {
 						prefs = data ;
+						statP9S.open = prefs ;
+						loadXonomy('#ccXonomy') ;
 					}}) ;
 			} else {
+				loadXonomy('#ccXonomy') ;
 			}
-		}}) ;
+		}
+	}) ;
 }
 
 function smoothScrollToAnchor(event) {
