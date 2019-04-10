@@ -1,4 +1,4 @@
-window.addEventListener('load', function(event) {
+window.addEventListener('load', function (event) {
 	initComposer() ;
 }) ;
 
@@ -172,7 +172,7 @@ var StateSetter = Object.freeze([
 ]) ;
 
 /* register events */
-document.addEventListener('DOMContentLoaded', function(event) {
+document.addEventListener('DOMContentLoaded', function (event) {
 
 	/* addEventListener doesn't work with Bootstrap (SO #24211185) */
 	$('#ccGalleryCarousel').on('slid.bs.carousel', updateBtnConf) ;
@@ -250,10 +250,12 @@ function btnOpen(event) {
 function inpOpen(event) {
 	var file = new FileReader() ;
 	file.onload = function (e) {
-		statThis.hold = e.target.result.replace(/(\r?\n|\r)\s*/g, "") ;
+		statThis.hold = this.result.replace(/(\r?\n|\r)\s*/g, "") ;
 		Transition[statThis.stat][Event.OPEN]() ;
 	} ;
 	file.readAsText($(this)[0].files[0]) ;
+	/* allow to select same file several times in a row (SO #12030686) */ 
+	this.value = null ;
 }
 
 function btnNew(event) {
@@ -272,16 +274,16 @@ function btnLoad(event) {
 	href = $('.carousel .active').attr('data-load-chart') ;
 	$.ajax({url: href,
 		dataType: 'text',
-		dataFilter: function(data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
-		success: function(data) {
+		dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
+		success: function (data) {
 			chart = data ;
 			/* fetch preferences */
 			href = $('.carousel .active').attr('data-load-prefs') ;
 			if (href) {
 				$.ajax({url: href,
 					dataType: 'text',
-					dataFilter: function(data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
-					success: function(data) {
+					dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
+					success: function (data) {
 						prefs = data ;
 					}}) ;
 			} else {
@@ -293,7 +295,7 @@ function smoothScrollToAnchor(event) {
 		if (this.hash !== "") {
 			var hash = this.hash ;
 			event.preventDefault() ;
-			$('html, body').animate({ scrollTop: $(this.hash).offset().top }, 800, function() { window.location.hash = hash ; }) ;
+			$('html, body').animate({scrollTop: $(hash).offset().top}, 800, function () {window.location.hash = hash}) ;
 		}
 }
 
