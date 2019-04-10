@@ -101,7 +101,7 @@ Create `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml` with content `<Contex
   startup.bat
   ```
 
-The REST API implementaion uses the [Jersey](https://jersey.github.io/) RESTful Web Service framework.
+The REST API implementation uses the [Jersey](https://jersey.github.io/) RESTful Web Service framework.
 
 #### Helpful links
 - [CSS reference]( https://www.w3schools.com/cssref/default.asp) on [w3schools.com](https://www.w3schools.com/)
@@ -114,3 +114,5 @@ The REST API implementaion uses the [Jersey](https://jersey.github.io/) RESTful 
 - SO article on an [animated hamburger icon](https://stackoverflow.com/questions/37758887/animated-x-icon-for-bootstrap-toggle) and an [update for Bootstrap 4](http://kylegoslan.co.uk/bootstrap-4-hamburger-menu-animation/)
 - List of [media queries](https://css-tricks.com/snippets/css/media-queries-for-standard-devices/) grouped by device type
 - The [Harel statechart definition](http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf). A handy [variation of the statechart notation](http://dec.bournemouth.ac.uk/staff/kphalp/statecharts.pdf) as proposed by Harel. A [theoretical application example](https://de.slideshare.net/lmatteis/are-statecharts-the-next-big-ui-paradigm) (mind the links on 2nd last slide) and finally [bureaucracy](https://github.com/samroberton/bureaucracy), the practical implementation in Clojure on GitHub (visit links in README.md and especially take a look at [Kevin Lynagh's Sketch.system](https://sketch.systems/tutorials/five-minute-introduction/) implementation).
+- A [hierarchical FSM implementation](https://xstate.js.org/docs/#hierarchical-nested-state-machines) in JavaScript (mind the visualizer)
+- An article on [Consuming a RESTful Web Service with jQuery](https://spring.io/guides/gs/consuming-rest-jquery/)
