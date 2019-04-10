@@ -77,6 +77,7 @@ function aotEmpOpn() {
 	statThis.open = statThis.hold ;
 	statThis.hold = null ;
 	loadXonomy('#ccXonomy') ;
+	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
 	statThis.stat = State.OPENED ;
 	StateSetter[statThis.stat]() ;
 	console.log("Emp/Opn") ;
@@ -89,6 +90,7 @@ function aotEmpChg() {
 function aotOpnNew() {
 	statThis.open = statThis.defdef ;
 	loadXonomy('#ccXonomy') ;
+	$('html, body').animate({scrollTop: $('#ccComposer').offset().top}, 800) ;
 	statThis.stat = State.EMPTY ;
 	StateSetter[statThis.stat]() ;
 	console.log("Opn/New") ;
@@ -97,6 +99,7 @@ function aotOpnOpn() {
 	statThis.open = statThis.hold ;
 	statThis.hold = null ;
 	loadXonomy('#ccXonomy') ;
+	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
 	statThis.stat = State.OPENED ;
 	StateSetter[statThis.stat]() ;
 	console.log("Opn/Opn") ;
@@ -130,6 +133,7 @@ function aotChgChg() {
 function aotWrnNew() {
 	statThis.open = statThis.defdef ;
 	loadXonomy('#ccXonomy') ;
+	$('html, body').animate({scrollTop: $('#ccComposer').offset().top}, 800) ;
 	statThis.stat = State.EMPTY ;
 	StateSetter[statThis.stat]() ;
 	console.log("Wrn/New") ;
@@ -138,6 +142,7 @@ function aotWrnOpn() {
 	statThis.open = statThis.hold ;
 	statThis.hold = null ;
 	loadXonomy('#ccXonomy') ;
+	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
 	statThis.stat = State.OPENED ;
 	StateSetter[statThis.stat]() ;
 	console.log("Wrn/Opn") ;
@@ -220,6 +225,7 @@ function btnTglD(event) {
 	statExch = statP9S ;
 	/* load Composer from toggled state object */
 	loadXonomy('#ccXonomy') ;
+	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
 	StateSetter[statThis.stat]() ;
 }
 
@@ -238,6 +244,7 @@ function btnTglP(event) {
 	statExch = statD8N ;
 	/* load Composer from toggled state object */
 	loadXonomy('#ccXonomy') ;
+	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
 	StateSetter[statThis.stat]() ;
 }
 

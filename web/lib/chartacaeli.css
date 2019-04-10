@@ -41,6 +41,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 .carousel-caption h3 { color: #007bff ; font-weight: 400 ; }
 .info-txt {  }
 .info-img { width: 360px ; }
+#ccGallery .btn-box {  }
 
 /* overview */
 #ccOverview figure { max-width: 768px ; }
@@ -66,6 +67,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 #xonomyBubble.laic #xonomyBubbleContent input.textbox, #xonomyBubble.laic #xonomyBubbleContent .techno { font-size: 1.25rem ; }
 .modal-footer { display: block ; }
 .modal-footer > :not(:first-child) { margin-left: 0 ; }
+#ccComposer .btn-box {  }
 
 /* concepts */
 .pragma-bg-headimg { background-image: url("../starchart.png") ; background-size: contain ; background-repeat: no-repeat ; background-position: left top ; transform: scale(-1, -1) ; min-height: 100vh ; display: flex ; }
