@@ -38,11 +38,14 @@ function loadXonomy(id) {
 	Xonomy.render(statThis.open, xonDiv[0], statThis.Xonomy) ;
 }
 function grabXonomy(id) {
+	var head, data ;
 	var xonDiv = $(id) ;
 	if (xonDiv.css('display') === 'none') {
 		return null ;
 	}
-	return Xonomy.harvest() ;
+	head = statThis.XMLdec ;
+	data = Xonomy.harvest() ;
+	return head+data ;
 }
 
 /* definition and preferences state objects */
@@ -230,9 +233,14 @@ function btnTglP(event) {
 }
 
 function btnExec(event) {
-	var rest = $(this).attr('data-rest-api') ;
-	$.ajax({
-		url: rest
+	var exec, chart, prefs ;
+	statThis.open = grabXonomy() ;
+	chart = statD8N.open ;
+	prefs = statP9S.open ;
+	exec = $(this).attr('data-rest-api') ;
+	$.ajax({url: exec,
+		method: 'POST',
+		data: { chart: chart, prefs, prefs }
 	}).then(function(data) {
 		console.log(data) ;
 	}) ;
@@ -285,9 +293,14 @@ function btnLoad(event) {
 						prefs = data ;
 						statP9S.open = prefs ;
 						loadXonomy('#ccXonomy') ;
+						statP9S.stat = State.OPENED ;
+						statD8N.stat = State.OPENED ;
+						StateSetter[statThis.stat]() ;
 					}}) ;
 			} else {
 				loadXonomy('#ccXonomy') ;
+				statD8N.stat = State.OPENED ;
+				StateSetter[statThis.stat]() ;
 			}
 		}
 	}) ;
