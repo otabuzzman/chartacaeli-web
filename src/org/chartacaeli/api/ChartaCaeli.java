@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-public class ChartaCaeliAPI {
+public class ChartaCaeli {
 
 	@Path( "/exec" ) @POST
 	public Response exec(
@@ -25,5 +25,4 @@ public class ChartaCaeliAPI {
 	// stat, id in query param, return true/ false
 	// take, id in query param, return pdf
 	// wipe, id in query param
-
 }

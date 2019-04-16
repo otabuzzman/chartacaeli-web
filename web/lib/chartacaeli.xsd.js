@@ -14,7 +14,7 @@ minimum occurrences (minOcc) are reached.
 // chart specification object (prototype of statD8N)
 var chartS11N = Object.freeze({
 	// default chart definition
-	defdef: "<ChartaCaeli xmlns='http://www.chartacaeli.eu/model' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.chartacaeli.eu/model chartacaeli.xsd'/>",
+	defdef: "<ChartaCaeli xmlns='http://www.chartacaeli.org/model' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.chartacaeli.org/model https://raw.githubusercontent.com/otabuzzman/chartacaeli/master/chartacaeli.xsd'/>",
 
 	// XML declaration and any further required prolog
 	XMLdec: "<?xml version='1.0' encoding='UTF-8'?>",
