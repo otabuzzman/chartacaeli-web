@@ -59,12 +59,12 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 #ccBtnExec:disabled .ccwf-brandicon::before { color: #007bff ; }
 #ccBtnTglP, .ccBtnTglP, #ccBtnTglD, .ccBtnTglD { width: 100% ; margin-bottom: 5px ; }
 #ccXonomy { padding: 12px 12px 12px 24px ; font-size: 1rem ; word-break: break-all ; }
-.xonomy.laic .element > .tag.opening > .attributes > .attribute > .valueContainer { font-size: 1.25rem ; }
+.xonomy.laic .element > .tag.opening > .attributes > .attribute > .valueContainer { font-size: 1rem ; }
 .xonomy.laic .element > .connector > .plusminus { background-image: url(../xon-minus-primary.svg) ; background-color: #ffffff ; left: -24px }
 .xonomy.laic .element.collapsed > .connector > .plusminus { background-image: url(../xon-plus-primary.svg) ; background-color: #ffffff ; }
-.xonomy.laic .element.collapsed > .childrenCollapsed { font-size: 1.5rem ; color: #007bff ; }
+.xonomy.laic .element.collapsed > .childrenCollapsed { font-size: 1rem ; color: #007bff ; }
 .xonomy.laic .element > .children { padding-left: 22px ; }
-#xonomyBubble.laic #xonomyBubbleContent input.textbox, #xonomyBubble.laic #xonomyBubbleContent .techno { font-size: 1.25rem ; }
+#xonomyBubble.laic #xonomyBubbleContent input.textbox, #xonomyBubble.laic #xonomyBubbleContent .techno { font-size: 1rem ; }
 .modal-footer { display: block ; }
 .modal-footer > :not(:first-child) { margin-left: 0 ; }
 #ccComposer .btn-box {  }
