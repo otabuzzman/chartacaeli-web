@@ -12,7 +12,7 @@ The project depends on the [repository](https://github.com/otabuzzman/chartacael
 - To rebuild the images (for instance to check if the core app works) run:
 
   ```
-  # Windows
+  # Windows (Cygwin)
   export GS_FONTPATH=c:/users/jschuck/src/chartacaeli-web\;c:/users/jschuck/src/chartacaeli
   # Linux
   export GS_FONTPATH=~/lab/chartacaeli-web:~/lab/chartacaeli

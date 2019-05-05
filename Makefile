@@ -3,6 +3,7 @@ libdir = $(docdir)/lib
 labdir = $(docdir)/lab
 # the (W)EB-INF l(ib) folder
 wibdir = $(docdir)/WEB-INF/lib
+clsdir = $(docdir)/WEB-INF/classes
 
 JAXVER = 2.28
 JAXZIP = jaxrs-ri-$(JAXVER).zip
@@ -76,7 +77,7 @@ webdir = ../chartacaeli-web
 	$${GS:-gs} -q -o - -r150 -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
 	magick convert png:- -background "rgb(255,255,255)" -flatten $@
 
-all: lab/$(JAXZIP) $(libdir)/xonomy $(libdir)/Justv2.ttf $(libdir)/Justv22.ttf
+all: lab/$(JAXZIP) $(libdir)/xonomy $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
 
 pdf: $(PDF)
 png: $(PNG)
@@ -104,7 +105,7 @@ clean:
 # local clean
 lclean: clean
 	( for jar in $(JAXJAR) ; do rm -f $(wibdir)/`basename $$jar` ; done )
-	rm -f $(libdir)/Justv2.ttf $(libdir)/Justv22.ttf
+	rm -f $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
 
 # real clean
 rclean: lclean
@@ -123,5 +124,5 @@ $(libdir)/xonomy:
 	(cd $@ ; git checkout 810057e13c671728d236f85579296188e93a9fb3)
 lab/just.zip:
 	wget -P lab -q http://www.iconian.com/fonts/just.zip
-$(libdir)/Justv2.ttf $(libdir)/Justv22.ttf: lab/just.zip
+$(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf: lab/just.zip
 	unzip -qod $(@D) $< $(@F)
