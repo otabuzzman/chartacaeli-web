@@ -807,12 +807,12 @@
 						<BodyStellar turn="0" spin="0">
 							<Annotation>
 								<AnnotationStraight anchor="middleleft" radiant="false" reverse="false">
-									<Script purpose="bodylettering7" value="{rektaszensiongrd}&#x00b0;{rektaszensiongrdmin}' (RA)"/>
+									<Script purpose="bodylettering7" value="{rightascensiondeg}&#x00b0;{rightascensiondegmin}' (RA)"/>
 								</AnnotationStraight>
 							</Annotation>
 							<Annotation>
 								<AnnotationStraight anchor="topleft" radiant="false" reverse="false">
-									<Script purpose="bodylettering7" value="{deklinationgrdneg~&#x0022;true&#x0022;?&#x0022;-&#x0022;:&#x0022;+&#x0022;}{deklinationgrd}&#x00b0;{deklinationgrdmin}' (&#x03b4;)"/>
+									<Script purpose="bodylettering7" value="{declinationdegneg~&#x0022;true&#x0022;?&#x0022;-&#x0022;:&#x0022;+&#x0022;}{declinationdeg}&#x00b0;{declinationdegmin}' (&#x03b4;)"/>
 								</AnnotationStraight>
 							</Annotation>
 							<Annotation>

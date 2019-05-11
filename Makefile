@@ -74,7 +74,7 @@ webdir = ../chartacaeli-web
 	@test -f $(appdir)/$@ && mv $(appdir)/$@ .
 
 .pdf.png:
-	$${GS:-gs} -q -o - -r150 -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
+	$${GS:-gs} -q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
 	magick convert png:- -background "rgb(255,255,255)" -flatten $@
 
 all: lab/$(JAXZIP) $(libdir)/xonomy $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
