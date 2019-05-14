@@ -103,6 +103,48 @@ Create `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml` with content `<Contex
 
 The REST API implementation uses the [Jersey](https://jersey.github.io/) RESTful Web Service framework.
 
+#### REST API design
+|Resource|Methods|URI|Description|
+|--|--|--|--|
+|Charts  |POST|`/api/charts`       ||
+|Status  |GET |`/api/status/{uuid}`||
+|Chart   |GET |`/api/charts/{uuid}/{name}.pdf`||
+
+**HTTP POST /api/charts response**
+```
+HTTP/1.1 202 Accepted
+Content-Type: application/xml;charset=UTF-8
+Location: https://chartacaeli.org/api/status/{uuid}
+
+<chart uuid="{uuid}">
+  <status>accepted</status>
+  <link rel="self" href="/api/status/{uuid}" />
+</chart>
+```
+
+**HTTP GET /api/status/{uuid} *processing* response**
+```
+HTTP/1.1 200 OK
+Content-Type: application/xml;charset=UTF-8
+
+<chart uuid="{uuid}">
+  <status>processing</status>
+  <link rel="self" href="/api/status/{uuid}" />
+</chart>
+```
+
+**HTTP GET /api/status/{uuid} *completed* response**
+```
+HTTP/1.1 303 See Other
+Content-Type: application/xml;charset=UTF-8
+Location: https://chartacaeli.org/api/charts/{uuid}/{name}.pdf
+
+<chart uuid="{uuid}">
+  <status>completed</status>
+  <link rel="self" href="/api/charts/{uuid}/{name}.pdf" />
+</chart>
+```
+
 #### Helpful links
 - [CSS reference]( https://www.w3schools.com/cssref/default.asp) on [w3schools.com](https://www.w3schools.com/)
 - [YT tutorial](https://www.youtube.com/watch?v=emBwAyYBkC4) about a simple modern looking webpage. Actually this video started the project.
@@ -115,7 +157,7 @@ The REST API implementation uses the [Jersey](https://jersey.github.io/) RESTful
 - List of [media queries](https://css-tricks.com/snippets/css/media-queries-for-standard-devices/) grouped by device type
 - The [Harel statechart definition](http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf). A handy [variation of the statechart notation](http://dec.bournemouth.ac.uk/staff/kphalp/statecharts.pdf) as proposed by Harel. A [theoretical application example](https://de.slideshare.net/lmatteis/are-statecharts-the-next-big-ui-paradigm) (mind the links on 2nd last slide) and finally [bureaucracy](https://github.com/samroberton/bureaucracy), the practical implementation in Clojure on GitHub (visit links in README.md and especially take a look at [Kevin Lynagh's Sketch.system](https://sketch.systems/tutorials/five-minute-introduction/) implementation).
 - A [hierarchical FSM implementation](https://xstate.js.org/docs/#hierarchical-nested-state-machines) in JavaScript (mind the visualizer)
-- [SO Answer](https://stackoverflow.com/questions/45625925/what-exactly-is-the-resourceconfig-class-in-jersey-2?answertab=active#tab-top) on how to configure JAX-RS servlet container
-- [The RESTful Cookbook](http://restcookbook.com/) and an article on [Consuming a RESTful Web Service with jQuery](https://spring.io/guides/gs/consuming-rest-jquery/).
-- Article collection on long running asynchronous web applications: [MS article](https://docs.microsoft.com/de-de/azure/architecture/best-practices/api-design#using-the-hateoas-approach-to-enable-navigation-to-related-resources) (German) on REST API design, [SO answer](https://stackoverflow.com/questions/18004527/implement-a-long-running-process-in-a-web-app?answertab=active#tab-top) that states OOTB features of HTTP 1.1 and Servlet 3.0, [case study](https://www.endpoint.com/blog/2011/03/08/jquery-and-long-running-web-app) on long running web apps triggered by Ajax, [Jersey UG chapter](https://jersey.github.io/documentation/latest/async.html) on asynchronous services and clients. Finally, an [implementation example](https://www.adayinthelifeof.nl/2011/06/02/asynchronous-operations-in-rest/) (somewhat outdated).
-- [Considerations on REST and HATEOAS](https://m.heise.de/developer/artikel/Hoechster-Reifegrad-fuer-REST-mit-HATEOAS-3550392.html) (German) and an [implementation example](https://howtodoinjava.com/resteasy/writing-restful-webservices-with-hateoas-using-jax-rs-and-jaxb-in-java/).
+- [SO Answer](https://stackoverflow.com/questions/45625925/what-exactly-is-the-resourceconfig-class-in-jersey-2?answertab=active#tab-top) on various options to configure JAX-RS servlet container
+- Article collection on long running asynchronous web applications: [The RESTful Cookbook](http://restcookbook.com/), the [REST Guidelines](https://www.gcloud.belgium.be/rest/) ressource with a [chapter on long running tasks](https://www.gcloud.belgium.be/rest/#long-running-tasks), an [MS article](https://docs.microsoft.com/de-de/azure/architecture/best-practices/api-design#using-the-hateoas-approach-to-enable-navigation-to-related-resources) (German) on REST API design, [SO answer](https://stackoverflow.com/questions/18004527/implement-a-long-running-process-in-a-web-app?answertab=active#tab-top) that states OOTB features of HTTP 1.1 and Servlet 3.0, [case study](https://www.endpoint.com/blog/2011/03/08/jquery-and-long-running-web-app) on long running web apps triggered by Ajax, [Jersey UG chapter](https://jersey.github.io/documentation/latest/async.html) on asynchronous services and clients.
+- [Considerations on REST and HATEOAS](https://m.heise.de/developer/artikel/Hoechster-Reifegrad-fuer-REST-mit-HATEOAS-3550392.html) (German), [REST API design](https://restfulapi.net/rest-api-design-tutorial-with-example/) and [implementation](https://restfulapi.net/create-rest-apis-with-jax-rs-2-0/) tutorials, HATEOAS [implementation example](https://howtodoinjava.com/resteasy/writing-restful-webservices-with-hateoas-using-jax-rs-and-jaxb-in-java/).
+- [The Swagger Petstore example](https://editor.swagger.io/) and a less sophisticated [OpenAPI primer](https://www.blazemeter.com/blog/create-your-first-openapi-definition-with-swagger-editor) utilizing [Swagger Editor](https://swagger.io/tools/swagger-editor/).
