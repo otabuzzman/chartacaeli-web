@@ -14,7 +14,7 @@ minimum occurrences (minOcc) are reached.
 // chart specification object (prototype of statD8N)
 var chartS11N = Object.freeze({
 	// default chart definition
-	defdef: "<ChartaCaeli xmlns='http://www.chartacaeli.org/model' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.chartacaeli.org/model https://raw.githubusercontent.com/otabuzzman/chartacaeli/master/chartacaeli.xsd'/>",
+	defdef: "<ChartaCaeli name='default' xmlns='http://www.chartacaeli.org/model' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.chartacaeli.org/model https://raw.githubusercontent.com/otabuzzman/chartacaeli/master/chartacaeli.xsd'/>",
 
 	// XML declaration and any further required prolog
 	XMLdec: "<?xml version='1.0' encoding='UTF-8'?>",
@@ -4388,7 +4388,6 @@ var chartS11N = Object.freeze({
 			},
 			"ChartaCaeli": {
 				menu: [{
-					// occurance 0..1
 					caption: "add \@@name",
 					action: Xonomy.newAttribute,
 					actionParameter: {name: "name"},
@@ -4411,11 +4410,7 @@ var chartS11N = Object.freeze({
 				}],
 				attributes: {
 					"name": {
-						asker: Xonomy.askString,
-						menu: [{
-							caption: "delete",
-							action: Xonomy.deleteAttribute
-						}]
+						asker: Xonomy.askString
 					}
 				}
 			}
