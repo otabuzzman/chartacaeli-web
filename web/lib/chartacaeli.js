@@ -240,7 +240,7 @@ function btnExec(event) {
 	exec = $(this).attr('data-rest-api') ;
 	$.ajax({url: exec,
 		method: 'POST',
-		data: { chart: chart, prefs, prefs }
+		data: { chart: chart, prefs: prefs }
 	}).then(function(data) {
 		console.log(data) ;
 	}) ;
