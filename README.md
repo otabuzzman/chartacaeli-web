@@ -108,7 +108,6 @@ The REST API implementation uses the [Jersey](https://jersey.github.io/) RESTful
 |--|--|--|--|
 |Charts  |POST|`/charts`       ||
 |States  |GET |`/states/{id}`||
-|Chart   |GET |`/charts/{id}/{name}.pdf`||
 
 **HTTP POST /charts response**
 ```
