@@ -105,11 +105,13 @@ The REST API implementation uses the [Jersey](https://jersey.github.io/) RESTful
 
 #### REST API design
 **Object model**
+
 |Object|Comment|
 |--|--|
 |Chart||
 
 **Object model URI**
+
 |URI (Resource)|Comment|
 |--|--|
 |`/`           |API entry point|
@@ -117,6 +119,7 @@ The REST API implementation uses the [Jersey](https://jersey.github.io/) RESTful
 |`/charts/{id}`||
 
 **HTTP methods**
+
 |Method|Resource|HATEOAS|Purpose|Comment|
 |--|--|--|--|--|
 |GET |`/`           |self, new|Access API.||
@@ -124,6 +127,7 @@ The REST API implementation uses the [Jersey](https://jersey.github.io/) RESTful
 |GET |`/charts/{id}`|self|Retrieve chart creation state.|Response code 304 while processing, 201 when finished. Representations updated accordingly.|
 
 **Object representations**
+
 |Object|Class|Comment|
 |--|--|--|
 |Chart  |org.chartacaeli.api.Chart  ||
