@@ -1,17 +1,17 @@
 # Charta Caeli web service
-A web frontend to the Charta Caeli star chart creation tool. The web service is basically made up of an UI and a REST API connecting the UI with the Charta Caeli core application. The UI utilizes Bootstrap 4 for responsiveness. Another major component is the [Xonomy XML editor](https://github.com/michmech/xonomy) which provides a way to edit star chart definitions on devices with appropriate display sizes.
+A web frontend to the Charta Caeli star chart creation tool. The web service is basically made up of an UI and a RESTful API connecting the UI with the Charta Caeli core application. The UI utilizes Bootstrap 4 for responsiveness. Another major component is the [Xonomy XML editor](https://github.com/michmech/xonomy) which provides a way to edit star chart definitions on devices with appropriate display sizes.
 
 ### Build
 The project depends on the [repository](https://github.com/otabuzzman/chartacaeli) of the Charta Caeli star chart creation tool (core application). Thus, to setup the web service, one first has to download and build the core app according to instructions given there. Afterwards clone this repository and follow steps listed below. Run clone commands from same folder to make sure top-level directories of core app and web service share the same parent folder.
 - Change directory (bash) to top-level directory of Charta Caeli web service.
 - Run build commands:
-  ```
+  ```bash
   make all
   ```
 
 - To rebuild the images (for instance to check if the core app works) run:
 
-  ```
+  ```bash
   # Windows (Cygwin)
   export GS_FONTPATH=c:/users/jschuck/src/chartacaeli-web\;c:/users/jschuck/src/chartacaeli
   # Linux
@@ -21,7 +21,7 @@ The project depends on the [repository](https://github.com/otabuzzman/chartacael
   make install
   ```
 
-### Notes during development
+### Development notes
 
 #### Xonomy web XML editor
 Install XMLStarlet
@@ -34,7 +34,7 @@ Cues for Cygwin
 - `cd /usr/include ; ln -s libxml2/libxml libxml`
 
 Sample commands to check document specification for missing elements, attributes and patterns.
-```
+```bash
 # elements
 for e in `xml sel -t -v "//xs:element/@name" ../chartacaeli/chartacaeli.xsd | sort -u` ; do \
 	echo -n $e " " ; egrep -c "^\s*\"$e\"" web/lib/chartacaeli.xsd.js ; done |\
@@ -88,33 +88,20 @@ Purposes of links in running text is provision of background information or to g
 |Navigation menu entry|Primary color 10% darkened for `:hover` and 15% for `:active`.|
 |URL in text (inline)|Same as for navigation menu entries. No text decorations.|
 
-#### REST setup
-Installation and configuration of Tomcat performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
+#### RESTful API design
+The RESTful API implementation uses the [Jersey](https://jersey.github.io/) RESTful Web Service framework. The HATEOAS uses links in HTTP headers according to [RFC5988](https://tools.ietf.org/html/rfc5988).
 
-Create `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml` with content `<Context docBase="<appbase>" path="" reloadable="true"/>` and `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web`) to make Charta Caeli default (start on domain URL).
-
-- To start Tomcat on Windows enter these commands in `cmd.exe`:
-
-  ```
-  set "JAVA_HOME=C:\Program Files\Java\jdk1.8.0_151"
-  cd AppData\Local\Apache\apache-tomcat-8.5.37\bin
-  startup.bat
-  ```
-
-The REST API implementation uses the [Jersey](https://jersey.github.io/) RESTful Web Service framework.
-
-#### REST API design
 **Object model**
 
 |Object|Comment|
 |--|--|
 |Chart||
 
-**Object model URI**
+**Object model URIs**
 
 |URI (Resource)|Comment|
 |--|--|
-|`/`           |API entry point|
+|`/`           |The root resource.|
 |`/charts`     ||
 |`/charts/{id}`||
 
@@ -122,16 +109,99 @@ The REST API implementation uses the [Jersey](https://jersey.github.io/) RESTful
 
 |Method|Resource|HATEOAS|Purpose|Comment|
 |--|--|--|--|--|
-|GET |`/`           |self, new|Access API.||
-|POST|`/charts/`    |next|Issue chart creation request.|Response code 202, Location `/charts/{id}`|
-|GET |`/charts/{id}`|self|Retrieve chart creation state.|Response code 304 while processing, 201 when finished. Representations updated accordingly.|
+|GET |`/`           |self, new|Start API session.||
+|POST|`/charts`     |self, next|Issue chart creation request.|Response code 202, Location `/charts/{id}`. Response code 4XX in case of rejected state (e.g. XML schema or DTD violation).|
+|GET |`/charts/{id}`|self, next|Retrieve chart creation state.|Response code 200 until finished state. When finished response code 303, _next_ relation set, Location `/charts/{id}/{name}.pdf` with `{name}` set to value of `/ChartaCaeli/@name`.|
 
 **Object representations**
 
 |Object|Class|Comment|
 |--|--|--|
-|Chart  |org.chartacaeli.api.Chart  ||
-|Message|org.chartacaeli.api.Message|For client information in case of no resource representation needed.|
+|Chart|`org.chartacaeli.api.Chart`||
+
+#### RESTful API setup
+Installation and configuration of Tomcat performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
+
+Create `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml` with content `<Context docBase="<appbase>" path="" reloadable="true"/>` and `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web`) to make Charta Caeli default (start on domain URL).
+
+- To start Tomcat on Windows enter these commands in `cmd.exe`:
+
+  ```bash
+  set "JAVA_HOME=C:\Program Files\Java\jdk1.8.0_151"
+  cd AppData\Local\Apache\apache-tomcat-8.5.37\bin
+  startup.bat
+  ```
+
+#### Database setup
+The configuration provides for the [Hibernate](https://hibernate.org/) ORM implementation twinned with an [H2](http://www.h2database.com/html/main.html) database.
+
+- Change directory (bash) to top-level directory of Charta Caeli RESTful web service.
+- Run commands to initialize database:
+
+  ```bash
+  # initialize database with H2 Shell tool
+  java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Shell \
+	-url jdbc:h2:~/src/chartacaeli-web/ChartDB \
+	-user chartacaeli -password chartaca3li \
+	-sql ""
+
+  # start H2 Server on newly created database
+  java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Server \
+	-tcp \
+	-web
+  ```
+
+- Open H2 Console URL `http://localhost:8082` in browser.
+- Provide parameters on login page and click Connect button.
+
+  |Parameter|Value|
+  |--|--|
+  |Saved Settings|Generic H2 (Server)|
+  |JDBC URL|jdbc:h2:tcp://localhost/~/src/chartacaeli-web/ChartDB|
+  |User Name|chartacaeli|
+  |Password|chartaca3li|
+
+- Run SQL commands in H2 Console to setup database:
+
+  ```sql
+  DROP TABLE IF EXISTS `charts` ;
+
+  CREATE TABLE `charts` (
+  	`id` VARCHAR(36) NOT NULL,
+  	`created` BIGINT NOT NULL,
+  	`modified` BIGINT NOT NULL,
+  	`name` VARCHAR(256) NOT NULL,
+  	`stat` ENUM(
+  		'none',
+  		'received',
+  		'accepted',
+  		'rejected',
+  		'started',
+  		'finished',
+  		'failed',
+  		'cleaned') NOT NULL
+  ) ;
+  ```
+
+- Create some entries and populate database:
+
+  ```bash
+  for s in none received accepted rejected started finished failed cleaned ; do sleep 1 ; \
+		i=`uuidgen` ; c=`date +%s`000 ; m=`date +%s`003 ; echo \
+		"INSERT INTO \`CHARTS\` (\`ID\`, \`CREATED\`, \`MODIFIED\`, \`NAME\`, \`STAT\`) \
+		VALUES ('$i', '$c', '$m', 'scientific-star-chart', '$s') ;" ; done
+  ```
+
+  ```sql
+  INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('fccc5742-9999-40a7-bf50-bbd1f79719d9', '1566126471000', '1566126471003', 'scientific-star-chart', 'none') ;
+  INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('ce98dca2-81e2-4f37-b6bf-6b66ab094aec', '1566126472000', '1566126472003', 'scientific-star-chart', 'received') ;
+  INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('31593fa8-3078-4a59-87f2-f8c4837cb202', '1566126473000', '1566126473003', 'scientific-star-chart', 'accepted') ;
+  INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('39aefc5e-5dbd-41d9-b72b-75b3bbf5c83c', '1566126474000', '1566126474003', 'scientific-star-chart', 'rejected') ;
+  INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('628a8519-0f25-41c7-a711-3cbc78a5393a', '1566126476000', '1566126476003', 'scientific-star-chart', 'started') ;
+  INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('3c03731d-117a-4781-a82d-dd495b4b606d', '1566126477000', '1566126477003', 'scientific-star-chart', 'finished') ;
+  INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('4736b81d-1405-4c9c-8ea5-4f8e1a6869b2', '1566126478000', '1566126478003', 'scientific-star-chart', 'failed') ;
+  INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('2e541e9d-67b3-44d8-9b91-f513704f054a', '1566126479000', '1566126479003', 'scientific-star-chart', 'cleaned') ;
+  ```
 
 #### Helpful links
 - [CSS reference]( https://www.w3schools.com/cssref/default.asp) on [w3schools.com](https://www.w3schools.com/)

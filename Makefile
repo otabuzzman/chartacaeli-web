@@ -5,9 +5,15 @@ labdir = $(docdir)/lab
 wibdir = $(docdir)/WEB-INF/lib
 clsdir = $(docdir)/WEB-INF/classes
 
+H2VER = 1.4.199
+H2ZIP = h2-2019-03-13.zip
+# check in case of H2 update
+H2JAR = \
+h2/bin/h2-$(H2VER).jar
+
 JAXVER = 2.28
 JAXZIP = jaxrs-ri-$(JAXVER).zip
-# check in case of JAXZIP update
+# check in case of Jersey update
 JAXJAR = \
 jaxrs-ri/api/jakarta.ws.rs-api-2.1.5.jar \
 jaxrs-ri/ext/aopalliance-repackaged-2.5.0.jar \
@@ -77,7 +83,7 @@ webdir = ../chartacaeli-web
 	$${GS:-gs} -q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
 	magick convert png:- -background "rgb(255,255,255)" -flatten $@
 
-all: lab/$(JAXZIP) $(libdir)/xonomy $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
+all: lab/$(H2ZIP) lab/$(JAXZIP) $(libdir)/xonomy $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
 
 pdf: $(PDF)
 png: $(PNG)
@@ -104,16 +110,20 @@ clean:
 
 # local clean
 lclean: clean
-	( for jar in $(JAXJAR) ; do rm -f $(wibdir)/`basename $$jar` ; done )
+	( for jar in $(H2JAR) $(JAXJAR) ; do rm -f $(wibdir)/`basename $$jar` ; done )
 	rm -f $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
 
 # real clean
 rclean: lclean
-	rm -f lab/$(JAXZIP)
+	rm -f lab/$(H2ZIP) lab/$(JAXZIP)
 	rm -f lab/just.zip
 	rm -rf $(libdir)/xonomy
 
 tidy: rclean
+
+lab/$(H2ZIP):
+	wget -P $(@D) -q http://www.h2database.com/$(@F)
+	( for jar in $(H2JAR) ; do unzip -joq -d $(wibdir) $@ $$jar || rm -f $@ ; done )
 
 lab/$(JAXZIP):
 	wget -P $(@D) -q http://repo1.maven.org/maven2/org/glassfish/jersey/bundles/jaxrs-ri/$(JAXVER)/$(@F)
