@@ -123,7 +123,7 @@ public class ChartsResource {
 					.entity( creq )
 					.build() ;
 		case Chart.ST_FINISHED:
-			nextURI = uri.getAbsolutePathBuilder().path( creq.getName()+".pdf" ).build() ;
+			nextURI = uri.getBaseUriBuilder().path( "db").path( id ).path( creq.getName()+".pdf" ).build() ;
 			next = Link.fromUri( nextURI ).rel( "next" ).build() ;
 
 			return Response.status( Response.Status.SEE_OTHER )

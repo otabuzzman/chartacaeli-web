@@ -111,7 +111,7 @@ The RESTful API implementation uses the [Jersey](https://jersey.github.io/) REST
 |--|--|--|--|--|
 |GET |`/`           |self, new|Start API session.||
 |POST|`/charts`     |self, next|Issue chart creation request.|Response code 202, Location `/charts/{id}`. Response code 4XX in case of rejected state (e.g. XML schema or DTD violation).|
-|GET |`/charts/{id}`|self, next|Retrieve chart creation state.|Response code 200 until finished state. When finished response code 303, _next_ relation set, Location `/charts/{id}/{name}.pdf` with `{name}` set to value of `/ChartaCaeli/@name`.|
+|GET |`/charts/{id}`|self, next|Retrieve chart creation state.|Response code 200 until finished state. When finished response code 303, _next_ relation set, Location `/db/{id}/{name}.pdf` with `{name}` set to value of `/ChartaCaeli/@name`.|
 
 **Object representations**
 
@@ -140,8 +140,10 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
 
   ```bash
   # initialize database with H2 Shell tool
+  mkdir ~/src/chartacaeli-web/db
+
   java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Shell \
-	-url jdbc:h2:~/src/chartacaeli-web/ChartDB \
+	-url jdbc:h2:~/src/chartacaeli-web/db/ChartDB \
 	-user chartacaeli -password chartaca3li \
 	-sql ""
 
@@ -157,7 +159,7 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
   |Parameter|Value|
   |--|--|
   |Saved Settings|Generic H2 (Server)|
-  |JDBC URL|jdbc:h2:tcp://localhost/~/src/chartacaeli-web/ChartDB|
+  |JDBC URL|jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB|
   |User Name|chartacaeli|
   |Password|chartaca3li|
 
