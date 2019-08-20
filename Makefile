@@ -5,46 +5,6 @@ labdir = $(docdir)/lab
 wibdir = $(docdir)/WEB-INF/lib
 clsdir = $(docdir)/WEB-INF/classes
 
-H2VER = 1.4.199
-H2ZIP = h2-2019-03-13.zip
-# check in case of H2 update
-H2JAR = \
-h2/bin/h2-$(H2VER).jar
-
-JAXVER = 2.28
-JAXZIP = jaxrs-ri-$(JAXVER).zip
-# check in case of Jersey update
-JAXJAR = \
-jaxrs-ri/api/jakarta.ws.rs-api-2.1.5.jar \
-jaxrs-ri/ext/aopalliance-repackaged-2.5.0.jar \
-jaxrs-ri/ext/hk2-api-2.5.0.jar \
-jaxrs-ri/ext/hk2-locator-2.5.0.jar \
-jaxrs-ri/ext/hk2-utils-2.5.0.jar \
-jaxrs-ri/ext/jakarta.activation-api-1.2.1.jar \
-jaxrs-ri/ext/jakarta.annotation-api-1.3.4.jar \
-jaxrs-ri/ext/jakarta.inject-2.5.0.jar \
-jaxrs-ri/ext/jakarta.json-1.1.5.jar \
-jaxrs-ri/ext/jakarta.json-api-1.1.5.jar \
-jaxrs-ri/ext/jakarta.json.bind-api-1.0.1.jar \
-jaxrs-ri/ext/jakarta.persistence-api-2.2.2.jar \
-jaxrs-ri/ext/jakarta.servlet-api-4.0.2.jar \
-jaxrs-ri/ext/jakarta.ws.rs-api-2.1.5-sources.jar \
-jaxrs-ri/ext/jakarta.xml.bind-api-2.3.2.jar \
-jaxrs-ri/ext/javassist-3.22.0-GA.jar \
-jaxrs-ri/ext/org.osgi.core-4.2.0.jar \
-jaxrs-ri/ext/osgi-resource-locator-1.0.1.jar \
-jaxrs-ri/ext/validation-api-2.0.1.Final.jar \
-jaxrs-ri/ext/yasson-1.0.3.jar \
-jaxrs-ri/lib/jersey-client.jar \
-jaxrs-ri/lib/jersey-common.jar \
-jaxrs-ri/lib/jersey-container-servlet-core.jar \
-jaxrs-ri/lib/jersey-container-servlet.jar \
-jaxrs-ri/lib/jersey-hk2.jar \
-jaxrs-ri/lib/jersey-media-jaxb.jar \
-jaxrs-ri/lib/jersey-media-json-binding.jar \
-jaxrs-ri/lib/jersey-media-sse.jar \
-jaxrs-ri/lib/jersey-server.jar \
-
 PDF = general-features-selection.pdf \
 	scientific-star-chart.pdf \
 	artistic-star-chart.pdf \
@@ -83,7 +43,7 @@ webdir = ../chartacaeli-web
 	$${GS:-gs} -q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
 	magick convert png:- -background "rgb(255,255,255)" -flatten $@
 
-all: lab/$(H2ZIP) lab/$(JAXZIP) $(libdir)/xonomy $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
+all: $(libdir)/xonomy $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
 
 pdf: $(PDF)
 png: $(PNG)
@@ -110,24 +70,14 @@ clean:
 
 # local clean
 lclean: clean
-	( for jar in $(H2JAR) $(JAXJAR) ; do rm -f $(wibdir)/`basename $$jar` ; done )
 	rm -f $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
 
 # real clean
 rclean: lclean
-	rm -f lab/$(H2ZIP) lab/$(JAXZIP)
 	rm -f lab/just.zip
 	rm -rf $(libdir)/xonomy
 
 tidy: rclean
-
-lab/$(H2ZIP):
-	wget -P $(@D) -q http://www.h2database.com/$(@F)
-	( for jar in $(H2JAR) ; do unzip -joq -d $(wibdir) $@ $$jar || rm -f $@ ; done )
-
-lab/$(JAXZIP):
-	wget -P $(@D) -q http://repo1.maven.org/maven2/org/glassfish/jersey/bundles/jaxrs-ri/$(JAXVER)/$(@F)
-	( for jar in $(JAXJAR) ; do unzip -joq -d $(wibdir) $@ $$jar || rm -f $@ ; done )
 
 $(libdir)/xonomy:
 	(cd $(libdir) ; git clone https://github.com/michmech/xonomy.git)

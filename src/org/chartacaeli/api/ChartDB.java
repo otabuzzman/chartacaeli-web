@@ -13,10 +13,14 @@ public class ChartDB implements DAO<Chart> {
 		Optional<Chart> chart ;
 
 		em = ServletContextListener.createEntityManager() ;
-		chart = Optional.ofNullable( em
-				.createNamedQuery( "Chart.findById", Chart.class )
-				.setParameter( "id", id )
-				.getSingleResult() ) ;
+		try {
+			chart = Optional.ofNullable( em
+					.createNamedQuery( "Chart.findById", Chart.class )
+					.setParameter( "id", id )
+					.getSingleResult() ) ;
+		} catch ( Exception e ) {
+			chart = Optional.ofNullable( null ) ;
+		}
 		em.close() ;
 
 		return chart ;

@@ -12,8 +12,11 @@
 /ccGallery_scientific-star-chart.png
 /general-features-selection.pdf
 /general-features-selection.png
+/maven-archiver/
+/maven-status/
 /scientific-star-chart.pdf
 /scientific-star-chart.png
+/web/WEB-INF/classes/
 *.class
 *.jar
 *.ttf
