@@ -3,10 +3,13 @@ package org.chartacaeli.api;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -16,22 +19,35 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 @Path( "/charts" )
 public class ChartsResource {
 
+	// message key (MK_)
+	private final static String MK_EEXCEPT = "eexcept" ;
+	private final static String MK_EVALXML = "evalxml" ;
+	private final static String MK_ED8NNAM = "ed8nnam" ;
+
 	@Context
 	private UriInfo uri ;
+
+	@Context
+	private ServletContext context ;
 
 	private ChartDB chartDB = new ChartDB() ;
 
@@ -43,21 +59,24 @@ public class ChartsResource {
 		String cnam ;
 		Link self, next ;
 		URI nextURI ;
+		CompositeResult result ;
 
 		creq = new Chart() ;
 		creq.setId( UUID.randomUUID().toString() ) ;
 		creq.setCreated( System.currentTimeMillis() ) ;
 		creq.setStatNum( Chart.ST_RECEIVED ) ;
 
-		if ( validateD8N( chart, creq ) == false ) {
+		if ( ! ( result = validateD8N( chart, creq ) ).ok() ) {
 			creq.setStatNum( Chart.ST_REJECTED ) ;
+			creq.setInfo( MessageCatalog.getMessage( this, MK_EVALXML, new Object[] { "chart definition", result.message() } ) ) ;
 
 			return Response.status( Response.Status.BAD_REQUEST )
 					.entity( creq )
 					.build() ;
 		}
-		if ( validateP9S( prefs, creq ) == false ) {
+		if ( ! ( result = validateP9S( prefs, creq ) ).ok() ) {
 			creq.setStatNum( Chart.ST_REJECTED ) ;
+			creq.setInfo( MessageCatalog.getMessage( this, MK_EVALXML, new Object[] { "chart preferences", result.message() } ) ) ;
 
 			return Response.status( Response.Status.BAD_REQUEST )
 					.entity( creq )
@@ -67,7 +86,7 @@ public class ChartsResource {
 		try {
 			cnam = getChartName( chart ) ;
 		} catch ( Exception e ) {
-			creq.setInfo( e.getMessage() ) ;
+			creq.setInfo( MessageCatalog.getMessage( this, MK_ED8NNAM, new Object[] { e.toString() } ) ) ;
 
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 					.entity( creq )
@@ -155,21 +174,81 @@ public class ChartsResource {
 		} catch ( ParserConfigurationException
 				| SAXException | IOException
 				| XPathExpressionException e ) {
-			throw new Exception( e.getMessage() ) ;
+			throw new Exception( MessageCatalog.getMessage( this, MK_EEXCEPT, new Object[] { e.toString() } ) ) ;
 		}
 
 		return name ;
 	}
 
-	private boolean validateD8N( final String chart, final Chart creq ) {
-		return true ;
+	private CompositeResult validateD8N( final String chart, final Chart creq ) {
+		CompositeResult valid ;
+
+		valid = validateXML( chart, false ) ;
+
+		return valid ;
 	}
 
-	private boolean validateP9S( final String prefs, final Chart creq ) {
+	private CompositeResult validateP9S( final String prefs, final Chart creq ) {
+		CompositeResult valid ;
 
-		if ( prefs == null )
-			return true ;
+		if ( prefs == null || prefs.isEmpty() )
+			return new SuccessResult() ;
 
-		return true ;
+		valid = validateXML( prefs, true ) ;
+
+		return valid ;
+	}
+
+	private CompositeResult validateXML( final String xml, boolean parseAgainstDTD ) {
+		DocumentBuilderFactory dactory ;
+		DocumentBuilder builder ;
+		SchemaFactory sactory ;
+		Schema xsd ;
+		URL url ;
+
+		dactory = DocumentBuilderFactory.newInstance() ;
+		if ( parseAgainstDTD )
+			dactory.setValidating( true ) ;
+		else {
+			dactory.setValidating( false ) ;
+			dactory.setNamespaceAware( true ) ;
+			sactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI ) ;
+
+			try {
+				url = new URL( context.getInitParameter( "schemaLocation" ) ) ;
+				xsd = sactory.newSchema( url ) ;
+				dactory.setSchema( xsd ) ;
+			} catch ( MalformedURLException
+					| SAXException e ) {
+				return new FailureResult( MessageCatalog.getMessage( this, MK_EEXCEPT, new Object[] { e.toString() } ) ) ;
+			}
+		}
+
+		try {
+			builder = dactory.newDocumentBuilder() ;
+			builder.setErrorHandler( new ErrorHandler() {
+
+				@Override
+				public void warning( SAXParseException e ) throws SAXException {
+					throw new SAXException( e ) ;
+				}
+
+				@Override
+				public void fatalError( SAXParseException e ) throws SAXException {
+					throw new SAXException( e ) ;
+				}
+
+				@Override
+				public void error( SAXParseException e ) throws SAXException {
+					throw new SAXException( e ) ;
+				}
+			} ) ;
+			builder.parse( new InputSource( new StringReader( xml ) ) ) ;
+		} catch ( ParserConfigurationException
+				| SAXException | IOException e ) {
+			return new FailureResult( MessageCatalog.getMessage( this, MK_EEXCEPT, new Object[] { e.toString() } ) ) ;
+		}
+
+		return new SuccessResult() ;
 	}
 }

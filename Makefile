@@ -43,7 +43,7 @@ webdir = ../chartacaeli-web
 	$${GS:-gs} -q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
 	magick convert png:- -background "rgb(255,255,255)" -flatten $@
 
-all: $(libdir)/xonomy $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
+all: $(libdir)/xonomy $(libdir)/Justv2.ttf $(libdir)/Justv22.ttf
 
 pdf: $(PDF)
 png: $(PNG)
@@ -70,7 +70,7 @@ clean:
 
 # local clean
 lclean: clean
-	rm -f $(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf
+	rm -f $(libdir)/Justv2.ttf $(libdir)/Justv22.ttf
 
 # real clean
 rclean: lclean
@@ -84,5 +84,5 @@ $(libdir)/xonomy:
 	(cd $@ ; git checkout 810057e13c671728d236f85579296188e93a9fb3)
 lab/just.zip:
 	wget -P lab -q http://www.iconian.com/fonts/just.zip
-$(wibdir)/Justv2.ttf $(wibdir)/Justv22.ttf: lab/just.zip
+$(libdir)/Justv2.ttf $(libdir)/Justv22.ttf: lab/just.zip
 	unzip -qod $(@D) $< $(@F)
