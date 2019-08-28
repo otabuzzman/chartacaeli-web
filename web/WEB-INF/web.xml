@@ -2,8 +2,12 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
 	<display-name>Charta Caeli RESTful Web Service API</display-name>
 	<context-param>
-		<param-name>schemaLocation</param-name>
+		<param-name>org.chartacaeli.api.ChartsResource.schemaLocation</param-name>
 		<param-value>https://raw.githubusercontent.com/otabuzzman/chartacaeli/master/chartacaeli.xsd</param-value>
+	</context-param>
+	<context-param>
+		<param-name>org.chartacaeli.api.ChartsResource.outputPath</param-name>
+		<param-value>~/src/chartacaeli-web/db</param-value>
 	</context-param>
 	<resource-ref>
 		<res-ref-name>jdbc/ChartDB</res-ref-name>

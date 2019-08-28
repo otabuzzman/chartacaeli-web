@@ -7,6 +7,23 @@
 	"item": [
 		{
 			"name": "root resource",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9168b5b0-e81e-4eb3-b8f0-d3219cc71314",
+						"exec": [
+							"pm.test( \"CC API entry point\", function () {\r",
+							"    pm.response.to.have.status( 200 ) ;\r",
+							"    pm.response.to.have.header( \"Link\" ) ;\r",
+							"    pm.response.to.have.body( \"Charta Caeli RESTful Web Service API\" ) ;\r",
+							"} ) ;\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -160,28 +177,6 @@
 			"response": []
 		},
 		{
-			"name": "chart with STAT accepted",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:4711/chartacaeli-web/api/charts/31593fa8-3078-4a59-87f2-f8c4837cb202",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4711",
-					"path": [
-						"chartacaeli-web",
-						"api",
-						"charts",
-						"31593fa8-3078-4a59-87f2-f8c4837cb202"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "chart with STAT rejected",
 			"request": {
 				"method": "GET",
@@ -198,6 +193,28 @@
 						"api",
 						"charts",
 						"39aefc5e-5dbd-41d9-b72b-75b3bbf5c83c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "chart with STAT accepted",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4711/chartacaeli-web/api/charts/31593fa8-3078-4a59-87f2-f8c4837cb202",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4711",
+					"path": [
+						"chartacaeli-web",
+						"api",
+						"charts",
+						"31593fa8-3078-4a59-87f2-f8c4837cb202"
 					]
 				}
 			},

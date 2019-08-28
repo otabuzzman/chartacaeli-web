@@ -111,7 +111,7 @@ The RESTful API implementation uses the [Jersey](https://jersey.github.io/) REST
 |--|--|--|--|--|
 |GET |`/`           |self, new|Start API session.||
 |POST|`/charts`     |self, next|Issue chart creation request.|Response code 202, Location `/charts/{id}`. Response code 4XX in case of rejected state (e.g. XML schema or DTD violation).|
-|GET |`/charts/{id}`|self, next|Retrieve chart creation state.|Response code 200 until finished state. When finished response code 303, _next_ relation set, Location `/db/{id}/{name}.pdf` with `{name}` set to value of `/ChartaCaeli/@name`.|
+|GET |`/charts/{id}`|self, next, related|Retrieve chart creation state.|Response code 200 until finished state. When finished response code 303, _next_ relation set, Location `/db/{id}/{name}.pdf` with `{name}` set to value of `/ChartaCaeli/@name`. In case of failed state _related_ relations set to point at log files of application and PDF converter.|
 
 **Object representations**
 
