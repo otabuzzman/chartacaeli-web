@@ -5,10 +5,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,21 +23,13 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 @Path( "/charts" )
 public class ChartsResource {
@@ -225,7 +215,7 @@ public class ChartsResource {
 			return new FailureResult( MessageCatalog.getMessage( this, MK_ED8NINV, null ) ) ;
 
 		try {
-			cdef = validateXML( chart, false ) ;
+			cdef = new D8NParser( context.getInitParameter( this.getClass().getName()+CF_XSDLOC ) ).parse( chart ) ;
 
 			xpath = XPathFactory.newInstance().newXPath() ;
 			name = xpath.evaluate( "/*[local-name() = 'ChartaCaeli']/@name", cdef ) ;
@@ -251,7 +241,7 @@ public class ChartsResource {
 			return new SuccessResult() ;
 
 		try {
-			validateXML( prefs, true ) ;
+			new P9SParser().parse( prefs ) ;
 		} catch ( SAXException
 				| MalformedURLException e ) {
 			log.info( e.getMessage() ) ;
@@ -265,51 +255,6 @@ public class ChartsResource {
 		}
 
 		return new SuccessResult() ;
-	}
-
-	private Document validateXML( final String xml, boolean parseAgainstDTD ) throws SAXException, ParserConfigurationException, IOException {
-		DocumentBuilderFactory dactory ;
-		DocumentBuilder builder ;
-		SchemaFactory sactory ;
-		Schema xsd ;
-		URL url ;
-		String xsdloc ;
-
-		xsdloc = context.getInitParameter( this.getClass().getName()+CF_XSDLOC ) ;
-
-		dactory = DocumentBuilderFactory.newInstance() ;
-		if ( parseAgainstDTD )
-			dactory.setValidating( true ) ;
-		else { // parseAgainstXSD
-			dactory.setValidating( false ) ;
-			dactory.setNamespaceAware( true ) ;
-			sactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI ) ;
-
-			url = new URL( xsdloc ) ;
-			xsd = sactory.newSchema( url ) ;
-			dactory.setSchema( xsd ) ;
-		}
-
-		builder = dactory.newDocumentBuilder() ;
-		builder.setErrorHandler( new ErrorHandler() {
-
-			@Override
-			public void warning( SAXParseException e ) throws SAXException {
-				throw new SAXException( e ) ;
-			}
-
-			@Override
-			public void fatalError( SAXParseException e ) throws SAXException {
-				throw new SAXException( e ) ;
-			}
-
-			@Override
-			public void error( SAXParseException e ) throws SAXException {
-				throw new SAXException( e ) ;
-			}
-		} ) ;
-
-		return builder.parse( new InputSource( new StringReader( xml ) ) ) ;
 	}
 
 	private static void createDbFile( String filename, String data, boolean mkdirs ) throws IOException {
