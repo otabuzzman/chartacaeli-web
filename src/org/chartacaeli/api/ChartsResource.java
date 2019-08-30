@@ -23,6 +23,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -54,19 +55,30 @@ public class ChartsResource {
 	@Context
 	private ServletContext context ;
 
+	// web.xml
+	private final String CF_XSDLOC = ".schemaLocation" ;
+	private final String CF_OUTDIR = ".outputPath" ;
+
 	private ChartDB chartDB = new ChartDB() ;
 
 	private Logger log = Logger.getLogger( ChartsResource.class.getName() ) ;
+
+	public ChartsResource() {
+	}
 
 	@POST
 	public Response charts(
 			@FormParam( "chart")  String chart,
 			@FormParam( "prefs" ) String prefs ) {
 		Chart creq ;
-		String outdir, reqdir ;
 		Link self, next ;
 		URI nextURI ;
 		CompositeResult result ;
+		String outdir ;
+
+		outdir = context.getInitParameter( this.getClass().getName()+CF_OUTDIR ) ;
+		if ( outdir.charAt( 0 ) == '~' )
+			outdir = System.getProperty( "user.home" )+outdir.substring( 1 ) ;
 
 		creq = new Chart() ;
 		creq.setId( UUID.randomUUID().toString() ) ;
@@ -92,14 +104,9 @@ public class ChartsResource {
 					.build() ;
 		}
 
-		outdir = context.getInitParameter( this.getClass().getName()+".outputPath" ) ;
-		if ( outdir.charAt( 0 ) == '~' )
-			outdir = System.getProperty( "user.home" )+outdir.substring( 1 ) ;
-		reqdir = outdir+"/"+creq.getId() ;
-
 		try {
-			createDbFile( reqdir+"/"+creq.getName()+".xml", chart, true ) ;
-			createDbFile( reqdir+"/"+creq.getName()+".preferences", prefs, false ) ;
+			createDbFile( outdir+"/"+creq.getId()+"/"+creq.getName()+".xml", chart, true ) ;
+			createDbFile( outdir+"/"+creq.getId()+"/"+creq.getName()+".preferences", prefs, false ) ;
 		} catch ( IOException e ) {
 			log.info( e.getMessage() ) ;
 
@@ -136,6 +143,14 @@ public class ChartsResource {
 		Chart creq ;
 		Link self, next, applog, pdferr ;
 		URI nextURI, applogURI, pdferrURI ;
+		String filename ;
+		File file ;
+		ResponseBuilder builder ;
+		String outdir ;
+
+		outdir = context.getInitParameter( this.getClass().getName()+CF_OUTDIR ) ;
+		if ( outdir.charAt( 0 ) == '~' )
+			outdir = System.getProperty( "user.home" )+outdir.substring( 1 ) ;
 
 		qres = chartDB.findById( id ) ;
 
@@ -156,26 +171,43 @@ public class ChartsResource {
 					.entity( creq )
 					.build() ;
 		case Chart.ST_FINISHED:
-			nextURI = uri.getBaseUriBuilder().path( "db" ).path( id ).path( creq.getName()+".pdf" ).build() ;
+			nextURI = uri.getBaseUriBuilder().path( id ).path( creq.getName()+".pdf" ).build() ;
 			next = Link.fromUri( nextURI ).rel( "next" ).build() ;
-			applogURI = uri.getBaseUriBuilder().path( "db" ).path( id ).path( creq.getName()+".log" ).build() ;
+			applogURI = uri.getBaseUriBuilder().path( id ).path( creq.getName()+".log" ).build() ;
 			applog = Link.fromUri( applogURI ).rel( "related" ).build() ;
 
-			return Response.status( Response.Status.SEE_OTHER )
+			builder = Response.status( Response.Status.SEE_OTHER )
 					.location( nextURI )
-					.links( self, next, applog )
-					.entity( creq )
-					.build() ;
+					.links( self, next )
+					.entity( creq ) ;
+
+			filename = outdir+"/"+id+"/"+creq.getName()+".log" ;
+			file = new File( filename ) ;
+			if ( file.isFile() && file.length()>0 )
+				builder.links( applog ) ;
+
+			return builder.build() ;
 		case Chart.ST_FAILED:
-			applogURI = uri.getBaseUriBuilder().path( "db" ).path( id ).path( creq.getName()+".log" ).build() ;
+			applogURI = uri.getBaseUriBuilder().path( id ).path( creq.getName()+".log" ).build() ;
 			applog = Link.fromUri( applogURI ).rel( "related" ).build() ;
-			pdferrURI = uri.getBaseUriBuilder().path( "db" ).path( id ).path( creq.getName()+".err" ).build() ;
+			pdferrURI = uri.getBaseUriBuilder().path( id ).path( creq.getName()+".err" ).build() ;
 			pdferr = Link.fromUri( pdferrURI ).rel( "related" ).build() ;
 
-			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
-					.links( self, applog, pdferr )
-					.entity( creq )
-					.build() ;
+			builder = Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+					.links( self )
+					.entity( creq ) ;
+
+			filename = outdir+"/"+id+"/"+creq.getName()+".log" ;
+			file = new File( filename ) ;
+			if ( file.isFile() && file.length()>0 )
+				builder.links( applog ) ;
+
+			filename = outdir+"/"+id+"/"+creq.getName()+".err" ;
+			file = new File( filename ) ;
+			if ( file.isFile() && file.length()>0 )
+				builder.links( pdferr ) ;
+
+			return builder.build() ;
 		case Chart.ST_RECEIVED:
 		case Chart.ST_REJECTED:
 		default:
@@ -241,6 +273,9 @@ public class ChartsResource {
 		SchemaFactory sactory ;
 		Schema xsd ;
 		URL url ;
+		String xsdloc ;
+
+		xsdloc = context.getInitParameter( this.getClass().getName()+CF_XSDLOC ) ;
 
 		dactory = DocumentBuilderFactory.newInstance() ;
 		if ( parseAgainstDTD )
@@ -250,7 +285,7 @@ public class ChartsResource {
 			dactory.setNamespaceAware( true ) ;
 			sactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI ) ;
 
-			url = new URL( context.getInitParameter( this.getClass().getName()+".schemaLocation" ) ) ;
+			url = new URL( xsdloc ) ;
 			xsd = sactory.newSchema( url ) ;
 			dactory.setSchema( xsd ) ;
 		}
