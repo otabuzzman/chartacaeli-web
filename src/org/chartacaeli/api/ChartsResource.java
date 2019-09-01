@@ -46,7 +46,6 @@ public class ChartsResource {
 	private ServletContext context ;
 
 	// web.xml
-	private final String CF_XSDLOC = ".schemaLocation" ;
 	private final String CF_OUTDIR = ".outputPath" ;
 
 	private ChartDB chartDB = new ChartDB() ;
@@ -64,22 +63,28 @@ public class ChartsResource {
 		Link self, next ;
 		URI nextURI ;
 		CompositeResult result ;
-		String outdir ;
 
-		outdir = context.getInitParameter( this.getClass().getName()+CF_OUTDIR ) ;
-		if ( outdir.charAt( 0 ) == '~' )
-			outdir = System.getProperty( "user.home" )+outdir.substring( 1 ) ;
+		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
 
 		creq = new Chart() ;
 		creq.setId( UUID.randomUUID().toString() ) ;
 		creq.setCreated( System.currentTimeMillis() ) ;
 		creq.setStatNum( Chart.ST_RECEIVED ) ;
 
+		if ( chart == null ) {
+			creq.setInfo( MessageCatalog.getMessage( this, MK_ED8NINV, null ) ) ;
+			return Response.status( Response.Status.BAD_REQUEST )
+					.links( self )
+					.entity( creq )
+					.build() ;
+		}
+
 		if ( ! ( result = validateD8N( chart ) ).ok() ) {
 			creq.setStatNum( Chart.ST_REJECTED ) ;
 			creq.setInfo( result.message() ) ;
 
 			return Response.status( result.getRC() )
+					.links( self )
 					.entity( creq )
 					.build() ;
 		} else
@@ -90,20 +95,23 @@ public class ChartsResource {
 			creq.setInfo( result.message() ) ;
 
 			return Response.status( result.getRC() )
+					.links( self )
 					.entity( creq )
 					.build() ;
 		}
 
 		try {
-			createDbFile( outdir+"/"+creq.getId()+"/"+creq.getName()+".xml", chart, true ) ;
-			createDbFile( outdir+"/"+creq.getId()+"/"+creq.getName()+".preferences", prefs, false ) ;
-		} catch ( IOException e ) {
+			createFile( getD8NFilename( creq ), chart ) ;
+			createFile( getP9SFilename( creq ), prefs ) ;
+		} catch ( NullPointerException
+				| IOException e ) {
 			log.info( e.getMessage() ) ;
 
 			creq.setStatNum( Chart.ST_REJECTED ) ;
 			creq.setInfo( MessageCatalog.getMessage( this, MK_EREQINI, null ) ) ;
 
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+					.links( self )
 					.entity( creq )
 					.build() ;
 		}
@@ -112,8 +120,6 @@ public class ChartsResource {
 		creq.setModified( System.currentTimeMillis() ) ;
 
 		chartDB.insert( creq ) ;
-
-		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
 
 		nextURI = uri.getAbsolutePathBuilder().path( creq.getId() ).build() ;
 		next = Link.fromUri( nextURI ).rel( "next" ).build() ;
@@ -131,16 +137,9 @@ public class ChartsResource {
 			@PathParam( value = "id" ) String id ) {
 		Optional<Chart> qres ;
 		Chart creq ;
-		Link self, next, applog, pdferr ;
-		URI nextURI, applogURI, pdferrURI ;
-		String filename ;
-		File file ;
-		ResponseBuilder builder ;
-		String outdir ;
-
-		outdir = context.getInitParameter( this.getClass().getName()+CF_OUTDIR ) ;
-		if ( outdir.charAt( 0 ) == '~' )
-			outdir = System.getProperty( "user.home" )+outdir.substring( 1 ) ;
+		Link self, next, log, err ;
+		URI nextURI, logURI, errURI ;
+		ResponseBuilder resbldr ;
 
 		qres = chartDB.findById( id ) ;
 
@@ -161,43 +160,43 @@ public class ChartsResource {
 					.entity( creq )
 					.build() ;
 		case Chart.ST_FINISHED:
-			nextURI = uri.getBaseUriBuilder().path( id ).path( creq.getName()+".pdf" ).build() ;
+			nextURI = uri.getBaseUriBuilder().path( creq.getPath()+".pdf" ).build() ;
 			next = Link.fromUri( nextURI ).rel( "next" ).build() ;
-			applogURI = uri.getBaseUriBuilder().path( id ).path( creq.getName()+".log" ).build() ;
-			applog = Link.fromUri( applogURI ).rel( "related" ).build() ;
+			logURI = uri.getBaseUriBuilder().path( creq.getPath()+".log" ).build() ;
+			log = Link.fromUri( logURI ).rel( "related" ).build() ;
 
-			builder = Response.status( Response.Status.SEE_OTHER )
+			if ( ! probeFile( getPDFFilename( creq ) ) )
+				return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+						.links( self )
+						.entity( creq )
+						.build();
+
+			resbldr = Response.status( Response.Status.SEE_OTHER )
 					.location( nextURI )
 					.links( self, next )
 					.entity( creq ) ;
 
-			filename = outdir+"/"+id+"/"+creq.getName()+".log" ;
-			file = new File( filename ) ;
-			if ( file.isFile() && file.length()>0 )
-				builder.links( applog ) ;
+			if ( probeFile( getLogFilename( creq ) ) )
+				resbldr.links( log ) ;
 
-			return builder.build() ;
+			return resbldr.build() ;
 		case Chart.ST_FAILED:
-			applogURI = uri.getBaseUriBuilder().path( id ).path( creq.getName()+".log" ).build() ;
-			applog = Link.fromUri( applogURI ).rel( "related" ).build() ;
-			pdferrURI = uri.getBaseUriBuilder().path( id ).path( creq.getName()+".err" ).build() ;
-			pdferr = Link.fromUri( pdferrURI ).rel( "related" ).build() ;
+			logURI = uri.getBaseUriBuilder().path( creq.getPath()+".log" ).build() ;
+			log = Link.fromUri( logURI ).rel( "related" ).build() ;
+			errURI = uri.getBaseUriBuilder().path( creq.getPath()+".err" ).build() ;
+			err = Link.fromUri( errURI ).rel( "related" ).build() ;
 
-			builder = Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+			resbldr = Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 					.links( self )
 					.entity( creq ) ;
 
-			filename = outdir+"/"+id+"/"+creq.getName()+".log" ;
-			file = new File( filename ) ;
-			if ( file.isFile() && file.length()>0 )
-				builder.links( applog ) ;
+			if ( probeFile( getLogFilename( creq ) ) )
+				resbldr.links( log ) ;
 
-			filename = outdir+"/"+id+"/"+creq.getName()+".err" ;
-			file = new File( filename ) ;
-			if ( file.isFile() && file.length()>0 )
-				builder.links( pdferr ) ;
+			if ( probeFile( getErrFilename( creq ) ) )
+				resbldr.links( err ) ;
 
-			return builder.build() ;
+			return resbldr.build() ;
 		case Chart.ST_RECEIVED:
 		case Chart.ST_REJECTED:
 		default:
@@ -215,12 +214,13 @@ public class ChartsResource {
 			return new FailureResult( MessageCatalog.getMessage( this, MK_ED8NINV, null ) ) ;
 
 		try {
-			cdef = new D8NParser( context.getInitParameter( this.getClass().getName()+CF_XSDLOC ) ).parse( chart ) ;
+			cdef = new D8NParser( context ).parse( chart ) ;
 
 			xpath = XPathFactory.newInstance().newXPath() ;
 			name = xpath.evaluate( "/*[local-name() = 'ChartaCaeli']/@name", cdef ) ;
 
-		} catch ( SAXException e ) {
+		} catch ( MalformedURLException
+				| SAXException e ) {
 			log.info( e.getMessage() ) ;
 
 			return new FailureResult( Response.Status.BAD_REQUEST, MessageCatalog.getMessage( this, MK_ED8NINV, null ) ) ;
@@ -241,7 +241,7 @@ public class ChartsResource {
 			return new SuccessResult() ;
 
 		try {
-			new P9SParser().parse( prefs ) ;
+			new P9SParser( context ).parse( prefs ) ;
 		} catch ( SAXException
 				| MalformedURLException e ) {
 			log.info( e.getMessage() ) ;
@@ -257,23 +257,76 @@ public class ChartsResource {
 		return new SuccessResult() ;
 	}
 
-	private static void createDbFile( String filename, String data, boolean mkdirs ) throws IOException {
-		File file ;
-		FileOutputStream fos ;
-		OutputStreamWriter osw ;
+	private String getD8NFilename( final Chart creq ) {
+		return getOutputPath()
+				+creq.getPath()
+				+".xml" ;
+	}
 
-		if ( data == null )
-			return ;
+	private String getP9SFilename( final Chart creq ) {
+		return getOutputPath()
+				+creq.getPath()
+				+".preferences" ;
+	}
+
+	private String getPDFFilename( final Chart creq ) {
+		return getOutputPath()
+				+creq.getPath()
+				+".pdf" ;
+	}
+
+	private String getLogFilename( final Chart creq ) {
+		return getOutputPath()
+				+creq.getPath()
+				+".log" ;
+	}
+
+	private String getErrFilename( final Chart creq ) {
+		return getOutputPath()
+				+creq.getPath()
+				+".err" ;
+	}
+
+	private void createFile( final String filename, final String data ) throws IOException {
+		File file, path ;
+		FileOutputStream stream ;
+		OutputStreamWriter writer ;
+
+		file = new File( filename ) ;
+		path = file.getParentFile() ;
+
+		if ( ! path.exists() )
+			path.mkdirs() ;
+
+		stream = new FileOutputStream( file ) ;
+		writer = new OutputStreamWriter( stream, StandardCharsets.UTF_8 ) ;
+
+		writer.append( data ) ;
+		writer.close() ;
+	}
+
+	private boolean probeFile( final String filename ) {
+		File file ;
 
 		file = new File( filename ) ;
 
-		if ( mkdirs )
-			file.getParentFile().mkdirs() ;
+		if ( file.exists() && file.length()>0 )
+			return true ;
+		return false ;
+	}
 
-		fos = new FileOutputStream( file ) ;
-		osw = new OutputStreamWriter( fos, StandardCharsets.UTF_8 ) ;
-		osw.append( data ) ;
+	private String getOutputPath() {
+		String key, val, dir ;
 
-		osw.close() ;
+		key = this.getClass().getName()+CF_OUTDIR ;
+		val = context.getInitParameter( key ) ;
+
+		if ( val.charAt( 0 ) == '~' )
+			dir = System.getProperty( "user.home" )
+			+val.substring( 1 ) ;
+		else
+			dir = val ;
+
+		return dir ;
 	}
 }

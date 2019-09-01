@@ -4,6 +4,7 @@ package org.chartacaeli.api;
 import java.io.IOException;
 import java.io.StringReader;
 
+import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,7 +17,7 @@ public class P9SParser implements XMLParser {
 
 	private DocumentBuilderFactory dactory = DocumentBuilderFactory.newInstance() ;
 
-	public P9SParser() {
+	public P9SParser( ServletContext context ) {
 		dactory.setValidating( true ) ;
 	}
 

@@ -13,12 +13,12 @@ public class ServletContextListener implements javax.servlet.ServletContextListe
 	private static EntityManagerFactory factory ;
 
 	@Override
-	public void contextInitialized(ServletContextEvent arg0) {
+	public void contextInitialized( ServletContextEvent event ) {
 		factory = Persistence.createEntityManagerFactory( "ChartDB" ) ;
 	}
 
 	@Override
-	public void contextDestroyed(ServletContextEvent arg0) {
+	public void contextDestroyed( ServletContextEvent event ) {
 		if ( factory != null )
 			factory.close() ;
 	}
