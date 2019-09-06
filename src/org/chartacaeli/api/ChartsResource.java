@@ -46,7 +46,7 @@ public class ChartsResource {
 	private ServletContext context ;
 
 	// web.xml
-	private final String CF_OUTDIR = ".outputPath" ;
+	private final String CF_OUTDIR = ".outputDirectory" ;
 
 	private ChartDB chartDB = new ChartDB() ;
 
@@ -72,7 +72,9 @@ public class ChartsResource {
 		creq.setStatNum( Chart.ST_RECEIVED ) ;
 
 		if ( chart == null ) {
+			creq.setStatNum( Chart.ST_REJECTED ) ;
 			creq.setInfo( MessageCatalog.getMessage( this, MK_ED8NINV, null ) ) ;
+
 			return Response.status( Response.Status.BAD_REQUEST )
 					.links( self )
 					.entity( creq )
@@ -143,13 +145,14 @@ public class ChartsResource {
 
 		qres = chartDB.findById( id ) ;
 
+		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
+
 		if ( qres.isPresent() )
 			creq = qres.get() ;
 		else
 			return Response.status( Response.Status.NOT_FOUND )
+					.links( self )
 					.build() ;
-
-		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
 
 		switch ( creq.getStatNum() ) {
 		case Chart.ST_ACCEPTED:
@@ -201,6 +204,8 @@ public class ChartsResource {
 		case Chart.ST_REJECTED:
 		default:
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+					.links( self )
+					.entity( creq )
 					.build() ;
 		}
 	}

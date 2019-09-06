@@ -6,7 +6,7 @@
 		<param-value>https://raw.githubusercontent.com/otabuzzman/chartacaeli/master/chartacaeli.xsd</param-value>
 	</context-param>
 	<context-param>
-		<param-name>org.chartacaeli.api.ChartsResource.outputPath</param-name>
+		<param-name>org.chartacaeli.api.ChartsResource.outputDirectory</param-name>
 		<param-value>~/src/chartacaeli-web/db</param-value>
 	</context-param>
 	<resource-ref>

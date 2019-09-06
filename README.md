@@ -192,6 +192,13 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
 		i=`uuidgen` ; c=`date +%s`000 ; m=`date +%s`003 ; echo \
 		"INSERT INTO \`CHARTS\` (\`ID\`, \`CREATED\`, \`MODIFIED\`, \`NAME\`, \`STAT\`) \
 		VALUES ('$i', '$c', '$m', 'scientific-star-chart', '$s') ;" ; done
+
+  # Shell variables to exec Runner.sh in a Cygwin-based environment
+  GS=gswin64c
+  # use DBURL as shown as well in web/META-INF/context.xml and H2 Console
+  DBURL="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO"
+  OUTDIR=$(cygpath -m ~/src/chartacaeli-web/db)
+  APPDIR=~/src/chartacaeli/mvn/web/WEB-INF
   ```
 
   ```sql

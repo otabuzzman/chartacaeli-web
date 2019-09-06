@@ -1,0 +1,71 @@
+# Runner.sh.rc - run commands on Runner.sh startup
+#
+
+info() {
+	echo $(date +%Y/%m/%d\ %H:%M:%S) : INFO : Charta Caeli Web Service : $this : $1
+}
+warn() {
+	echo $(date +%Y/%m/%d\ %H:%M:%S) : WARN : Charta Caeli Web Service : $this : $1
+}
+fail() {
+	echo $(date +%Y/%m/%d\ %H:%M:%S) : FAIL : Charta Caeli Web Service : $this : $1
+}
+
+probeJRE() {
+	( java -version 2>&1 | grep version ) >/dev/null
+
+	return $?
+}
+
+probeOUTDIR() {
+	( cd ${OUTDIR:=~/db} ) >/dev/null 2>&1
+
+	return $?
+}
+
+probeAPPDIR() {
+	( cd ${APPDIR:=~/web/WEB-INF} ) >/dev/null 2>&1
+
+	return $?
+}
+
+probeAPPEXE() {
+	probeAPPDIR && test -x $APPDIR/${APPEXE:=chartacaeli.sh}
+
+	return $?
+}
+
+probeDB() {
+	java -cp ${CLASSPATH:=web/WEB-INF/lib/h2-*.jar} org.h2.tools.Shell \
+	-url ${DBURL:=jdbc:h2:tcp://localhost/~/db/ChartDB;IF_EXISTS=TRUE} \
+	-user ${DBUSER:=chartacaeli} -password ${DBPASS:=chartaca3li} \
+	-sql "" >/dev/null 2>&1
+
+	return $?
+}
+
+probeGS() {
+	( ${GS:=gs} -version 2>&1 | grep Ghostscript ) >/dev/null
+
+	return $?
+}
+
+signalhandler() {
+	info "rollback $id and leave upon signal"
+
+	rm -f $pdf $log $err
+
+	java -cp $CLASSPATH org.h2.tools.Shell \
+	-url $DBURL -user $DBUSER -password $DBPASS \
+	-sql "UPDATE charts SET stat = 'accepted', modified = '$(date +%s)000' WHERE id = '$id'"
+
+	exit 1
+}
+
+updateDB() {
+	java -cp $CLASSPATH org.h2.tools.Shell \
+	-url $DBURL -user $DBUSER -password $DBPASS \
+	-sql "UPDATE charts SET stat = '$2', modified = '$(date +%s)000' WHERE id = '$1'"
+
+	return $?
+}
