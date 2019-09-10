@@ -18,8 +18,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Link;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -143,9 +145,9 @@ public class ChartsResource {
 		URI nextURI, logURI, errURI ;
 		ResponseBuilder resbldr ;
 
-		qres = chartDB.findById( id ) ;
-
 		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
+
+		qres = chartDB.findById( id ) ;
 
 		if ( qres.isPresent() )
 			creq = qres.get() ;
@@ -157,6 +159,12 @@ public class ChartsResource {
 		switch ( creq.getStatNum() ) {
 		case Chart.ST_ACCEPTED:
 		case Chart.ST_STARTED:
+			next = Link.fromUri( uri.getAbsolutePath() ).rel( "next" ).build() ;
+
+			return Response.status( Response.Status.OK )
+					.links( self, next )
+					.entity( creq )
+					.build() ;
 		case Chart.ST_CLEANED:
 			return Response.status( Response.Status.OK )
 					.links( self )
@@ -208,6 +216,37 @@ public class ChartsResource {
 					.entity( creq )
 					.build() ;
 		}
+	}
+
+	@GET
+	@Path( "/{id}/{file}" )
+	public Response chart(
+			@PathParam( value = "id" ) String id,
+			@PathParam( value = "file" ) String file ) {
+		String path ;
+		Link self ;
+		File desc ;
+		boolean pdf ;
+
+		path = getOutputDirectroy()
+				+"/"+id
+				+"/"+file ;
+
+		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
+
+		if ( ! probeFile( path ) )
+			return Response.status( Response.Status.NOT_FOUND )
+					.links( self )
+					.build() ;
+
+		desc = new File( path ) ;
+
+		pdf = file.substring( file.length()-4).equals( ".pdf" ) ;
+
+		return Response.ok( desc )
+				.links( self )
+				.type( pdf ? "application/pdf" : MediaType.TEXT_PLAIN )
+				.build() ;
 	}
 
 	private CompositeResult validateD8N( final String chart ) {
@@ -263,31 +302,31 @@ public class ChartsResource {
 	}
 
 	private String getD8NFilename( final Chart creq ) {
-		return getOutputPath()
+		return getOutputDirectroy()
 				+creq.getPath()
 				+".xml" ;
 	}
 
 	private String getP9SFilename( final Chart creq ) {
-		return getOutputPath()
+		return getOutputDirectroy()
 				+creq.getPath()
 				+".preferences" ;
 	}
 
 	private String getPDFFilename( final Chart creq ) {
-		return getOutputPath()
+		return getOutputDirectroy()
 				+creq.getPath()
 				+".pdf" ;
 	}
 
 	private String getLogFilename( final Chart creq ) {
-		return getOutputPath()
+		return getOutputDirectroy()
 				+creq.getPath()
 				+".log" ;
 	}
 
 	private String getErrFilename( final Chart creq ) {
-		return getOutputPath()
+		return getOutputDirectroy()
 				+creq.getPath()
 				+".err" ;
 	}
@@ -320,7 +359,7 @@ public class ChartsResource {
 		return false ;
 	}
 
-	private String getOutputPath() {
+	private String getOutputDirectroy() {
 		String key, val, dir ;
 
 		key = this.getClass().getName()+CF_OUTDIR ;

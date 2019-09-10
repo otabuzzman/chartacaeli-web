@@ -1,5 +1,5 @@
 # Charta Caeli web service
-A web frontend to the Charta Caeli star chart creation tool. The web service is basically made up of an UI and a RESTful API connecting the UI with the Charta Caeli core application. The UI utilizes Bootstrap 4 for responsiveness. Another major component is the [Xonomy XML editor](https://github.com/michmech/xonomy) which provides a way to edit star chart definitions on devices with appropriate display sizes.
+A web frontend to the Charta Caeli star chart creation tool. The web service is basically made up of an UI and a RESTful API connecting the UI with the Charta Caeli core application. The UI utilizes Bootstrap 4 for responsiveness. [Xonomy XML editor](https://github.com/michmech/xonomy) provides a way to edit star chart definitions on devices with appropriate display sizes.
 
 ### Build
 The project depends on the [repository](https://github.com/otabuzzman/chartacaeli) of the Charta Caeli star chart creation tool (core application). Thus, to setup the web service, one first has to download and build the core app according to instructions given there. Afterwards clone this repository and follow steps listed below. Run clone commands from same folder to make sure top-level directories of core app and web service share the same parent folder.
@@ -89,48 +89,103 @@ Purposes of links in running text is provision of background information or to g
 |URL in text (inline)|Same as for navigation menu entries. No text decorations.|
 
 #### RESTful API design
-The RESTful API implementation uses the [Jersey](https://jersey.github.io/) RESTful Web Service framework. The HATEOAS uses links in HTTP headers according to [RFC5988](https://tools.ietf.org/html/rfc5988).
+RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful Web Service framework. HATEOAS according to [RFC5988](https://tools.ietf.org/html/rfc5988) as well as Location header field (redirection).
 
-**Object model**
-
-|Object|Comment|
-|--|--|
-|Chart||
-
-**Object model URIs**
-
-|URI (Resource)|Comment|
-|--|--|
-|`/`           |The root resource.|
-|`/charts`     ||
-|`/charts/{id}`||
-
-**HTTP methods**
-
-|Method|Resource|HATEOAS|Purpose|Comment|
-|--|--|--|--|--|
-|GET |`/`           |self, new|Start API session.||
-|POST|`/charts`     |self, next|Issue chart creation request.|Response code 202, Location `/charts/{id}`. Response code 4XX in case of rejected state (e.g. XML schema or DTD violation).|
-|GET |`/charts/{id}`|self, next, related|Retrieve chart creation state.|Response code 200 until finished state. When finished response code 303, _next_ relation set, Location `/db/{id}/{name}.pdf` with `{name}` set to value of `/ChartaCaeli/@name`. In case of failed state _related_ relations set to point at log files of application and PDF converter.|
-
-**Object representations**
+**Object model and representations**
 
 |Object|Class|Comment|
 |--|--|--|
 |Chart|`org.chartacaeli.api.Chart`||
 
-#### RESTful API setup
-Installation and configuration of Tomcat performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
+```xml
+<chart id="{id}">
+  <created>{UTC ms since 01.01.1970}</created>
+  <modified>{UTC ms since 01.01.1970}</modified>
+  <name>{/ChartaCaeli/@name}</name>
+  <stat>{accepted|rejected|started|finished|failed|cleaned}</stat>
+  <info></info>
+</chart>
+```
 
-Create `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml` with content `<Context docBase="<appbase>" path="" reloadable="true"/>` and `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web`) to make Charta Caeli default (start on domain URL).
+**Object model URIs (Resources)**
 
-- To start Tomcat on Windows enter these commands in `cmd.exe`:
+|URI|Comment|
+|--|--|
+|`/`           |Entry point|
+|`/charts`     |New chart|
+|`/chart/{id}`|Get chart state|
+|`/chart/{id}/{file}`|Get chart file<br>`file` being one of *.pdf, *.log, *.err|
+
+**Requests**
+
+|Method|URI|HATEOAS|Comment|
+|--|--|--|--|
+|GET|`/`|self, new|Content with welcome message.|
+|POST|`/charts`|Location, self, next|Status 202, Header field Location set to `/charts/{id}`. Content with Chart object representation XML.<br>Status 400 in case of schema violation.<br>Status 500 in case of server errors.|
+|GET|`/chart/{id}`|Location, self, next, related|Status 200 until finished or failed state.Content with Chart object representation XML.<br>Status 303 when finished. _next_ relation and Location set to point at PDF file.<br>Status 303 when failed. _related_ relations set to point at log files of application and PDF converter.<br>Status 500 in case of server errors.|
+|GET|`/chart/{id}/{file}`|self|Status 200.<br>Status 404 in case of invalid `{file}`.|
+
+**Parameters**
+
+|URI|Name|Kind (URL, Data)|Type|Necessity|Encoding|Comment|
+|:--|:--|:--|:--|:--|:--|:--|
+|`/charts`|chart|Data parameter|String|mandatory|x-www-form-urlencoded|XML document conforming to Chart Specification XSD|
+|`/charts`|prefs|Data parameter|String|optional|x-www-form-urlencoded|XML document conforming to Java Preferences DTD|
+
+#### RESTful API test setup
+- Open bash and start H2 database
 
   ```bash
-  set "JAVA_HOME=C:\Program Files\Java\jdk1.8.0_151"
-  cd AppData\Local\Apache\apache-tomcat-8.5.37\bin
-  startup.bat
+  # Windows (Cygwin)
+  export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+  # Linux
+  export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+  export PATH=$JAVA_HOME/bin:$PATH
+
+  java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Server \
+	-tcp \
+	-web &
   ```
+
+- Start browser and connect with H2 Console (optional)
+- In H2 Console clear CHARTS table (optional)
+- Change to top-level directory of Charta Caeli RESTful web service
+- Set environment and start `Runner.sh`
+
+  ```bash
+  cd ~/chartacaeli-web
+
+  export GS=gswin64c
+  export DBURL="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO"
+  export OUTDIR=$(cygpath -m ~/src/chartacaeli-web/db)
+  export APPDIR=~/src/chartacaeli/mvn/web/WEB-INF
+  export INTERVAL=10
+
+  sh Runner.sh
+  ```
+
+- Start Charta Caeli RESTful web service (either Eclipse IDE or Tomcat)
+- Run test cases with [Postman API Development Environment](https://www.getpostman.com/)
+
+#### RESTful API test cases
+|Request|Status|HATEOAS|Content|Check|Cause|
+|:--|:--|:--||||
+|`GET /api`|200|self, new|Welcome message|- Welcome message present<br>-new equals New chart URI<br>- self equals URI||
+|`POST /api/charts`|202|Location, self, next|Object representation XML|- XML stat element equals accepted<br>- Location equals next<br>- self equals URI||
+||400|self|Object representation XML|- XML stat element equals rejected<br>- info element set<br>- self equals URI|- Invalid or missing D8N.<br>- Invalid P9S.|
+|`POST /api/charts`|500|self|Object representation XML|- XML stat element equals rejected<br>- info element set<br>- self equals URI||
+|`GET /api/chart/{id}`|200|self, next|Object representation XML|- XML stat element equals accepted &#124; started<br>- self equals URI<br>- next equals URI||
+||200|self|Object representation XML|- XML stat element equals cleaned<br>- self equals URI||
+||303|Location, self, next, related|Object representation XML|- XML stat element equals finished<br>- Location equals next<br>- related (optional) equals *.log<br>- self equals URI<br>||
+||500|self|Object representation XML|- XML stat element equals finished<br>- self equals URI<br>|PDF file missing on server.|
+||500|self, related|Object representation XML|-XML stat element equals failed<br>- related equal *.log or *.err<br>- self equals URI<br>|Charta Caeli core app or PDF conversion process failed|
+||500|self|Object representation XML|- XML stat element equals received &#124; rejected<br>- self equals URI<br>|Illegal values for stat element.|
+|`GET /api/chart/{id}/{name}.pdf`|200|self|Chart PDF file|||
+||404|self|||Invalid resource name|
+|`GET /api/chart/{id}/{name}.log`|200|self|Charta Caeli core app log file|||
+||404|self|||Invalid resource name|
+|`GET /api/chart/{id}/{name}.log`|200|self|PDF conversion error file (stderr)|||
+||404|self|||Invalid resource name|
 
 #### Database setup
 The configuration provides for the [Hibernate](https://hibernate.org/) ORM implementation twinned with an [H2](http://www.h2database.com/html/main.html) database.
@@ -159,7 +214,7 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
   |Parameter|Value|
   |--|--|
   |Saved Settings|Generic H2 (Server)|
-  |JDBC URL|jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB|
+  |JDBC URL|jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO|
   |User Name|chartacaeli|
   |Password|chartaca3li|
 
@@ -210,6 +265,19 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
   INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('3c03731d-117a-4781-a82d-dd495b4b606d', '1566126477000', '1566126477003', 'scientific-star-chart', 'finished') ;
   INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('4736b81d-1405-4c9c-8ea5-4f8e1a6869b2', '1566126478000', '1566126478003', 'scientific-star-chart', 'failed') ;
   INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('2e541e9d-67b3-44d8-9b91-f513704f054a', '1566126479000', '1566126479003', 'scientific-star-chart', 'cleaned') ;
+  ```
+
+#### Tomcat setup
+Installation and configuration of Tomcat performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
+
+Create `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml` with content `<Context docBase="<appbase>" path="" reloadable="true"/>` and `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web`) to make Charta Caeli default (start on domain URL).
+
+- To start Tomcat on Windows enter these commands in `cmd.exe`:
+
+  ```bash
+  set "JAVA_HOME=C:\Program Files\Java\jdk1.8.0_151"
+  cd AppData\Local\Apache\apache-tomcat-8.5.37\bin
+  startup.bat
   ```
 
 #### Helpful links
