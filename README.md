@@ -170,7 +170,7 @@ RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful
 #### RESTful API test cases
 
 |Request|Status|HATEOAS|Content|Check|Cause|
-|:--|:--|:--||||
+|:--|:--|:--|:--|:--|:--|
 |`GET /api`|200|self, new|Welcome message|- Welcome message present<br>-new equals New chart URI<br>- self equals URI||
 |`POST /api/charts`|202|Location, self, next|Object representation XML|- XML stat element equals accepted<br>- Location equals next<br>- self equals URI||
 ||400|self|Object representation XML|- XML stat element equals rejected<br>- info element set<br>- self equals URI|- Invalid or missing D8N.<br>- Invalid P9S.|
