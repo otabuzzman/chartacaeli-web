@@ -113,8 +113,8 @@ RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful
 |--|--|
 |`/`           |Entry point|
 |`/charts`     |New chart|
-|`/chart/{id}`|Get chart state|
-|`/chart/{id}/{file}`|Get chart file<br>`file` being one of *.pdf, *.log, *.err|
+|`/charts/{id}`|Get chart state|
+|`/charts/{id}/{file}`|Get chart file<br>`file` being one of *.pdf, *.log, *.err|
 
 **Requests**
 
@@ -122,8 +122,8 @@ RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful
 |--|--|--|--|
 |GET|`/`|self, new|Content with welcome message.|
 |POST|`/charts`|Location, self, next|Status 202, Header field Location set to `/charts/{id}`. Content with Chart object representation XML.<br>Status 400 in case of schema violation.<br>Status 500 in case of server errors.|
-|GET|`/chart/{id}`|Location, self, next, related|Status 200 until finished or failed state.Content with Chart object representation XML.<br>Status 303 when finished. _next_ relation and Location set to point at PDF file.<br>Status 303 when failed. _related_ relations set to point at log files of application and PDF converter.<br>Status 500 in case of server errors.|
-|GET|`/chart/{id}/{file}`|self|Status 200.<br>Status 404 in case of invalid `{file}`.|
+|GET|`/charts/{id}`|Location, self, next, related|Status 200 until finished or failed state.Content with Chart object representation XML.<br>Status 303 when finished. _next_ relation and Location set to point at PDF file.<br>Status 303 when failed. _related_ relations set to point at log files of application and PDF converter.<br>Status 500 in case of server errors.|
+|GET|`/charts/{id}/{file}`|self|Status 200.<br>Status 404 in case of invalid `{file}`.|
 
 **Parameters**
 
@@ -168,23 +168,24 @@ RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful
 - Run test cases with [Postman API Development Environment](https://www.getpostman.com/)
 
 #### RESTful API test cases
+
 |Request|Status|HATEOAS|Content|Check|Cause|
 |:--|:--|:--||||
 |`GET /api`|200|self, new|Welcome message|- Welcome message present<br>-new equals New chart URI<br>- self equals URI||
 |`POST /api/charts`|202|Location, self, next|Object representation XML|- XML stat element equals accepted<br>- Location equals next<br>- self equals URI||
 ||400|self|Object representation XML|- XML stat element equals rejected<br>- info element set<br>- self equals URI|- Invalid or missing D8N.<br>- Invalid P9S.|
 |`POST /api/charts`|500|self|Object representation XML|- XML stat element equals rejected<br>- info element set<br>- self equals URI||
-|`GET /api/chart/{id}`|200|self, next|Object representation XML|- XML stat element equals accepted &#124; started<br>- self equals URI<br>- next equals URI||
+|`GET /api/charts/{id}`|200|self, next|Object representation XML|- XML stat element equals accepted &#124; started<br>- self equals URI<br>- next equals URI||
 ||200|self|Object representation XML|- XML stat element equals cleaned<br>- self equals URI||
 ||303|Location, self, next, related|Object representation XML|- XML stat element equals finished<br>- Location equals next<br>- related (optional) equals *.log<br>- self equals URI<br>||
 ||500|self|Object representation XML|- XML stat element equals finished<br>- self equals URI<br>|PDF file missing on server.|
 ||500|self, related|Object representation XML|-XML stat element equals failed<br>- related equal *.log or *.err<br>- self equals URI<br>|Charta Caeli core app or PDF conversion process failed|
 ||500|self|Object representation XML|- XML stat element equals received &#124; rejected<br>- self equals URI<br>|Illegal values for stat element.|
-|`GET /api/chart/{id}/{name}.pdf`|200|self|Chart PDF file|||
+|`GET /api/charts/{id}/{name}.pdf`|200|self|Chart PDF file|||
 ||404|self|||Invalid resource name|
-|`GET /api/chart/{id}/{name}.log`|200|self|Charta Caeli core app log file|||
+|`GET /api/charts/{id}/{name}.log`|200|self|Charta Caeli core app log file|||
 ||404|self|||Invalid resource name|
-|`GET /api/chart/{id}/{name}.log`|200|self|PDF conversion error file (stderr)|||
+|`GET /api/charts/{id}/{name}.log`|200|self|PDF conversion error file (stderr)|||
 ||404|self|||Invalid resource name|
 
 #### Database setup
