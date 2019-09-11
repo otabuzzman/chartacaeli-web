@@ -18,7 +18,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
@@ -40,6 +39,10 @@ public class ChartsResource {
 	private final static String MK_ED8NINV = "ed8ninv" ;
 	private final static String MK_EP9SINV = "ep9sinv" ;
 	private final static String MK_EREQINI = "ereqini" ;
+
+	// Mediatypes
+	private final static String MT_APPLICATION_PDF = "application/pdf" ;
+	private final static String MT_TEXT_PLAIN_UTF8 = MediaType.TEXT_PLAIN+";charset="+StandardCharsets.UTF_8 ;
 
 	@Context
 	private UriInfo uri ;
@@ -143,7 +146,7 @@ public class ChartsResource {
 		Chart creq ;
 		Link self, next, log, err ;
 		URI nextURI, logURI, errURI ;
-		ResponseBuilder resbldr ;
+		ResponseBuilder response ;
 
 		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
 
@@ -171,9 +174,9 @@ public class ChartsResource {
 					.entity( creq )
 					.build() ;
 		case Chart.ST_FINISHED:
-			nextURI = uri.getBaseUriBuilder().path( creq.getPath()+".pdf" ).build() ;
+			nextURI = uri.getAbsolutePathBuilder().path( creq.getName()+".pdf" ).build() ;
 			next = Link.fromUri( nextURI ).rel( "next" ).build() ;
-			logURI = uri.getBaseUriBuilder().path( creq.getPath()+".log" ).build() ;
+			logURI = uri.getAbsolutePathBuilder().path( creq.getName()+".log" ).build() ;
 			log = Link.fromUri( logURI ).rel( "related" ).build() ;
 
 			if ( ! probeFile( getPDFFilename( creq ) ) )
@@ -182,32 +185,32 @@ public class ChartsResource {
 						.entity( creq )
 						.build();
 
-			resbldr = Response.status( Response.Status.SEE_OTHER )
+			response = Response.status( Response.Status.SEE_OTHER )
 					.location( nextURI )
 					.links( self, next )
 					.entity( creq ) ;
 
 			if ( probeFile( getLogFilename( creq ) ) )
-				resbldr.links( log ) ;
+				response.links( log ) ;
 
-			return resbldr.build() ;
+			return response.build() ;
 		case Chart.ST_FAILED:
-			logURI = uri.getBaseUriBuilder().path( creq.getPath()+".log" ).build() ;
+			logURI = uri.getAbsolutePathBuilder().path( creq.getName()+".log" ).build() ;
 			log = Link.fromUri( logURI ).rel( "related" ).build() ;
-			errURI = uri.getBaseUriBuilder().path( creq.getPath()+".err" ).build() ;
+			errURI = uri.getAbsolutePathBuilder().path( creq.getName()+".err" ).build() ;
 			err = Link.fromUri( errURI ).rel( "related" ).build() ;
 
-			resbldr = Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+			response = Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 					.links( self )
 					.entity( creq ) ;
 
 			if ( probeFile( getLogFilename( creq ) ) )
-				resbldr.links( log ) ;
+				response.links( log ) ;
 
 			if ( probeFile( getErrFilename( creq ) ) )
-				resbldr.links( err ) ;
+				response.links( err ) ;
 
-			return resbldr.build() ;
+			return response.build() ;
 		case Chart.ST_RECEIVED:
 		case Chart.ST_REJECTED:
 		default:
@@ -219,14 +222,13 @@ public class ChartsResource {
 	}
 
 	@GET
-	@Path( "/{id}/{file}" )
+	@Path( "/{id}/{file: .+[.](pdf|log|err)$}" )
 	public Response chart(
 			@PathParam( value = "id" ) String id,
 			@PathParam( value = "file" ) String file ) {
 		String path ;
 		Link self ;
-		File desc ;
-		boolean pdf ;
+		ResponseBuilder response ;
 
 		path = getOutputDirectroy()
 				+"/"+id
@@ -239,14 +241,15 @@ public class ChartsResource {
 					.links( self )
 					.build() ;
 
-		desc = new File( path ) ;
+		response = Response.ok( new File( path ) )
+				.links( self ) ;
 
-		pdf = file.substring( file.length()-4).equals( ".pdf" ) ;
+		if ( file.substring( file.length()-4).equals( ".pdf" ) )
+			response.type( MT_APPLICATION_PDF ) ;
+		else
+			response.type( MT_TEXT_PLAIN_UTF8 ) ;
 
-		return Response.ok( desc )
-				.links( self )
-				.type( pdf ? "application/pdf" : MediaType.TEXT_PLAIN )
-				.build() ;
+		return response.build() ;
 	}
 
 	private CompositeResult validateD8N( final String chart ) {
