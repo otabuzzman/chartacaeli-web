@@ -89,22 +89,76 @@ Purposes of links in running text is provision of background information or to g
 |URL in text (inline)|Same as for navigation menu entries. No text decorations.|
 
 #### RESTful API design
-RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful Web Service framework. HATEOAS according to [RFC5988](https://tools.ietf.org/html/rfc5988) as well as Location header field (redirection).
+RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful Web Service framework. HATEOAS using Link header based on [RFC5988](https://tools.ietf.org/html/rfc5988) with Location header field (redirection) set to value of next relation if appropriate.
 
 **Object model and representations**
 
 |Object|Class|Comment|
 |--|--|--|
+|Root|`org.chartacaeli.api.Root`||
 |Chart|`org.chartacaeli.api.Chart`||
 
+XML Root object representation sample if Accept header not aplication/json or missing
+
 ```xml
-<chart id="{id}">
-  <created>{UTC ms since 01.01.1970}</created>
-  <modified>{UTC ms since 01.01.1970}</modified>
-  <name>{/ChartaCaeli/@name}</name>
-  <stat>{accepted|rejected|started|finished|failed|cleaned}</stat>
-  <info></info>
+<root>
+  <info>Charta Caeli RESTful Web Service API</info>
+  <hateoas href="http://localhost:4711/chartacaeli-web/api" rel="self"/>
+  <hateoas href="http://localhost:4711/chartacaeli-web/api/charts" rel="new"/>
+</root>
+```
+
+JSON Root object representation sample if Accept header equals aplication/json
+
+```json
+{
+  "info": "Charta Caeli RESTful Web Service API",
+  "hateoas": [
+    "javax.ws.rs.core.Link$JaxbLink@3537a1f3",
+    "javax.ws.rs.core.Link$JaxbLink@81939dd3"
+  ]
+}
+```
+
+XML Chart object representation sample
+
+```xml
+<chart id="96fc442a-12ff-4c0d-b28e-ba9e2c3e1843"> <!-- UUID -->
+  <created>1569965427216</created>                <!-- msec since 1.1.1970 -->
+  <modified>1569965432000</modified>              <!-- msec since 1.1.1970 -->
+  <name>scientific-star-chart</name>              <!-- value of /ChartaCaeli/@name -->
+  <stat>finished</stat>                           <!-- accepted|rejected|started|finished|failed|cleaned -->
+  <!-- one or more HATEOAS links (optional) -->
+  <hateoas href="http://localhost:4711/chartacaeli-web/api/charts/96fc442a-12ff-4c0d-b28e-ba9e2c3e1843" rel="self"/>
+  <hateoas href="http://localhost:4711/chartacaeli-web/api/charts/96fc442a-12ff-4c0d-b28e-ba9e2c3e1843/scientific-star-chart.pdf" rel="next"/>
+  <hateoas href="http://localhost:4711/chartacaeli-web/api/charts/96fc442a-12ff-4c0d-b28e-ba9e2c3e1843/scientific-star-chart.log" rel="related"/>
 </chart>
+```
+
+JSON Chart object representation sample
+
+```json
+{
+  "id": "96fc442a-12ff-4c0d-b28e-ba9e2c3e1843",
+  "created": 1569965427216,
+  "modified": 1569965432000,
+  "name": "scientific-star-chart",
+  "stat": "finished",
+  "hateoas": [
+    {
+      "href": "http://localhost:4711/chartacaeli-web/api/charts/96fc442a-12ff-4c0d-b28e-ba9e2c3e1843",
+      "rel": "self"
+    },
+    {
+      "href": "http://localhost:4711/chartacaeli-web/api/charts/96fc442a-12ff-4c0d-b28e-ba9e2c3e1843/scientific-star-chart.pdf",
+      "rel": "next"
+    },
+    {
+      "href": "http://localhost:4711/chartacaeli-web/api/charts/96fc442a-12ff-4c0d-b28e-ba9e2c3e1843/scientific-star-chart.log",
+      "rel": "related"
+    }
+  ]
+}
 ```
 
 **Object model URIs (Resources)**
@@ -120,9 +174,9 @@ RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful
 
 |Method|URI|HATEOAS|Comment|
 |--|--|--|--|
-|GET|`/`|self, new|Content with welcome message.|
-|POST|`/charts`|Location, self, next|Status 202, Header field Location set to `/charts/{id}`. Content with Chart object representation XML.<br>Status 400 in case of schema violation.<br>Status 500 in case of server errors.|
-|GET|`/charts/{id}`|Location, self, next, related|Status 200 until finished or failed state.Content with Chart object representation XML.<br>Status 303 when finished. _next_ relation and Location set to point at PDF file.<br>Status 303 when failed. _related_ relations set to point at log files of application and PDF converter.<br>Status 500 in case of server errors.|
+|GET|`/`|self, new|Content with Root object representation.|
+|POST|`/charts`|Location, self, next|Status 202, Header field Location set to `/charts/{id}`. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header.<br>Status 400 in case of schema violation.<br>Status 500 in case of server errors.|
+|GET|`/charts/{id}`|Location, self, next, related|Status 200 until finished or failed state. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header.<br>Status 303 when finished. _next_ relation and Location set to point at PDF file.<br>Status 303 when failed. _related_ relations set to point at log files of application and PDF converter.<br>Status 404 in case of invalid `{id}`.<br>Status 500 in case of server errors.|
 |GET|`/charts/{id}/{file}`|self|Status 200.<br>Status 404 in case of invalid `{file}`.|
 
 **Parameters**
@@ -130,7 +184,7 @@ RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful
 |URI|Name|Kind (URL, Data)|Type|Necessity|Encoding|Comment|
 |:--|:--|:--|:--|:--|:--|:--|
 |`/charts`|chart|Data parameter|String|mandatory|x-www-form-urlencoded|XML document conforming to Chart Specification XSD|
-|`/charts`|prefs|Data parameter|String|optional|x-www-form-urlencoded|XML document conforming to Java Preferences DTD|
+||prefs|Data parameter|String|optional|x-www-form-urlencoded|XML document conforming to Java Preferences DTD|
 
 #### RESTful API test setup
 - Open bash and start H2 database
@@ -138,6 +192,7 @@ RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful
   ```bash
   # Windows (Cygwin)
   export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+  export PATH=$JAVA_HOME/bin:$PATH
   # Linux
   export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
   export PATH=$JAVA_HOME/bin:$PATH
@@ -150,12 +205,14 @@ RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful
 - Start browser and connect with H2 Console (optional)
 - In H2 Console clear CHARTS table (optional)
 - Change to top-level directory of Charta Caeli RESTful web service
-- Set environment and start `Runner.sh`
+- Set environment (or use default values in script) and start `Runner.sh`
 
   ```bash
   cd ~/chartacaeli-web
 
+  # sample shell variables to exec Runner.sh in a Cygwin-based environment
   export GS=gswin64c
+  # use DBURL as shown in web/META-INF/context.xml and H2 Console as well
   export DBURL="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO"
   export OUTDIR=$(cygpath -m ~/src/chartacaeli-web/db)
   export APPDIR=~/src/chartacaeli/mvn/web/WEB-INF
@@ -172,15 +229,15 @@ RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful
 |Request|Status|HATEOAS|Content|Check|Cause|
 |:--|:--|:--|:--|:--|:--|
 |`GET /api`|200|self, new|Welcome message|- Welcome message present<br>-new equals New chart URI<br>- self equals URI||
-|`POST /api/charts`|202|Location, self, next|Object representation XML|- XML stat element equals accepted<br>- Location equals next<br>- self equals URI||
-||400|self|Object representation XML|- XML stat element equals rejected<br>- info element set<br>- self equals URI|- Invalid or missing D8N.<br>- Invalid P9S.|
-|`POST /api/charts`|500|self|Object representation XML|- XML stat element equals rejected<br>- info element set<br>- self equals URI||
-|`GET /api/charts/{id}`|200|self, next|Object representation XML|- XML stat element equals accepted &#124; started<br>- self equals URI<br>- next equals URI||
-||200|self|Object representation XML|- XML stat element equals cleaned<br>- self equals URI||
-||303|Location, self, next, related|Object representation XML|- XML stat element equals finished<br>- Location equals next<br>- related (optional) equals *.log<br>- self equals URI<br>||
-||500|self|Object representation XML|- XML stat element equals finished<br>- self equals URI<br>|PDF file missing on server.|
-||500|self, related|Object representation XML|-XML stat element equals failed<br>- related equal *.log or *.err<br>- self equals URI<br>|Charta Caeli core app or PDF conversion process failed|
-||500|self|Object representation XML|- XML stat element equals received &#124; rejected<br>- self equals URI<br>|Illegal values for stat element.|
+|`POST /api/charts`|202|Location, self, next|Chart object representation|- stat element equals accepted<br>- Location equals next<br>- self equals URI||
+||400|self|Chart object representation|- stat element equals rejected<br>- info element set<br>- self equals URI|- Invalid or missing D8N.<br>- Invalid P9S.|
+||500|self|Chart object representation|- stat element equals rejected<br>- info element set<br>- self equals URI||
+|`GET /api/charts/{id}`|200|self, next|Chart object representation|- stat element equals accepted &#124; started<br>- self equals URI<br>- next equals URI||
+||200|self|Chart object representation|- stat element equals cleaned<br>- self equals URI||
+||303|Location, self, next, related|Chart object representation|- stat element equals finished<br>- Location equals next<br>- related (optional) equals *.log<br>- self equals URI<br>||
+||500|self|Chart object representation|- stat element equals finished<br>- self equals URI<br>|PDF file missing on server.|
+||500|self, related|Chart object representation|- stat element equals failed<br>- related equal *.log or *.err<br>- self equals URI<br>|Charta Caeli core app or PDF conversion process failed|
+||500|self|Chart object representation|- stat element equals received &#124; rejected<br>- self equals URI<br>|Illegal values for stat element.|
 |`GET /api/charts/{id}/{name}.pdf`|200|self|Chart PDF file|||
 ||404|self|||Invalid resource name|
 |`GET /api/charts/{id}/{name}.log`|200|self|Charta Caeli core app log file|||
@@ -248,13 +305,6 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
 		i=`uuidgen` ; c=`date +%s`000 ; m=`date +%s`003 ; echo \
 		"INSERT INTO \`CHARTS\` (\`ID\`, \`CREATED\`, \`MODIFIED\`, \`NAME\`, \`STAT\`) \
 		VALUES ('$i', '$c', '$m', 'scientific-star-chart', '$s') ;" ; done
-
-  # Shell variables to exec Runner.sh in a Cygwin-based environment
-  GS=gswin64c
-  # use DBURL as shown as well in web/META-INF/context.xml and H2 Console
-  DBURL="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO"
-  OUTDIR=$(cygpath -m ~/src/chartacaeli-web/db)
-  APPDIR=~/src/chartacaeli/mvn/web/WEB-INF
   ```
 
   ```sql

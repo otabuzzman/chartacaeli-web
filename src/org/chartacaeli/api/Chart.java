@@ -1,6 +1,7 @@
 
 package org.chartacaeli.api;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,12 +14,14 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @NamedQueries({
 	@NamedQuery( name = "Chart.findAll", query = "SELECT x FROM Chart x" ),
@@ -74,12 +77,16 @@ public class Chart {
 	private int statNum ;
 
 	@Transient
-	@XmlElement ( name = "stat" )
+	@XmlElement( name = "stat" )
 	private String statNam ;
 
 	@Transient
 	@XmlElement
 	private String info ;
+
+	@Transient
+	@XmlJavaTypeAdapter( MoxyLinkAdapter.class )
+	private List<Link> hateoas ;
 
 	public Chart() {
 	}
@@ -149,6 +156,17 @@ public class Chart {
 
 	public void setInfo( String info ) {
 		this.info = info ;
+	}
+
+	public List<Link> getHateoas() {
+		return hateoas ;
+	}
+
+	public void setHateoas( Link link ) {
+		if ( hateoas == null )
+			hateoas = new ArrayList<Link>() ;
+
+		hateoas.add( link ) ;
 	}
 
 	public String getPath() {

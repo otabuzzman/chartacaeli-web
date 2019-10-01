@@ -48,6 +48,11 @@ function grabXonomy(id) {
 	return head+data ;
 }
 
+/* chart generation timeout handler */
+var hdExecWait ;
+/* chart generation poll interval handler */
+var hdExecPoll ;
+
 /* definition and preferences state objects */
 var statD8N ;
 var statP9S ;
@@ -56,21 +61,23 @@ var statThis ;
 var statExch ;
 
 /* state and event values enumerations */
-const State = Object.freeze({NONE: 0, EMPTY: 1, OPENED: 2, CHANGED: 3, WARNING: 4}) ;
-const Event = Object.freeze({NONE: 0, NEW: 1, OPEN: 2, CHANGE: 3, RETURN: 4}) ;
+const State = Object.freeze({NONE: 0, EMPTY: 1, OPENED: 2, CHANGED: 3, RUNNING: 4, WARNING: 5, ERROR: 6}) ;
+const Event = Object.freeze({NONE: 0, NEW: 1, OPEN: 2, EXEC: 3, CHANGE: 4, RETURN: 5, ERROR: 6}) ;
 /* transition table */
 const Transition = Object.freeze([
-	/*         Non,        New,        Opn,        Chg,        Ret,     */
-	/* Non */ [aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid],
-	/* Emp */ [aotInvalid, aotInvalid, aotEmpOpn,  aotEmpChg,  aotInvalid],
-	/* Opn */ [aotInvalid, aotOpnNew,  aotOpnOpn,  aotOpnChg,  aotInvalid],
-	/* Chg */ [aotInvalid, aotChgNew,  aotChgOpn,  aotChgChg,  aotInvalid],
-	/* Wrn */ [aotInvalid, aotWrnNew,  aotWrnOpn,  aotInvalid, aotWrnRet ]
+	/* S/E     Non,        New,        Opn,        Exe,        Chg,        Ret,        Err,     */
+	/* Non */ [aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid],
+	/* Emp */ [aotInvalid, aotInvalid, aotEmpOpn,  aotInvalid, aotEmpChg,  aotInvalid, aotInvalid],
+	/* Opn */ [aotInvalid, aotOpnNew,  aotOpnOpn,  aotOpnExe,  aotOpnChg,  aotInvalid, aotInvalid],
+	/* Chg */ [aotInvalid, aotChgNew,  aotChgOpn,  aotChgExe,  aotChgChg,  aotInvalid, aotInvalid],
+	/* Run */ [aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotRunRet,  aotRunErr ],
+	/* Wrn */ [aotInvalid, aotWrnNew,  aotWrnOpn,  aotInvalid, aotInvalid, aotWrnRet,  aotInvalid],
+	/* Err */ [aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotErrRet,  aotInvalid]
 ]) ;
 
 /* transition actions */
 function aotInvalid() {
-	console.log("INV") ;
+	console.log("Inv") ;
 }
 function aotEmpOpn() {
 	$('#ccInpOpen').focus().trigger('click') ;
@@ -93,31 +100,62 @@ function aotOpnOpn() {
 	$('#ccInpOpen').focus().trigger('click') ;
 	console.log("Opn/Opn") ;
 }
+function aotOpnExe() {
+	/* memorize state for later use by btnUnsaved2nd (Havel (H)istory) */
+	$('#ccBtnExec').data('hist-state', statThis.stat) ;
+	statThis.stat = State.RUNNING ;
+	StateSetter[statThis.stat]() ;
+	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	console.log("Opn/Exe") ;
+}
 function aotOpnChg() {
 	statThis.stat = State.CHANGED ;
 	StateSetter[statThis.stat]() ;
 	console.log("Opn/Chg") ;
 }
 function aotChgNew() {
-	/* memorize event for later use by mBtnWarn2nd */
-	$('#ccMBtnWarn2nd').data('event', Event.NEW) ;
-	$('#ccWarning').modal('toggle') ;
+	/* memorize event for later use by btnUnsaved2nd (Havel (C)ondition) */
+	$('#ccDgWarnKey2nd').data('hist-event', Event.NEW) ;
+	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
+	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
+	$('#ccDgWarn2Key').modal('toggle') ;
 	statThis.stat = State.WARNING ;
 	StateSetter[statThis.stat]() ;
 	console.log("Chg/New") ;
 }
 function aotChgOpn() {
-	/* memorize event for later use by mBtnWarn2nd */
-	$('#ccMBtnWarn2nd').data('event', Event.OPEN) ;
-	$('#ccWarning').modal('toggle') ;
+	/* memorize event for later use by btnUnsaved2nd (Havel (C)ondition) */
+	$('#ccDgWarnKey2nd').data('hist-event', Event.OPEN) ;
+	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
+	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
+	$('#ccDgWarn2Key').modal('toggle') ;
 	statThis.stat = State.WARNING ;
 	StateSetter[statThis.stat]() ;
 	console.log("Chg/Opn") ;
+}
+function aotChgExe() {
+	/* memorize state for later use by btnUnsaved2nd (Havel (H)istory) */
+	$('#ccBtnExec').data('hist-state', statThis.stat) ;
+	statThis.stat = State.RUNNING ;
+	StateSetter[statThis.stat]() ;
+	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	console.log("Chg/Exe") ;
 }
 function aotChgChg() {
 	statThis.stat = State.CHANGED ;
 	StateSetter[statThis.stat]() ;
 	console.log("Chg/Chg") ;
+}
+function aotRunRet() {
+	statThis.stat = $('#ccBtnExec').data('hist-state') ;
+	StateSetter[statThis.stat]() ;
+	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	console.log("Run/Ret") ;
+}
+function aotRunErr() {
+	statThis.stat = State.ERROR ;
+	StateSetter[statThis.stat]() ;
+	console.log("Run/Err") ;
 }
 function aotWrnNew() {
 	statThis.open = statThis.defdef ;
@@ -135,6 +173,12 @@ function aotWrnRet() {
 	statThis.stat = State.CHANGED ;
 	StateSetter[statThis.stat]() ;
 	console.log("Wrn/Ret") ;
+}
+function aotErrRet() {
+	statThis.stat = $('#ccBtnExec').data('hist-state') ;
+	StateSetter[statThis.stat]() ;
+	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	console.log("Err/Ret") ;
 }
 
 /* button states setter functions table */
@@ -156,7 +200,14 @@ var StateSetter = Object.freeze([
 		$('#ccBtnOpen').prop('disabled', false) ;
 		$('#ccBtnExec').prop('disabled', false) ;
 	},
+	function () { // State.RUNNING
+		$('#ccBtnNew').prop('disabled', true) ;
+		$('#ccBtnOpen').prop('disabled', true) ;
+		$('#ccBtnExec').prop('disabled', true) ;
+	},
 	function () { // State.WARNING
+	},
+	function () { // State.ERROR
 	}
 ]) ;
 
@@ -181,17 +232,23 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	document.querySelector('#ccBtnExec').addEventListener('click', btnExec) ;
 	document.querySelector('#ccBtnTglP').addEventListener('click', btnTglP) ;
 	document.querySelector('#ccBtnTglD').addEventListener('click', btnTglD) ;
-	document.querySelector('#ccMBtnWarn1st').addEventListener('click', mBtnWarn1st) ;
-	document.querySelector('#ccMBtnWarn2nd').addEventListener('click', mBtnWarn2nd) ;
+	document.querySelector('#ccDgWarnKey1st').addEventListener('click', dgWarnKey1st) ;
+	document.querySelector('#ccDgWarnKey2nd').addEventListener('click', dgWarnKey2nd) ;
+	document.querySelector('#ccDgErrorKey').addEventListener('click', dgErrorKey) ;
 }) ;
 
-function mBtnWarn2nd(event) {
-	Transition[statThis.stat][$(this).data('event')]() ;
-	$('#ccWarning').modal('toggle') ;
-}
-function mBtnWarn1st(event) {
+function dgErrorKey(event) {
 	Transition[statThis.stat][Event.RETURN]() ;
-	$('#ccWarning').modal('toggle') ;
+	$('#ccDgError').modal('toggle') ;
+}
+
+function dgWarnKey2nd(event) {
+	Transition[statThis.stat][$(this).data('hist-event')]() ;
+	$('#ccDgWarn2Key').modal('toggle') ;
+}
+function dgWarnKey1st(event) {
+	Transition[statThis.stat][Event.RETURN]() ;
+	$('#ccDgWarn2Key').modal('toggle') ;
 }
 
 /* toggle to definition button */
@@ -233,17 +290,83 @@ function btnTglP(event) {
 }
 
 function btnExec(event) {
-	var exec, chart, prefs ;
+	var exec, chart, prefs, xhr ;
+	hdExecWait = setTimeout(function () {
+		clearInterval(hdExecPoll) ;
+		Transition[statThis.stat][Event.RETURN]() ;
+		xhr.abort() ;
+	}, 45000) ;
+	Transition[statThis.stat][Event.EXEC]() ;
+	/* issue POST */
 	statThis.open = grabXonomy() ;
 	chart = statD8N.open ;
 	prefs = statP9S.open ;
 	exec = $(this).attr('data-rest-api') ;
-	$.ajax({url: exec,
+	xhr = $.ajax({
+		url: exec,
 		method: 'POST',
-		data: { chart: chart, prefs: prefs }
-	}).then(function(data) {
-		console.log(data) ;
+		data: { chart: chart, prefs: prefs },
+		dataType: 'json',
+		statusCode: {
+			202: function (creq) {exec202(creq)},
+			400: function (xhr) {exec400(xhr)},
+			500: function (xhr) {exec500(xhr)}
+		}
 	}) ;
+}
+
+function exec202(creq) {
+	var next = creq.hateoas.find(function (link) {return link.rel == 'next'}).href ;
+	hdExecPoll = setInterval(function () {
+		$.ajax({
+			url: next,
+			method: 'GET',
+			statusCode: {
+				200: function(body) {
+					if ( typeof body.stat === 'undefined') {
+						var pdf = new Blob([body], {type: "application/pdf"}) ;
+						var url = window.URL.createObjectURL(pdf) ;
+						window.open(url) ;
+						clearInterval(hdExecPoll) ;
+						clearTimeout(hdExecWait) ;
+						Transition[statThis.stat][Event.RETURN]() ;
+					} else
+						console.log(body.stat) ;
+				},
+				/* actually not used because ajax automatically follows redirect in Location header */
+				303: function(xhr) {
+					var creq = $.parseJSON(xhr.responseText) ;
+					var next = creq.hateoas.find(function (link) {return link.rel == 'next'}).href ;
+					window.open(next) ;
+					clearInterval(hdExecPoll) ;
+					clearTimeout(hdExecWait) ;
+					Transition[statThis.stat][Event.RETURN]() ;
+				}
+			}
+		}) ;
+	}, 5000) ;
+}
+
+function exec400(xhr) {
+	var creq ;
+	clearTimeout(hdExecWait) ;
+	creq = $.parseJSON(xhr.responseText) ;
+	$('#ccDgError .dgerr-400 .creq-info').text(creq.info) ;
+	$('#ccDgError').find('[class ^= dgerr-]').addClass('d-none') ;
+	$('#ccDgError').find('.dgerr-400').removeClass('d-none') ;
+	$('#ccDgError').modal('toggle') ;
+	Transition[statThis.stat][Event.ERROR]() ;
+}
+
+function exec500(xhr) {
+	var creq ;
+	clearTimeout(hdExecWait) ;
+	creq = $.parseJSON(xhr.responseText) ;
+	$('#ccDgError .dgerr-500 .creq-info').text(creq.info) ;
+	$('#ccDgError').find('[class ^= dgerr-]').addClass('d-none') ;
+	$('#ccDgError').find('.dgerr-500').removeClass('d-none') ;
+	$('#ccDgError').modal('toggle') ;
+	Transition[statThis.stat][Event.ERROR]() ;
 }
 
 function btnOpen(event) {
@@ -307,11 +430,11 @@ function btnLoad(event) {
 }
 
 function smoothScrollToAnchor(event) {
-		if (this.hash !== "") {
-			var hash = this.hash ;
-			event.preventDefault() ;
-			$('html, body').animate({scrollTop: $(hash).offset().top}, 800, function () {window.location.hash = hash}) ;
-		}
+	if (this.hash !== "") {
+		var hash = this.hash ;
+		event.preventDefault() ;
+		$('html, body').animate({scrollTop: $(hash).offset().top}, 800, function () {window.location.hash = hash}) ;
+	}
 }
 
 /* close open burger menu on any click */
@@ -340,8 +463,8 @@ function updateBtnConf(event) {
 	var d8n = statD8N.stat === State.CHANGED ;
 	var p9s = statP9S.stat === State.CHANGED ;
 	if (load && !(d8n || p9s)) {
-		$('#ccBtnLoad')	.removeClass('disabled') ;
+		$('#ccBtnLoad').removeClass('disabled') ;
 	} else {
-		$('#ccBtnLoad')	.addClass('disabled') ;
+		$('#ccBtnLoad').addClass('disabled') ;
 	}
 }

@@ -15,9 +15,11 @@ import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
@@ -29,6 +31,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.hibernate.exception.GenericJDBCException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -61,13 +64,23 @@ public class ChartsResource {
 	}
 
 	@POST
+	@Produces( {
+		MediaType.APPLICATION_JSON,
+		MediaType.APPLICATION_XML } )
 	public Response charts(
+			@HeaderParam( "Accept" ) String accept,
 			@FormParam( "chart")  String chart,
 			@FormParam( "prefs" ) String prefs ) {
 		Chart creq ;
 		Link self, next ;
 		URI nextURI ;
+		String type ;
 		CompositeResult result ;
+
+		if ( accept.equals( MediaType.APPLICATION_XML ) )
+			type = MediaType.APPLICATION_XML ;
+		else
+			type = MediaType.APPLICATION_JSON ;
 
 		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
 
@@ -75,6 +88,7 @@ public class ChartsResource {
 		creq.setId( UUID.randomUUID().toString() ) ;
 		creq.setCreated( System.currentTimeMillis() ) ;
 		creq.setStatNum( Chart.ST_RECEIVED ) ;
+		creq.setHateoas( self ) ;
 
 		if ( chart == null ) {
 			creq.setStatNum( Chart.ST_REJECTED ) ;
@@ -82,6 +96,7 @@ public class ChartsResource {
 
 			return Response.status( Response.Status.BAD_REQUEST )
 					.links( self )
+					.type( type )
 					.entity( creq )
 					.build() ;
 		}
@@ -92,6 +107,7 @@ public class ChartsResource {
 
 			return Response.status( result.getRC() )
 					.links( self )
+					.type( type )
 					.entity( creq )
 					.build() ;
 		} else
@@ -103,6 +119,7 @@ public class ChartsResource {
 
 			return Response.status( result.getRC() )
 					.links( self )
+					.type( type )
 					.entity( creq )
 					.build() ;
 		}
@@ -110,6 +127,11 @@ public class ChartsResource {
 		try {
 			createFile( getD8NFilename( creq ), chart ) ;
 			createFile( getP9SFilename( creq ), prefs ) ;
+
+			creq.setStatNum( Chart.ST_ACCEPTED ) ;
+			creq.setModified( System.currentTimeMillis() ) ;
+
+			chartDB.insert( creq ) ;
 		} catch ( NullPointerException
 				| IOException e ) {
 			log.info( e.getMessage() ) ;
@@ -119,36 +141,54 @@ public class ChartsResource {
 
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 					.links( self )
+					.type( type )
+					.entity( creq )
+					.build() ;
+		} catch ( GenericJDBCException e ) {
+			log.info( e.getMessage() ) ;
+
+			creq.setStatNum( Chart.ST_REJECTED ) ;
+			creq.setInfo( e.getMessage() ) ;
+
+			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
+					.links( self )
+					.type( type )
 					.entity( creq )
 					.build() ;
 		}
 
-		creq.setStatNum( Chart.ST_ACCEPTED ) ;
-		creq.setModified( System.currentTimeMillis() ) ;
-
-		chartDB.insert( creq ) ;
-
 		nextURI = uri.getAbsolutePathBuilder().path( creq.getId() ).build() ;
 		next = Link.fromUri( nextURI ).rel( "next" ).build() ;
+
+		creq.setHateoas( next ) ;
 
 		return Response.status( Response.Status.ACCEPTED )
 				.location( nextURI )
 				.links( self, next )
+				.type( type )
 				.entity( creq )
 				.build() ;
 	}
 
 	@GET
+	@Produces( {
+		MediaType.APPLICATION_JSON,
+		MediaType.APPLICATION_XML } )
 	@Path( "/{id}" )
 	public Response chart(
+			@HeaderParam( "Accept" ) String accept,
 			@PathParam( value = "id" ) String id ) {
 		Optional<Chart> qres ;
 		Chart creq ;
 		Link self, next, log, err ;
 		URI nextURI, logURI, errURI ;
+		String type ;
 		ResponseBuilder response ;
 
-		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
+		if ( accept.equals( MediaType.APPLICATION_XML ) )
+			type = MediaType.APPLICATION_XML ;
+		else
+			type = MediaType.APPLICATION_JSON ;
 
 		qres = chartDB.findById( id ) ;
 
@@ -156,21 +196,28 @@ public class ChartsResource {
 			creq = qres.get() ;
 		else
 			return Response.status( Response.Status.NOT_FOUND )
-					.links( self )
 					.build() ;
+
+		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
+
+		creq.setHateoas( self ) ;
 
 		switch ( creq.getStatNum() ) {
 		case Chart.ST_ACCEPTED:
 		case Chart.ST_STARTED:
 			next = Link.fromUri( uri.getAbsolutePath() ).rel( "next" ).build() ;
 
+			creq.setHateoas( next ) ;
+
 			return Response.status( Response.Status.OK )
 					.links( self, next )
+					.type( type )
 					.entity( creq )
 					.build() ;
 		case Chart.ST_CLEANED:
 			return Response.status( Response.Status.OK )
 					.links( self )
+					.type( type )
 					.entity( creq )
 					.build() ;
 		case Chart.ST_FINISHED:
@@ -182,16 +229,23 @@ public class ChartsResource {
 			if ( ! probeFile( getPDFFilename( creq ) ) )
 				return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 						.links( self )
+						.type( type )
 						.entity( creq )
 						.build();
+
+			creq.setHateoas( next ) ;
 
 			response = Response.status( Response.Status.SEE_OTHER )
 					.location( nextURI )
 					.links( self, next )
+					.type( type )
 					.entity( creq ) ;
 
-			if ( probeFile( getLogFilename( creq ) ) )
+			if ( probeFile( getLogFilename( creq ) ) ) {
+				creq.setHateoas( log ) ;
+
 				response.links( log ) ;
+			}
 
 			return response.build() ;
 		case Chart.ST_FAILED:
@@ -202,13 +256,20 @@ public class ChartsResource {
 
 			response = Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 					.links( self )
+					.type( type )
 					.entity( creq ) ;
 
-			if ( probeFile( getLogFilename( creq ) ) )
-				response.links( log ) ;
+			if ( probeFile( getLogFilename( creq ) ) ) {
+				creq.setHateoas( log ) ;
 
-			if ( probeFile( getErrFilename( creq ) ) )
+				response.links( log ) ;
+			}
+
+			if ( probeFile( getErrFilename( creq ) ) ) {
+				creq.setHateoas( err ) ;
+
 				response.links( err ) ;
+			}
 
 			return response.build() ;
 		case Chart.ST_RECEIVED:
@@ -216,6 +277,7 @@ public class ChartsResource {
 		default:
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 					.links( self )
+					.type( type )
 					.entity( creq )
 					.build() ;
 		}
@@ -224,25 +286,21 @@ public class ChartsResource {
 	@GET
 	@Path( "/{id}/{file: .+[.](pdf|log|err)$}" )
 	public Response chart(
+			@HeaderParam( "Accept" ) String accept,
 			@PathParam( value = "id" ) String id,
 			@PathParam( value = "file" ) String file ) {
 		String path ;
-		Link self ;
 		ResponseBuilder response ;
 
 		path = getOutputDirectroy()
 				+"/"+id
 				+"/"+file ;
 
-		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
-
 		if ( ! probeFile( path ) )
 			return Response.status( Response.Status.NOT_FOUND )
-					.links( self )
 					.build() ;
 
-		response = Response.ok( new File( path ) )
-				.links( self ) ;
+		response = Response.ok( new File( path ) ) ;
 
 		if ( file.substring( file.length()-4).equals( ".pdf" ) )
 			response.type( MT_APPLICATION_PDF ) ;

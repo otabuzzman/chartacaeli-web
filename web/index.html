@@ -6,7 +6,7 @@
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c:300,400,500,700&amp;subset=greek">
@@ -258,7 +258,7 @@
 					<button id="ccBtnNew" class="btn btn-outline-primary d-none d-md-inline" type="button" title="New" disabled><i class="fas fa-file"></i></button>
 					<button id="ccBtnOpen" class="btn btn-outline-primary" type="button" title="Open"><i class="fas fa-folder-open"></i></button>
 					<input id="ccInpOpen" class="d-none" type="file">
-					<button id="ccBtnExec" class="btn btn-outline-primary" type="button" title="Execute" disabled data-rest-api="api/charts"><i class="ccwf-brandicon"></i></button>
+					<button id="ccBtnExec" class="btn btn-outline-primary" type="button" title="Execute" disabled data-rest-api="api/charts"><i class="ccwf-brandicon"></i><span class="spinner-grow d-none" role="status"></span></button>
 					<button id="ccBtnSave" class="btn btn-outline-primary d-none" type="button" title="Download"><svg xmlns="http://www.w3.org/2000/svg"><path d="M8 20h3v-5h2v5h3l-4 4-4-4zm11.479-12.908c-.212-3.951-3.473-7.092-7.479-7.092s-7.267 3.141-7.479 7.092c-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h3.5v-2h-3.5c-1.93 0-3.5-1.57-3.5-3.5 0-2.797 2.479-3.833 4.433-3.72-.167-4.218 2.208-6.78 5.567-6.78 3.453 0 5.891 2.797 5.567 6.78 1.745-.046 4.433.751 4.433 3.72 0 1.93-1.57 3.5-3.5 3.5h-3.5v2h3.5c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408z"/></svg></button>
 					<button class="ccBtnCapture btn btn-outline-secondary d-sm-inline d-md-none" type="button" title="Copy to clipboard" disabled><i class="far fa-clipboard"></i></button>
 					<button id="ccBtnCapture" class="btn btn-outline-primary d-none d-md-inline" type="button" title="Copy to clipboard" disabled><i class="fas fa-clipboard"></i></button>
@@ -267,19 +267,52 @@
 				</div>
 			</div>
 		</div>
-		<div id="ccWarning" class="modal fade" role="dialog" tabindex="-1">
+		<div id="ccDgWarn2Key" class="modal fade" role="dialog" tabindex="-1">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h4 class="modal-title">Unsaved changes pending</h4>
+						<h4 class="modal-title">
+							<span class="dgwarn-unsaved">Unsaved changes pending</span>
+						</h4>
 						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
 					</div>
 					<div class="modal-body info-txt lead">
-						<p>Of course you know about your <strong>pending changes</strong> but anyway and at the risk of boring you: do you really want to proceed and discard your unsaved changes?</p>
+						<p>
+							<span class="dgwarn-unsaved">Do you really want to proceed and discard your unsaved changes?</span>
+						</p>
 					</div>
 					<div class="modal-footer">
-						<button id="ccMBtnWarn2nd" class="btn btn-secondary btn-lg btn-block" type="button">Proceed and discard unsaved changes</button>
-						<button id="ccMBtnWarn1st" class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">Return and preserve unsaved changes</button>
+						<button id="ccDgWarnKey2nd" class="btn btn-secondary btn-lg btn-block" type="button">
+							<span class="dgwarn-unsaved">Proceed and discard unsaved changes</span>
+						</button>
+						<button id="ccDgWarnKey1st" class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">
+							<span class="dgwarn-unsaved">Return and preserve unsaved changes</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="ccDgError" class="modal fade" role="dialog" tabindex="-1">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">
+							<span class="dgerr-400">Bad request (400) error occurred</span>
+							<span class="dgerr-500">Internal server error (500) occurred</span>
+						</h4>
+						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
+					</div>
+					<div class="modal-body info-txt lead">
+						<p>
+							<span class="dgerr-400">Server sent <i class="creq-info"></i>. Check if chart definition and preferences (if given) are valid.</span>
+							<span class="dgerr-500">Server sent <i class="creq-info"></i>. There is not much you can do except try again later.</span>
+						</p>
+					</div>
+					<div class="modal-footer">
+						<button id="ccDgErrorKey" class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">
+							<span class="dgerr-400">OK</span>
+							<span class="dgerr-500">OK</span>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -355,8 +388,8 @@
 	<!-- end community -->
 
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
 	<script type="text/javascript" src="lib/xonomy/xonomy.js"></script>
 	<script type="text/javascript" src="lib/chartacaeli.xsd.js"></script>

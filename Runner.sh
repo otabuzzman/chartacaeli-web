@@ -21,8 +21,7 @@ while sleep ${INTERVAL:-1} ; do
 	gawk '$1~/[0-9A-Za-z]{8}/ {print $0}')
 
 	# check and log
-	[ -n "$creq" ] && info "found chart definition $id" \
-	|| { info "nothing to do" ; continue ; }
+	[ -n "$creq" ] || { info "nothing to do" ; continue ; }
 
 	set $creq ; id=$1 name=$3
 	bas=$OUTDIR/$id/$name
