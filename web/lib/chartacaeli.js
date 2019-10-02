@@ -321,27 +321,16 @@ function exec202(creq) {
 		$.ajax({
 			url: next,
 			method: 'GET',
-			statusCode: {
-				200: function(body) {
-					if ( typeof body.stat === 'undefined') {
-						var pdf = new Blob([body], {type: "application/pdf"}) ;
-						var url = window.URL.createObjectURL(pdf) ;
-						window.open(url) ;
-						clearInterval(hdExecPoll) ;
-						clearTimeout(hdExecWait) ;
-						Transition[statThis.stat][Event.RETURN]() ;
-					} else
-						console.log(body.stat) ;
-				},
-				/* actually not used because ajax automatically follows redirect in Location header */
-				303: function(xhr) {
-					var creq = $.parseJSON(xhr.responseText) ;
-					var next = creq.hateoas.find(function (link) {return link.rel == 'next'}).href ;
-					window.open(next) ;
+			success: function(body) {
+				if ( typeof body.stat === 'undefined') {
+					var pdf = new Blob([body], {type: "application/pdf"}) ;
+					var url = window.URL.createObjectURL(pdf) ;
+					window.open(url) ;
 					clearInterval(hdExecPoll) ;
 					clearTimeout(hdExecWait) ;
 					Transition[statThis.stat][Event.RETURN]() ;
-				}
+				} else
+					console.log(body.stat) ;
 			}
 		}) ;
 	}, 5000) ;

@@ -5,6 +5,10 @@ this=$(basename $0)
 
 . ./$this.rc
 
+( LOGLEVEL=3 info started )
+
+trap signalhandler 1 2 3 6 15
+
 probeJRE || { fail "Java not available. Start canceled." ; exit 1 ; }
 probeDB || { fail "database '$DBURL' not available. Start canceled." ; exit 1 ; }
 probeOUTDIR || { fail "OUTDIR '$OUTDIR' invalid. Start canceled" ; exit 1 ; }
@@ -12,7 +16,7 @@ probeAPPDIR || { fail "APPDIR '$APPDIR' invalid. Start canceled." ; exit 1 ; }
 probeAPPEXE || { fail "APPEXE '$APPEXE' invalid. Start canceled." ; exit 1 ; }
 probeGS || { fail "Ghostscript not available. Start canceled." ; exit 1 ; }
 
-while sleep ${INTERVAL:-1} ; do
+while true ; do
 	# lookup oldest chart creation request in 'accepted' state
 	# `stat` column is workaround for CRLF output of H2 Shell Tool
 	creq=$(java -cp $CLASSPATH org.h2.tools.Shell \
@@ -21,7 +25,7 @@ while sleep ${INTERVAL:-1} ; do
 	gawk '$1~/[0-9A-Za-z]{8}/ {print $0}')
 
 	# check and log
-	[ -n "$creq" ] || { info "nothing to do" ; continue ; }
+	[ -n "$creq" ] || { info "nothing to do" ; sleep ${INTERVAL:-1} ; continue ; }
 
 	set $creq ; id=$1 name=$3
 	bas=$OUTDIR/$id/$name
@@ -34,8 +38,6 @@ while sleep ${INTERVAL:-1} ; do
 	pdf=$bas.pdf
 	log=$bas.log
 	err=$bas.err
-
-	trap signalhandler 1 2 3 6 15
 
 	# set 'started' state
 	info "set state 'started' for $id"

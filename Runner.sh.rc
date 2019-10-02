@@ -1,14 +1,15 @@
 # Runner.sh.rc - run commands on Runner.sh startup
 #
 
+# enum LOGLEVEL { NONE, FAIL, WARN, INFO }
 info() {
-	echo $(date +%Y/%m/%d\ %H:%M:%S) : INFO : Charta Caeli Web Service : $this : $1
+	(( ${LOGLEVEL:-0} > 2 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : INFO : Charta Caeli Web Service : $this : $1
 }
 warn() {
-	echo $(date +%Y/%m/%d\ %H:%M:%S) : WARN : Charta Caeli Web Service : $this : $1
+	(( ${LOGLEVEL:-0} > 1 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : WARN : Charta Caeli Web Service : $this : $1
 }
 fail() {
-	echo $(date +%Y/%m/%d\ %H:%M:%S) : FAIL : Charta Caeli Web Service : $this : $1
+	(( ${LOGLEVEL:-0} > 0 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : FAIL : Charta Caeli Web Service : $this : $1
 }
 
 probeJRE() {
@@ -51,7 +52,7 @@ probeGS() {
 }
 
 signalhandler() {
-	info "rollback $id and leave upon signal"
+	( LOGLEVEL=3 info "rollback $id and exit upon signal" )
 
 	rm -f $pdf $log $err
 
@@ -59,7 +60,7 @@ signalhandler() {
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "UPDATE charts SET stat = 'accepted', modified = '$(date +%s)000' WHERE id = '$id'"
 
-	exit 1
+	exit 0
 }
 
 updateDB() {

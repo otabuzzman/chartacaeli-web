@@ -106,7 +106,8 @@ XML Root object representation sample if Accept header not aplication/json or mi
   <info>Charta Caeli RESTful Web Service API</info>
   <hateoas href="http://localhost:4711/chartacaeli-web/api" rel="self"/>
   <hateoas href="http://localhost:4711/chartacaeli-web/api/charts" rel="new"/>
-</root>```
+</root>
+```
 
 JSON Root object representation sample if Accept header equals aplication/json
 
@@ -123,7 +124,8 @@ JSON Root object representation sample if Accept header equals aplication/json
       "rel": "new"
     }
   ]
-}```
+}
+```
 
 XML Chart object representation sample
 
@@ -216,14 +218,16 @@ JSON Chart object representation sample
   cd ~/chartacaeli-web
 
   # sample shell variables to exec Runner.sh in a Cygwin-based environment
+  export PATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
   export GS=gswin64c
-  # use DBURL as shown in web/META-INF/context.xml and H2 Console as well
+  # use DBURL as shown below in web/META-INF/context.xml and H2 Console as well
   export DBURL="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO"
   export OUTDIR=$(cygpath -m ~/src/chartacaeli-web/db)
   export APPDIR=~/src/chartacaeli/mvn/web/WEB-INF
   export INTERVAL=10
+  export LOGLEVEL=3
 
-  sh Runner.sh
+  sh Runner.sh &
   ```
 
 - Start Charta Caeli RESTful web service (either Eclipse IDE or Tomcat)
@@ -326,7 +330,7 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
 #### Tomcat setup
 Installation and configuration of Tomcat performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
 
-Create `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml` with content `<Context docBase="<appbase>" path="" reloadable="true"/>` and `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web`) to make Charta Caeli default (start on domain URL).
+Copy `META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`. Update Context element to `<Context docBase="<appbase>" path="" reloadable="true"/>` with `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web`). This makes Charta Caeli the default web app (start on domain URL).
 
 - To start Tomcat on Windows enter these commands in `cmd.exe`:
 
