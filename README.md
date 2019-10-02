@@ -101,12 +101,12 @@ RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful
 XML Root object representation sample if Accept header not aplication/json or missing
 
 ```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <root>
   <info>Charta Caeli RESTful Web Service API</info>
   <hateoas href="http://localhost:4711/chartacaeli-web/api" rel="self"/>
   <hateoas href="http://localhost:4711/chartacaeli-web/api/charts" rel="new"/>
-</root>
-```
+</root>```
 
 JSON Root object representation sample if Accept header equals aplication/json
 
@@ -114,11 +114,16 @@ JSON Root object representation sample if Accept header equals aplication/json
 {
   "info": "Charta Caeli RESTful Web Service API",
   "hateoas": [
-    "javax.ws.rs.core.Link$JaxbLink@3537a1f3",
-    "javax.ws.rs.core.Link$JaxbLink@81939dd3"
+    {
+      "href": "http://localhost:4711/chartacaeli-web/api",
+      "rel": "self"
+    },
+    {
+      "href": "http://localhost:4711/chartacaeli-web/api/charts",
+      "rel": "new"
+    }
   ]
-}
-```
+}```
 
 XML Chart object representation sample
 

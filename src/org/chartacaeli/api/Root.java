@@ -21,7 +21,7 @@ public class Root {
 	private String info ;
 
 	@Transient
-	@XmlJavaTypeAdapter( Link.JaxbAdapter.class )
+	@XmlJavaTypeAdapter( MoxyLinkAdapter.class )
 	private List<Link> hateoas ;
 
 	public Root() {
