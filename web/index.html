@@ -267,6 +267,28 @@
 				</div>
 			</div>
 		</div>
+		<div id="ccDgInfo" class="modal fade" role="dialog" tabindex="-1">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">
+							<span class="dginfo-progress">Request still in progress</span>
+						</h4>
+						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
+					</div>
+					<div class="modal-body info-txt lead">
+						<p>
+							<span class="dginfo-progress">Star chart generation may take a couple of minutes. Your chart will open automatically if you leave this page open while doing other things. Bookmark and occasionally check this <a target="_blank">status link</a> to get redirected to your chart after processing is complete.</span>
+						</p>
+					</div>
+					<div class="modal-footer">
+						<button id="ccDgInfoKey" class="btn btn-primary btn-lg btn-block" type="button">
+							<span class="dginfo-progress">OK</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div id="ccDgWarn2Key" class="modal fade" role="dialog" tabindex="-1">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
@@ -292,26 +314,26 @@
 				</div>
 			</div>
 		</div>
-		<div id="ccDgError" class="modal fade" role="dialog" tabindex="-1">
+		<div id="ccDgFail" class="modal fade" role="dialog" tabindex="-1">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h4 class="modal-title">
-							<span class="dgerr-400">Bad request (400) error occurred</span>
-							<span class="dgerr-500">Internal server error (500) occurred</span>
+							<span class="dgfail-400">Bad request (400) error occurred</span>
+							<span class="dgfail-500">Internal server error (500) occurred</span>
 						</h4>
 						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
 					</div>
 					<div class="modal-body info-txt lead">
 						<p>
-							<span class="dgerr-400">Server sent <i class="creq-info"></i>. Check if chart definition and preferences (if given) are valid.</span>
-							<span class="dgerr-500">Server sent <i class="creq-info"></i>. There is not much you can do except try again later.</span>
+							<span class="dgfail-400">Server sent <i class="creq-info"></i>. Check if chart definition and preferences (if given) are valid.</span>
+							<span class="dgfail-500">Server sent <i class="creq-info"></i>. There is not much you can do except try again later.</span>
 						</p>
 					</div>
 					<div class="modal-footer">
-						<button id="ccDgErrorKey" class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">
-							<span class="dgerr-400">OK</span>
-							<span class="dgerr-500">OK</span>
+						<button id="ccDgFailKey" class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">
+							<span class="dgfail-400">OK</span>
+							<span class="dgfail-500">OK</span>
 						</button>
 					</div>
 				</div>

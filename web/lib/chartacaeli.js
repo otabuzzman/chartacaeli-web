@@ -48,10 +48,12 @@ function grabXonomy(id) {
 	return head+data ;
 }
 
-/* chart generation timeout handler */
-var hdExecWait ;
+/* chart generation cancel timeout handler */
+var hdExecCanc ;
 /* chart generation poll interval handler */
 var hdExecPoll ;
+/* chart generation progress timeout handler */
+var hdExecProg ;
 
 /* definition and preferences state objects */
 var statD8N ;
@@ -234,12 +236,17 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	document.querySelector('#ccBtnTglD').addEventListener('click', btnTglD) ;
 	document.querySelector('#ccDgWarnKey1st').addEventListener('click', dgWarnKey1st) ;
 	document.querySelector('#ccDgWarnKey2nd').addEventListener('click', dgWarnKey2nd) ;
-	document.querySelector('#ccDgErrorKey').addEventListener('click', dgErrorKey) ;
+	document.querySelector('#ccDgFailKey').addEventListener('click', dgFailKey) ;
+	document.querySelector('#ccDgInfoKey').addEventListener('click', dgInfoKey) ;
 }) ;
 
-function dgErrorKey(event) {
+function dgInfoKey(event) {
+	$('#ccDgInfo').modal('toggle') ;
+}
+
+function dgFailKey(event) {
 	Transition[statThis.stat][Event.RETURN]() ;
-	$('#ccDgError').modal('toggle') ;
+	$('#ccDgFail').modal('toggle') ;
 }
 
 function dgWarnKey2nd(event) {
@@ -291,11 +298,11 @@ function btnTglP(event) {
 
 function btnExec(event) {
 	var exec, chart, prefs, xhr ;
-	hdExecWait = setTimeout(function () {
+	hdExecCanc = setTimeout(function () {
 		clearInterval(hdExecPoll) ;
 		Transition[statThis.stat][Event.RETURN]() ;
 		xhr.abort() ;
-	}, 45000) ;
+	}, 30*60*1000) ; /* 30 min */
 	Transition[statThis.stat][Event.EXEC]() ;
 	/* issue POST */
 	statThis.open = grabXonomy() ;
@@ -309,52 +316,61 @@ function btnExec(event) {
 		dataType: 'json',
 		statusCode: {
 			202: function (creq) {exec202(creq)},
-			400: function (xhr) {exec400(xhr)},
-			500: function (xhr) {exec500(xhr)}
+			400: function (xhr) {exec400($.parseJSON(xhr.responseText))},
+			500: function (xhr) {exec500($.parseJSON(xhr.responseText))}
 		}
 	}) ;
 }
 
 function exec202(creq) {
 	var next = creq.hateoas.find(function (link) {return link.rel == 'next'}).href ;
+	$('#ccDgInfo').find('.dginfo-progress a').attr('href', next) ;
 	hdExecPoll = setInterval(function () {
 		$.ajax({
 			url: next,
 			method: 'GET',
-			success: function(body) {
+			success: function(body, stat, xhr) {
 				if ( typeof body.stat === 'undefined') {
-					var pdf = new Blob([body], {type: "application/pdf"}) ;
-					var url = window.URL.createObjectURL(pdf) ;
-					window.open(url) ;
+					/*
+					var dat = new Blob([body], {type: 'application/pdf'}) ;
+					var pdf = window.URL.createObjectURL(dat) ;
+					workaround due to lack of ajax blob support (SO #34586671) */
+					var link = xhr.getResponseHeader('link') ;
+					link = link.replace(/^.*</, '') ;
+					var pdf = link.replace(/>.*$/, '') ;
+					/* end of workaround */
+					window.open(pdf) ;
 					clearInterval(hdExecPoll) ;
-					clearTimeout(hdExecWait) ;
+					clearTimeout(hdExecProg) ;
+					clearTimeout(hdExecCanc) ;
 					Transition[statThis.stat][Event.RETURN]() ;
 				} else
 					console.log(body.stat) ;
 			}
 		}) ;
-	}, 5000) ;
+	}, 5*1000) ; /* 5 sec */
+	hdExecProg = setTimeout(function () {
+		$('#ccDgInfo').modal('toggle') ;
+	}, 15*1000) ; /* 15 sec */
 }
 
-function exec400(xhr) {
+function exec400(creq) {
 	var creq ;
-	clearTimeout(hdExecWait) ;
-	creq = $.parseJSON(xhr.responseText) ;
-	$('#ccDgError .dgerr-400 .creq-info').text(creq.info) ;
-	$('#ccDgError').find('[class ^= dgerr-]').addClass('d-none') ;
-	$('#ccDgError').find('.dgerr-400').removeClass('d-none') ;
-	$('#ccDgError').modal('toggle') ;
+	clearTimeout(hdExecCanc) ;
+	$('#ccDgFail .dgfail-400 .creq-info').text(creq.info) ;
+	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
+	$('#ccDgFail').find('.dgfail-400').removeClass('d-none') ;
+	$('#ccDgFail').modal('toggle') ;
 	Transition[statThis.stat][Event.ERROR]() ;
 }
 
-function exec500(xhr) {
+function exec500(creq) {
 	var creq ;
-	clearTimeout(hdExecWait) ;
-	creq = $.parseJSON(xhr.responseText) ;
-	$('#ccDgError .dgerr-500 .creq-info').text(creq.info) ;
-	$('#ccDgError').find('[class ^= dgerr-]').addClass('d-none') ;
-	$('#ccDgError').find('.dgerr-500').removeClass('d-none') ;
-	$('#ccDgError').modal('toggle') ;
+	clearTimeout(hdExecCanc) ;
+	$('#ccDgFail .dgfail-500 .creq-info').text(creq.info) ;
+	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
+	$('#ccDgFail').find('.dgfail-500').removeClass('d-none') ;
+	$('#ccDgFail').modal('toggle') ;
 	Transition[statThis.stat][Event.ERROR]() ;
 }
 

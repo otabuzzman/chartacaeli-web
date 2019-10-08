@@ -131,8 +131,8 @@ XML Chart object representation sample
 
 ```xml
 <chart id="96fc442a-12ff-4c0d-b28e-ba9e2c3e1843"> <!-- UUID -->
-  <created>1569965427216</created>                <!-- msec since 1.1.1970 -->
-  <modified>1569965432000</modified>              <!-- msec since 1.1.1970 -->
+  <created>1569965427216</created>                <!-- UTC msec since 1.1.1970 -->
+  <modified>1569965432000</modified>              <!-- UTC msec since 1.1.1970 -->
   <name>scientific-star-chart</name>              <!-- value of /ChartaCaeli/@name -->
   <stat>finished</stat>                           <!-- accepted|rejected|started|finished|failed|cleaned -->
   <!-- one or more HATEOAS links (optional) -->
@@ -248,11 +248,11 @@ JSON Chart object representation sample
 ||500|self, related|Chart object representation|- stat element equals failed<br>- related equal *.log or *.err<br>- self equals URI<br>|Charta Caeli core app or PDF conversion process failed|
 ||500|self|Chart object representation|- stat element equals received &#124; rejected<br>- self equals URI<br>|Illegal values for stat element.|
 |`GET /api/charts/{id}/{name}.pdf`|200|self|Chart PDF file|||
-||404|self|||Invalid resource name|
+||404||||Invalid resource name|
 |`GET /api/charts/{id}/{name}.log`|200|self|Charta Caeli core app log file|||
-||404|self|||Invalid resource name|
+||404||||Invalid resource name|
 |`GET /api/charts/{id}/{name}.log`|200|self|PDF conversion error file (stderr)|||
-||404|self|||Invalid resource name|
+||404||||Invalid resource name|
 
 #### Database setup
 The configuration provides for the [Hibernate](https://hibernate.org/) ORM implementation twinned with an [H2](http://www.h2database.com/html/main.html) database.

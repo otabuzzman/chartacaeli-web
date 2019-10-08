@@ -290,6 +290,7 @@ public class ChartsResource {
 			@PathParam( value = "id" ) String id,
 			@PathParam( value = "file" ) String file ) {
 		String path ;
+		Link self ;
 		ResponseBuilder response ;
 
 		path = getOutputDirectroy()
@@ -300,7 +301,11 @@ public class ChartsResource {
 			return Response.status( Response.Status.NOT_FOUND )
 					.build() ;
 
-		response = Response.ok( new File( path ) ) ;
+		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
+
+		response = Response
+				.ok( new File( path ) )
+				.links( self ) ;
 
 		if ( file.substring( file.length()-4).equals( ".pdf" ) )
 			response.type( MT_APPLICATION_PDF ) ;

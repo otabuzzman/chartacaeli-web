@@ -43,7 +43,7 @@ while true ; do
 	info "set state 'started' for $id"
 	updateDB $id started
 
-	info "about to exec '$APPEXE $xml'..."
+	info "about to exec '$APPEXE $xml' ..."
 	# run Charta Caeli app
 	( cd $APPDIR ; ./$APPEXE $xml 2>$log |\
 	$GS -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=$pdf -_ >$err 2>&1 ) \
