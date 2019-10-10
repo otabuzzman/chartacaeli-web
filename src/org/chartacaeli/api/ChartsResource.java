@@ -164,7 +164,6 @@ public class ChartsResource {
 
 		return Response.status( Response.Status.ACCEPTED )
 				.location( nextURI )
-				.links( self, next )
 				.type( type )
 				.entity( creq )
 				.build() ;
@@ -235,8 +234,7 @@ public class ChartsResource {
 
 			creq.setHateoas( next ) ;
 
-			response = Response.status( Response.Status.SEE_OTHER )
-					.location( nextURI )
+			response = Response.status( Response.Status.OK )
 					.links( self, next )
 					.type( type )
 					.entity( creq ) ;
@@ -290,7 +288,6 @@ public class ChartsResource {
 			@PathParam( value = "id" ) String id,
 			@PathParam( value = "file" ) String file ) {
 		String path ;
-		Link self ;
 		ResponseBuilder response ;
 
 		path = getOutputDirectroy()
@@ -301,11 +298,7 @@ public class ChartsResource {
 			return Response.status( Response.Status.NOT_FOUND )
 					.build() ;
 
-		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
-
-		response = Response
-				.ok( new File( path ) )
-				.links( self ) ;
+		response = Response.ok( new File( path ) ) ;
 
 		if ( file.substring( file.length()-4).equals( ".pdf" ) )
 			response.type( MT_APPLICATION_PDF ) ;

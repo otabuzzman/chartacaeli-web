@@ -182,8 +182,8 @@ JSON Chart object representation sample
 |Method|URI|HATEOAS|Comment|
 |--|--|--|--|
 |GET|`/`|self, new|Content with Root object representation.|
-|POST|`/charts`|Location, self, next|Status 202, Header field Location set to `/charts/{id}`. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header.<br>Status 400 in case of schema violation.<br>Status 500 in case of server errors.|
-|GET|`/charts/{id}`|Location, self, next, related|Status 200 until finished or failed state. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header.<br>Status 303 when finished. _next_ relation and Location set to point at PDF file.<br>Status 303 when failed. _related_ relations set to point at log files of application and PDF converter.<br>Status 404 in case of invalid `{id}`.<br>Status 500 in case of server errors.|
+|POST|`/charts`|Location|Status 202, Location header set to `/charts/{id}`. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header.<br>Status 400 in case of schema violation.<br>Status 500 in case of server errors.|
+|GET|`/charts/{id}`|self, next, related|Status 200. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header. HATEOAS relations updated according to state.<br>Status 404 in case of invalid `{id}`.<br>Status 500 in case of server errors.|
 |GET|`/charts/{id}/{file}`|self|Status 200.<br>Status 404 in case of invalid `{file}`.|
 
 **Parameters**
@@ -215,18 +215,23 @@ JSON Chart object representation sample
 - Set environment (or use default values in script) and start `Runner.sh`
 
   ```bash
-  cd ~/chartacaeli-web
-
-  # sample shell variables to exec Runner.sh in a Cygwin-based environment
+  # Windows (Cygwin)
   export PATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
   export GS=gswin64c
-  # use DBURL as shown below in web/META-INF/context.xml and H2 Console as well
+  # use same DBURL in web/META-INF/context.xml and if necessary in H2 Console as well
   export DBURL="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO"
   export OUTDIR=$(cygpath -m ~/src/chartacaeli-web/db)
   export APPDIR=~/src/chartacaeli/mvn/web/WEB-INF
   export INTERVAL=10
   export LOGLEVEL=3
+  # Linux
+  export DBURL="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO"
+  export OUTDIR=~/src/chartacaeli-web/db
+  export APPDIR=~/src/chartacaeli/mvn/web/WEB-INF
+  export INTERVAL=10
+  export LOGLEVEL=3
 
+  cd ~/src/chartacaeli-web
   sh Runner.sh &
   ```
 
@@ -238,12 +243,12 @@ JSON Chart object representation sample
 |Request|Status|HATEOAS|Content|Check|Cause|
 |:--|:--|:--|:--|:--|:--|
 |`GET /api`|200|self, new|Welcome message|- Welcome message present<br>-new equals New chart URI<br>- self equals URI||
-|`POST /api/charts`|202|Location, self, next|Chart object representation|- stat element equals accepted<br>- Location equals next<br>- self equals URI||
+|`POST /api/charts`|202|Location|Chart object representation|- Location points at valid `/charts/{id}` resource.||
 ||400|self|Chart object representation|- stat element equals rejected<br>- info element set<br>- self equals URI|- Invalid or missing D8N.<br>- Invalid P9S.|
 ||500|self|Chart object representation|- stat element equals rejected<br>- info element set<br>- self equals URI||
 |`GET /api/charts/{id}`|200|self, next|Chart object representation|- stat element equals accepted &#124; started<br>- self equals URI<br>- next equals URI||
 ||200|self|Chart object representation|- stat element equals cleaned<br>- self equals URI||
-||303|Location, self, next, related|Chart object representation|- stat element equals finished<br>- Location equals next<br>- related (optional) equals *.log<br>- self equals URI<br>||
+||200|self, next, related|Chart object representation|- stat element equals finished<br>- related (optional) equals *.log<br>- self equals URI<br>||
 ||500|self|Chart object representation|- stat element equals finished<br>- self equals URI<br>|PDF file missing on server.|
 ||500|self, related|Chart object representation|- stat element equals failed<br>- related equal *.log or *.err<br>- self equals URI<br>|Charta Caeli core app or PDF conversion process failed|
 ||500|self|Chart object representation|- stat element equals received &#124; rejected<br>- self equals URI<br>|Illegal values for stat element.|

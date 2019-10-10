@@ -322,23 +322,20 @@ function btnExec(event) {
 	}) ;
 }
 
+function hoasGetHref(hoas, rel) {
+	return hoas.find(function (link) {return link.rel == rel}).href ;
+}
+
 function exec202(creq) {
-	var next = creq.hateoas.find(function (link) {return link.rel == 'next'}).href ;
+	var next = hoasGetHref(creq.hateoas, 'next') ;
 	$('#ccDgInfo').find('.dginfo-progress a').attr('href', next) ;
 	hdExecPoll = setInterval(function () {
 		$.ajax({
 			url: next,
 			method: 'GET',
 			success: function(body, stat, xhr) {
-				if ( typeof body.stat === 'undefined') {
-					/*
-					var dat = new Blob([body], {type: 'application/pdf'}) ;
-					var pdf = window.URL.createObjectURL(dat) ;
-					workaround due to lack of ajax blob support (SO #34586671) */
-					var link = xhr.getResponseHeader('link') ;
-					link = link.replace(/^.*</, '') ;
-					var pdf = link.replace(/>.*$/, '') ;
-					/* end of workaround */
+				if (body.stat === 'finished') {
+					var pdf = hoasGetHref(body.hateoas, 'next') ;
 					window.open(pdf) ;
 					clearInterval(hdExecPoll) ;
 					clearTimeout(hdExecProg) ;
