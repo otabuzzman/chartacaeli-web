@@ -47,6 +47,10 @@ public class ChartsResource {
 	private final static String MT_APPLICATION_PDF = "application/pdf" ;
 	private final static String MT_TEXT_PLAIN_UTF8 = MediaType.TEXT_PLAIN+";charset="+StandardCharsets.UTF_8 ;
 
+	// rfc 5988 title strings
+	private final static String L_APPLOG = "Charta Caeli core application log file" ;
+	private final static String L_PDFERR = "Ghostscript PDF conversion error file" ;
+
 	@Context
 	private UriInfo uri ;
 
@@ -163,7 +167,7 @@ public class ChartsResource {
 		creq.setHateoas( next ) ;
 
 		return Response.status( Response.Status.ACCEPTED )
-				.location( nextURI )
+				.links( self, next )
 				.type( type )
 				.entity( creq )
 				.build() ;
@@ -223,7 +227,7 @@ public class ChartsResource {
 			nextURI = uri.getAbsolutePathBuilder().path( creq.getName()+".pdf" ).build() ;
 			next = Link.fromUri( nextURI ).rel( "next" ).build() ;
 			logURI = uri.getAbsolutePathBuilder().path( creq.getName()+".log" ).build() ;
-			log = Link.fromUri( logURI ).rel( "related" ).build() ;
+			log = Link.fromUri( logURI ).rel( "related" ).title( L_APPLOG ).build() ;
 
 			if ( ! probeFile( getPDFFilename( creq ) ) )
 				return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
@@ -248,9 +252,9 @@ public class ChartsResource {
 			return response.build() ;
 		case Chart.ST_FAILED:
 			logURI = uri.getAbsolutePathBuilder().path( creq.getName()+".log" ).build() ;
-			log = Link.fromUri( logURI ).rel( "related" ).build() ;
+			log = Link.fromUri( logURI ).rel( "related" ).title( L_APPLOG ).build() ;
 			errURI = uri.getAbsolutePathBuilder().path( creq.getName()+".err" ).build() ;
-			err = Link.fromUri( errURI ).rel( "related" ).build() ;
+			err = Link.fromUri( errURI ).rel( "related" ).title( L_PDFERR ).build() ;
 
 			response = Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 					.links( self )

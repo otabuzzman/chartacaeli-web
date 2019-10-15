@@ -319,21 +319,24 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h4 class="modal-title">
-							<span class="dgfail-400">Bad request (400) error occurred</span>
-							<span class="dgfail-500">Internal server error (500) occurred</span>
+							<span class="dgfail-exec400">Bad request (400) error occurred</span>
+							<span class="dgfail-exec500">Internal server error (500) occurred</span>
+							<span class="dgfail-poll500">Internal server error (500) occurred</span>
 						</h4>
 						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
 					</div>
 					<div class="modal-body info-txt lead">
 						<p>
-							<span class="dgfail-400">Server sent <i class="creq-info"></i>. Check if chart definition and preferences (if given) are valid.</span>
-							<span class="dgfail-500">Server sent <i class="creq-info"></i>. There is not much you can do except try again later.</span>
+							<span class="dgfail-exec400">Server sent <i class="creq-info"></i>. Check if chart definition and preferences (if given) are valid.</span>
+							<span class="dgfail-exec500">Server sent <i class="creq-info"></i>. There is not much you can do except try again later.</span>
+							<span class="dgfail-poll500">Chart generation or PDF conversion failed for some reason.<span class="applog"> See <a target="_blank">Charta Caeli log file</a> for details.</span><span class="pdferr"> <a target="_blank">Ghostscript PDF converter error log</a> might provide additional hints.</span></span>
 						</p>
 					</div>
 					<div class="modal-footer">
 						<button id="ccDgFailKey" class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">
-							<span class="dgfail-400">OK</span>
-							<span class="dgfail-500">OK</span>
+							<span class="dgfail-exec400">OK</span>
+							<span class="dgfail-exec500">OK</span>
+							<span class="dgfail-poll500">OK</span>
 						</button>
 					</div>
 				</div>

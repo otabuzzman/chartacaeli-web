@@ -4,12 +4,12 @@ A web frontend to the Charta Caeli star chart creation tool. The web service is 
 ### Build
 The project depends on the [repository](https://github.com/otabuzzman/chartacaeli) of the Charta Caeli star chart creation tool (core application). Thus, to setup the web service, one first has to download and build the core app according to instructions given there. Afterwards clone this repository and follow steps listed below. Run clone commands from same folder to make sure top-level directories of core app and web service share the same parent folder.
 - Change directory (bash) to top-level directory of Charta Caeli web service.
-- Run build commands:
+- Run build commands.
   ```bash
   make all
   ```
 
-- To rebuild the images (for instance to check if the core app works) run:
+- Rebuild images to check if core app works.
 
   ```bash
   # Windows (Cygwin)
@@ -89,7 +89,7 @@ Purposes of links in running text is provision of background information or to g
 |URL in text (inline)|Same as for navigation menu entries. No text decorations.|
 
 #### RESTful API design
-RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful Web Service framework. HATEOAS using Link header based on [RFC5988](https://tools.ietf.org/html/rfc5988) with Location header field (redirection) set to value of next relation if appropriate.
+RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful Web Service framework. HATEOAS using Link header based on [RFC5988](https://tools.ietf.org/html/rfc5988).
 
 **Object model and representations**
 
@@ -181,8 +181,8 @@ JSON Chart object representation sample
 
 |Method|URI|HATEOAS|Comment|
 |--|--|--|--|
-|GET|`/`|self, new|Content with Root object representation.|
-|POST|`/charts`|Location|Status 202, Location header set to `/charts/{id}`. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header.<br>Status 400 in case of schema violation.<br>Status 500 in case of server errors.|
+|GET|`/`|self, new|Status 200. Content with Root object representation.|
+|POST|`/charts`|self, next|Status 202. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header.<br>Status 400 in case of schema violation.<br>Status 500 in case of server errors.|
 |GET|`/charts/{id}`|self, next, related|Status 200. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header. HATEOAS relations updated according to state.<br>Status 404 in case of invalid `{id}`.<br>Status 500 in case of server errors.|
 |GET|`/charts/{id}/{file}`|self|Status 200.<br>Status 404 in case of invalid `{file}`.|
 
@@ -218,7 +218,6 @@ JSON Chart object representation sample
   # Windows (Cygwin)
   export PATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
   export GS=gswin64c
-  # use same DBURL in web/META-INF/context.xml and if necessary in H2 Console as well
   export DBURL="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO"
   export OUTDIR=$(cygpath -m ~/src/chartacaeli-web/db)
   export APPDIR=~/src/chartacaeli/mvn/web/WEB-INF
@@ -231,7 +230,6 @@ JSON Chart object representation sample
   export INTERVAL=10
   export LOGLEVEL=3
 
-  cd ~/src/chartacaeli-web
   sh Runner.sh &
   ```
 
@@ -243,7 +241,7 @@ JSON Chart object representation sample
 |Request|Status|HATEOAS|Content|Check|Cause|
 |:--|:--|:--|:--|:--|:--|
 |`GET /api`|200|self, new|Welcome message|- Welcome message present<br>-new equals New chart URI<br>- self equals URI||
-|`POST /api/charts`|202|Location|Chart object representation|- Location points at valid `/charts/{id}` resource.||
+|`POST /api/charts`|202|self, next|Chart object representation|- self equals URI<br>- next points at valid `/charts/{id}` resource.||
 ||400|self|Chart object representation|- stat element equals rejected<br>- info element set<br>- self equals URI|- Invalid or missing D8N.<br>- Invalid P9S.|
 ||500|self|Chart object representation|- stat element equals rejected<br>- info element set<br>- self equals URI||
 |`GET /api/charts/{id}`|200|self, next|Chart object representation|- stat element equals accepted &#124; started<br>- self equals URI<br>- next equals URI||

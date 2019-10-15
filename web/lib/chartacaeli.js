@@ -53,7 +53,7 @@ var hdExecCanc ;
 /* chart generation poll interval handler */
 var hdExecPoll ;
 /* chart generation progress timeout handler */
-var hdExecProg ;
+var hdExecPrgs ;
 
 /* definition and preferences state objects */
 var statD8N ;
@@ -315,15 +315,23 @@ function btnExec(event) {
 		data: { chart: chart, prefs: prefs },
 		dataType: 'json',
 		statusCode: {
-			202: function (creq) {exec202(creq)},
+			202: exec202,
 			400: function (xhr) {exec400($.parseJSON(xhr.responseText))},
 			500: function (xhr) {exec500($.parseJSON(xhr.responseText))}
 		}
 	}) ;
 }
 
-function hoasGetHref(hoas, rel) {
-	return hoas.find(function (link) {return link.rel == rel}).href ;
+function hoasGetHref(hoas, rel, title) {
+	var elem ;
+	if (typeof title === 'undefined')
+		elem = hoas.find(function (link) {return link.rel == rel}) ;
+	else
+		elem = hoas.find(function (link) {return link.rel == rel && link.title.includes(title)}) ;
+
+	if (typeof elem !== 'undefined')
+		return elem.href ;
+	return elem ;
 }
 
 function exec202(creq) {
@@ -333,40 +341,70 @@ function exec202(creq) {
 		$.ajax({
 			url: next,
 			method: 'GET',
-			success: function(body, stat, xhr) {
-				if (body.stat === 'finished') {
-					var pdf = hoasGetHref(body.hateoas, 'next') ;
-					window.open(pdf) ;
-					clearInterval(hdExecPoll) ;
-					clearTimeout(hdExecProg) ;
-					clearTimeout(hdExecCanc) ;
-					Transition[statThis.stat][Event.RETURN]() ;
-				} else
-					console.log(body.stat) ;
-			}
+			success: function(creq) {
+				switch (creq.stat) {
+					case 'accepted':
+					case 'started':
+						console.log(creq.stat) ;
+						break ;
+					case 'finished':
+						var pdf = hoasGetHref(creq.hateoas, 'next') ;
+						window.open(pdf) ;
+						clearInterval(hdExecPoll) ;
+						clearTimeout(hdExecPrgs) ;
+						clearTimeout(hdExecCanc) ;
+						Transition[statThis.stat][Event.RETURN]() ;
+						break ;
+					default:
+						console.log('unexpected state: '+creq.stat) ;
+						break ;
+				}
+			},
+			error: function (xhr) {poll500($.parseJSON(xhr.responseText))}
 		}) ;
 	}, 5*1000) ; /* 5 sec */
-	hdExecProg = setTimeout(function () {
+	hdExecPrgs = setTimeout(function () {
 		$('#ccDgInfo').modal('toggle') ;
 	}, 15*1000) ; /* 15 sec */
 }
 
-function exec400(creq) {
-	var creq ;
+function poll500(creq) {
+	var applog, pdferr ;
+	clearInterval(hdExecPoll) ;
+	clearTimeout(hdExecPrgs) ;
 	clearTimeout(hdExecCanc) ;
-	$('#ccDgFail .dgfail-400 .creq-info').text(creq.info) ;
+	applog = hoasGetHref(creq.hateoas, 'related', 'Charta Caeli') ;
+	if (typeof applog !== 'undefined') {
+		$('#ccDgFail .dgfail-poll500').find('.applog a').attr('href', applog) ;
+		$('#ccDgFail .dgfail-poll500').find('.applog').removeClass('d-none') ;
+	} else
+		$('#ccDgFail .dgfail-poll500').find('.applog').addClass('d-none') ;
+	pdferr = hoasGetHref(creq.hateoas, 'related', 'Ghostscript') ;
+	if (typeof pdferr !== 'undefined') {
+		$('#ccDgFail .dgfail-poll500').find('.pdferr a').attr('href', pdferr) ;
+		$('#ccDgFail .dgfail-poll500').find('.pdferr').removeClass('d-none') ;
+	} else
+		$('#ccDgFail .dgfail-poll500').find('.pdferr').addClass('d-none') ;
 	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
-	$('#ccDgFail').find('.dgfail-400').removeClass('d-none') ;
+	$('#ccDgFail').find('.dgfail-poll500').removeClass('d-none') ;
+	$('#ccDgFail').modal('toggle') ;
+	Transition[statThis.stat][Event.ERROR]() ;
+}
+
+function exec400(creq) {
+	clearTimeout(hdExecCanc) ;
+	$('#ccDgFail .dgfail-exec400 .creq-info').text(creq.info) ;
+	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
+	$('#ccDgFail').find('.dgfail-exec400').removeClass('d-none') ;
 	$('#ccDgFail').modal('toggle') ;
 	Transition[statThis.stat][Event.ERROR]() ;
 }
 
 function exec500(creq) {
-	var creq ;
 	clearTimeout(hdExecCanc) ;
-	$('#ccDgFail .dgfail-500 .creq-info').text(creq.info) ;
+	$('#ccDgFail .dgfail-exec500 .creq-info').text(creq.info) ;
 	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
-	$('#ccDgFail').find('.dgfail-500').removeClass('d-none') ;
+	$('#ccDgFail').find('.dgfail-exec500').removeClass('d-none') ;
 	$('#ccDgFail').modal('toggle') ;
 	Transition[statThis.stat][Event.ERROR]() ;
 }
@@ -374,6 +412,7 @@ function exec500(creq) {
 function btnOpen(event) {
 	Transition[statThis.stat][Event.OPEN]() ;
 }
+
 function inpOpen(event) {
 	var file = new FileReader() ;
 	file.onload = function (e) {
