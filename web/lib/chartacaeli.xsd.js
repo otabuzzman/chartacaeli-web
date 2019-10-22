@@ -4416,10 +4416,7 @@ var chartS11N = Object.freeze({
 			}
 		},
 		onchange: function() {
-			if (statThis && statThis.stat === State.CHANGED) {
-				return;
-			}
-			Transition[statThis.stat][Event.CHANGE]();
+			EATab[compThis.stat][Event.CHG]();
 		},
 		validate: function() {
 		}

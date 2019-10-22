@@ -4,24 +4,24 @@ window.addEventListener('load', function (event) {
 
 function initComposer() {
 	/* init state object template*/
-	var statTmpl = {
-		stat: {
-			value: State.EMPTY,
-			writable: true, enumerable: true, configurable: false
-		},
-		open: {
-			value: null,
-			writable: true, enumerable: true, configurable: false
-		}
+	var compTmpl = {
+			stat: {
+				value: State.EMP,
+				writable: true, enumerable: true, configurable: false
+			},
+			open: {
+				value: null,
+				writable: true, enumerable: true, configurable: false
+			}
 	} ;
 	/* init definition state object */
-	statD8N = Object.create(chartS11N, statTmpl) ;
-	statThis = statD8N ;
-	statThis.open = statD8N.defdef ;
+	compD8N = Object.create(chartS11N, compTmpl) ;
+	compThis = compD8N ;
+	compThis.open = compD8N.defdef ;
 	/* init preferences state object */
-	statP9S = Object.create(prefsS11N, statTmpl) ;
-	statExch = statP9S ;
-	statExch.open = statP9S.defdef ;
+	compP9S = Object.create(prefsS11N, compTmpl) ;
+	compExch = compP9S ;
+	compExch.open = compP9S.defdef ;
 	/* load Composer with current state object */
 	initXonomy() ;
 	loadXonomy('#ccXonomy') ;
@@ -35,7 +35,7 @@ function loadXonomy(id) {
 	if (xonDiv.css('display') === 'none') {
 		return ;
 	}
-	Xonomy.render(statThis.open, xonDiv[0], statThis.Xonomy) ;
+	Xonomy.render(compThis.open, xonDiv[0], compThis.Xonomy) ;
 }
 function grabXonomy(id) {
 	var head, data ;
@@ -43,175 +43,504 @@ function grabXonomy(id) {
 	if (xonDiv.css('display') === 'none') {
 		return null ;
 	}
-	head = statThis.XMLdec ;
+	head = compThis.XMLdec ;
 	data = Xonomy.harvest() ;
 	return head+data ;
 }
 
 /* chart generation cancel timeout handler */
 var hdExecCanc ;
-/* chart generation poll interval handler */
-var hdExecPoll ;
 /* chart generation progress timeout handler */
 var hdExecPrgs ;
+/* chart generation poll interval handler */
+var hdExecPoll ;
 
 /* definition and preferences state objects */
-var statD8N ;
-var statP9S ;
-/* runtime state objects referencing D/P */
-var statThis ;
-var statExch ;
+var compD8N ;
+var compP9S ;
+/* runtime state objects referencing D8N/P9S */
+var compThis ;
+var compExch ;
 
-/* state and event values enumerations */
-const State = Object.freeze({NONE: 0, EMPTY: 1, OPENED: 2, CHANGED: 3, RUNNING: 4, WARNING: 5, ERROR: 6}) ;
-const Event = Object.freeze({NONE: 0, NEW: 1, OPEN: 2, EXEC: 3, CHANGE: 4, RETURN: 5, ERROR: 6}) ;
-/* transition table */
-const Transition = Object.freeze([
-	/* S/E     Non,        New,        Opn,        Exe,        Chg,        Ret,        Err,     */
-	/* Non */ [aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid],
-	/* Emp */ [aotInvalid, aotInvalid, aotEmpOpn,  aotInvalid, aotEmpChg,  aotInvalid, aotInvalid],
-	/* Opn */ [aotInvalid, aotOpnNew,  aotOpnOpn,  aotOpnExe,  aotOpnChg,  aotInvalid, aotInvalid],
-	/* Chg */ [aotInvalid, aotChgNew,  aotChgOpn,  aotChgExe,  aotChgChg,  aotInvalid, aotInvalid],
-	/* Run */ [aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotRunRet,  aotRunErr ],
-	/* Wrn */ [aotInvalid, aotWrnNew,  aotWrnOpn,  aotInvalid, aotInvalid, aotWrnRet,  aotInvalid],
-	/* Err */ [aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotInvalid, aotErrRet,  aotInvalid]
-]) ;
-
-/* transition actions */
-function aotInvalid() {
+/* state enumeration names and values */
+const stateName = Object.freeze(["EMP", "OPN", "CHG", "WRN", "EXE", "ERR", "POL"]) ;
+const State = Object.freeze({EMP: 0, OPN: 1, CHG: 2, WRN: 3, EXE: 4, ERR: 5, POL: 6}) ;
+/* event enumeration names and values */
+const eventName = Object.freeze(["NEW", "OPN", "LOD", "CHG", "PCD", "CNC", "EXE", "CER", "SER", "TMO", "TGD", "TGP"]) ;
+const Event = Object.freeze({NEW: 0, OPN: 1, LOD: 2, CHG: 3, PCD: 4, CNC: 5, EXE: 6, CER: 7, SER: 8, TMO: 9, TGD: 10, TGP: 11}) ;
+/* event/ activity table */
+const EATab = Object.freeze([
+	/* S/ E     New        Opn        Lod        Chg        Pcd        Cnc        Exe        Cer        Ser        Tmo        Tgd        Tgp      */
+	/* Emp */  [eaInvalid, eaEmpOpn,  eaEmpLod,  eaEmpChg,  eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaEmpTgd,  eaEmpTgp],
+	/* Opn */  [eaOpnNew,  eaOpnOpn,  eaOpnLod,  eaOpnChg,  eaInvalid, eaInvalid, eaOpnExe,  eaInvalid, eaInvalid, eaInvalid, eaOpnTgd,  eaOpnTgp],
+	/* Chg */  [eaChgNew,  eaChgOpn,  eaChgLod,  eaChgChg,  eaInvalid, eaInvalid, eaChgExe,  eaInvalid, eaInvalid, eaInvalid, eaChgTgd,  eaChgTgp],
+	/* Wrn */  [eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaWrnPcd,  eaWrnCnc,  eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid],
+	/* Exe */  [eaExeNew,  eaExeOpn,  eaExeLod,  eaInvalid, eaExePcd,  eaInvalid, eaInvalid, eaExeCer,  eaExeSer,  eaExeTmo,  eaExeTgd,  eaExeTgp],
+	/* Err */  [eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaErrPcd,  eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid],
+	/* Pol */  [eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaPolPcd,  eaInvalid, eaInvalid, eaInvalid, eaPolSer,  eaPolTmo,  eaPolTgd,  eaPolTgp]
+	]) ;
+/* event activities */
+function eaInvalid() {
 	console.log("Inv") ;
 }
-function aotEmpOpn() {
-	$('#ccInpOpen').focus().trigger('click') ;
-	console.log("Emp/Opn") ;
+function eaEmpOpn() {
+	onclickBtnOpen() ;
+	console.log("Emp-Opn-Opn") ;
 }
-function aotEmpChg() {
-	statThis.stat = State.CHANGED ;
-	StateSetter[statThis.stat]() ;
-	console.log("Emp/Chg") ;
+function eaEmpLod() {
+	onclickBtnLoad() ;
+	console.log("Emp-Lod-Opn") ;
 }
-function aotOpnNew() {
-	statThis.open = statThis.defdef ;
-	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer').offset().top}, 800) ;
-	statThis.stat = State.EMPTY ;
-	StateSetter[statThis.stat]() ;
-	console.log("Opn/New") ;
+function eaEmpChg() {
+	/* set next FSM and button states */
+	compThis.stat = State.CHG ;
+	SBTab[compThis.stat]() ;
+	console.log("Emp-Chg-Chg") ;
 }
-function aotOpnOpn() {
-	$('#ccInpOpen').focus().trigger('click') ;
-	console.log("Opn/Opn") ;
+function eaEmpTgd() {
+	onclickBtnD8N() ;
+	/* set button states */
+	SBTab[compThis.stat]() ;
+	console.log("Emp-Tgd-D8N") ;
 }
-function aotOpnExe() {
-	/* memorize state for later use by btnUnsaved2nd (Havel (H)istory) */
-	$('#ccBtnExec').data('hist-state', statThis.stat) ;
-	statThis.stat = State.RUNNING ;
-	StateSetter[statThis.stat]() ;
+function eaEmpTgp() {
+	onclickBtnP9S() ;
+	/* set button states */
+	SBTab[compThis.stat]() ;
+	console.log("Emp-Tgp-P9S") ;
+}
+function eaOpnNew() {
+	onclickBtnNew() ;
+	/* set next FSM and button states */
+	compThis.stat = State.EMP ;
+	SBTab[compThis.stat]() ;
+	console.log("Opn-New-Emp") ;
+}
+function eaOpnOpn() {
+	onclickBtnOpen() ;
+	console.log("Opn-Opn-Opn") ;
+}
+function eaOpnLod() {
+	onclickBtnLoad() ;
+	console.log("Opn-Lod-Opn") ;
+}
+function eaOpnChg() {
+	/* set next FSM and button states */
+	compThis.stat = State.CHG ;
+	SBTab[compThis.stat]() ;
+	console.log("Opn-Chg-Chg") ;
+}
+function eaOpnExe() {
+	$('#ccBtnExec').data('stat-hist', compThis.stat) ;
+	onclickBtnExec() ;
 	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
-	console.log("Opn/Exe") ;
+	/* set next FSM and button states */
+	compThis.stat = State.EXE ;
+	SBTab[compThis.stat]() ;
+	console.log("Opn-Exe-Exe") ;
 }
-function aotOpnChg() {
-	statThis.stat = State.CHANGED ;
-	StateSetter[statThis.stat]() ;
-	console.log("Opn/Chg") ;
+function eaOpnTgd() {
+	onclickBtnD8N() ;
+	/* set button states */
+	SBTab[compThis.stat]() ;
+	console.log("Opn-Tgd-D8N") ;
 }
-function aotChgNew() {
-	/* memorize event for later use by btnUnsaved2nd (Havel (C)ondition) */
-	$('#ccDgWarnKey2nd').data('hist-event', Event.NEW) ;
+function eaOpnTgp() {
+	onclickBtnP9S() ;
+	/* set button states */
+	SBTab[compThis.stat]() ;
+	console.log("Opn-Tgp-P9S") ;
+}
+function eaChgNew() {
+	$('#ccDgWarn2Key').data('event-hist', Event.NEW) ;
 	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
 	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
 	$('#ccDgWarn2Key').modal('toggle') ;
-	statThis.stat = State.WARNING ;
-	StateSetter[statThis.stat]() ;
-	console.log("Chg/New") ;
+	/* set next FSM and button states */
+	compThis.stat = State.WRN ;
+	SBTab[compThis.stat]() ;
+	console.log("Chg-New-Wrn") ;
 }
-function aotChgOpn() {
-	/* memorize event for later use by btnUnsaved2nd (Havel (C)ondition) */
-	$('#ccDgWarnKey2nd').data('hist-event', Event.OPEN) ;
+function eaChgOpn() {
+	$('#ccDgWarn2Key').data('event-hist', Event.OPN) ;
 	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
 	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
 	$('#ccDgWarn2Key').modal('toggle') ;
-	statThis.stat = State.WARNING ;
-	StateSetter[statThis.stat]() ;
-	console.log("Chg/Opn") ;
+	/* set next FSM and button states */
+	compThis.stat = State.WRN ;
+	SBTab[compThis.stat]() ;
+	console.log("Chg-Opn-Wrn") ;
 }
-function aotChgExe() {
-	/* memorize state for later use by btnUnsaved2nd (Havel (H)istory) */
-	$('#ccBtnExec').data('hist-state', statThis.stat) ;
-	statThis.stat = State.RUNNING ;
-	StateSetter[statThis.stat]() ;
+function eaChgLod() {
+	$('#ccDgWarn2Key').data('event-hist', Event.LOD) ;
+	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
+	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
+	$('#ccDgWarn2Key').modal('toggle') ;
+	/* set next FSM and button states */
+	compThis.stat = State.WRN ;
+	SBTab[compThis.stat]() ;
+	console.log("Chg-Lod-Wrn") ;
+}
+function eaChgChg() {
+	console.log("Chg-Chg-Chg") ;
+}
+function eaChgExe() {
+	$('#ccBtnExec').data('stat-hist', compThis.stat) ;
+	onclickBtnExec() ;
 	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
-	console.log("Chg/Exe") ;
+	/* set next FSM and button states */
+	compThis.stat = State.EXE ;
+	SBTab[compThis.stat]() ;
+	console.log("Chg-Exe-Exe") ;
 }
-function aotChgChg() {
-	statThis.stat = State.CHANGED ;
-	StateSetter[statThis.stat]() ;
-	console.log("Chg/Chg") ;
+function eaChgTgd() {
+	onclickBtnD8N() ;
+	/* set button states */
+	SBTab[compThis.stat]() ;
+	console.log("Chg-Tgd-D8N") ;
 }
-function aotRunRet() {
-	statThis.stat = $('#ccBtnExec').data('hist-state') ;
-	StateSetter[statThis.stat]() ;
+function eaChgTgp() {
+	onclickBtnP9S() ;
+	/* set button states */
+	SBTab[compThis.stat]() ;
+	console.log("Chg-Tgp-P9S") ;
+}
+function eaWrnPcd() {
+	$('#ccDgWarn2Key').modal('toggle') ;
+	switch ($('#ccDgWarn2Key').data('event-hist')) {
+		case Event.NEW:
+			onclickBtnNew() ;
+			compThis.stat = State.EMP ;
+			/* set button states */
+			SBTab[compThis.stat]() ;
+		break ;
+		case Event.OPN:
+			onclickBtnOpen() ;
+		break ;
+		case Event.LOD:
+			onclickBtnLoad() ;
+		break ;
+	}
+	console.log("Wrn-Pcd-New|Opn") ;
+}
+function eaWrnCnc() {
+	$('#ccDgWarn2Key').modal('toggle') ;
+	console.log("Wrn-Cnc-"+stateName[compThis.stat]) ;
+}
+function eaExeNew() {
+	$('#ccDgWarn2Key').data('event-hist', Event.NEW) ;
+	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
+	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
+	$('#ccDgWarn2Key').modal('toggle') ;
+	/* set next FSM and button states */
+	compThis.stat = State.WRN ;
+	SBTab[compThis.stat]() ;
+	console.log("Exe-New-Wrn") ;
+}
+function eaExeOpn() {
+	$('#ccDgWarn2Key').data('event-hist', Event.OPN) ;
+	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
+	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
+	$('#ccDgWarn2Key').modal('toggle') ;
+	/* set next FSM and button states */
+	compThis.stat = State.WRN ;
+	SBTab[compThis.stat]() ;
+	console.log("Exe-Opn-Wrn") ;
+}
+function eaExeLod() {
+	$('#ccDgWarn2Key').data('event-hist', Event.LOD) ;
+	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
+	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
+	$('#ccDgWarn2Key').modal('toggle') ;
+	/* set next FSM and button states */
+	compThis.stat = State.WRN ;
+	SBTab[compThis.stat]() ;
+	console.log("Exe-Lod-Wrn") ;
+}
+function eaExePcd(creq) {
+	var next = restGetHref(creq.hateoas, 'next') ;
+	$('#ccDgInfo').find('.dginfo-progress a').attr('href', next) ;
+	hdExecPoll = setInterval(function () {
+		$.ajax({
+			url: next,
+			method: 'GET',
+			success: function(creq) {
+				switch (creq.stat) {
+				case 'accepted':
+				case 'started':
+					EATab[compThis.stat][Event.TMO]() ;
+					break ;
+				case 'finished':
+					EATab[compThis.stat][Event.PCD](creq) ;
+					break ;
+				default:
+					EATab[compThis.stat][Event.SER](creq) ;
+				break ;
+				}
+			},
+			error: function (xhr) {
+					EATab[compThis.stat][Event.SER]($.parseJSON(xhr.responseText)) ;
+			}
+		}) ;
+	}, 5*1000) ; /* 5 sec */
+	hdExecPrgs = setTimeout(function () {
+		$('#ccDgInfo').modal('toggle') ;
+	}, 15*1000) ; /* 15 sec */
+	/* set next FSM and button states */
+	compThis.stat = State.POL ;
+	SBTab[compThis.stat]() ;
+	console.log("Exe-Pcd-Pol") ;
+}
+function eaExeCer(creq) {
+	clearTimeout(hdExecCanc) ;
+	$('#ccDgFail .dgfail-exec400 .creq-info').text(creq.info) ;
+	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
+	$('#ccDgFail').find('.dgfail-exec400').removeClass('d-none') ;
+	$('#ccDgFail').modal('toggle') ;
+	/* set next FSM and button states */
+	compThis.stat = State.ERR ;
+	SBTab[compThis.stat]() ;
+	console.log("Exe-Cer-Err") ;
+}
+function eaExeSer(creq) {
+	clearTimeout(hdExecCanc) ;
+	$('#ccDgFail .dgfail-exec500 .creq-info').text(creq.info) ;
+	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
+	$('#ccDgFail').find('.dgfail-exec500').removeClass('d-none') ;
+	$('#ccDgFail').modal('toggle') ;
+	/* set next FSM and button states */
+	compThis.stat = State.ERR ;
+	SBTab[compThis.stat]() ;
+	console.log("Exe-Ser-Err") ;
+}
+function eaExeTmo() {
+	clearInterval(hdExecPoll) ;
 	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
-	console.log("Run/Ret") ;
+	/* set next FSM and button states */
+	compThis.stat = $('#ccBtnExec').data('stat-hist') ;
+	SBTab[compThis.stat]() ;
+	console.log("Exe-Tmo-"+stateName[compThis.stat]) ;
 }
-function aotRunErr() {
-	statThis.stat = State.ERROR ;
-	StateSetter[statThis.stat]() ;
-	console.log("Run/Err") ;
+function eaExeTgd() {
+	onclickBtnD8N() ;
+	/* set button states */
+	SBTab[compThis.stat]() ;
+	console.log("Exe-Tgd-D8N") ;
 }
-function aotWrnNew() {
-	statThis.open = statThis.defdef ;
-	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer').offset().top}, 800) ;
-	statThis.stat = State.EMPTY ;
-	StateSetter[statThis.stat]() ;
-	console.log("Wrn/New") ;
+function eaExeTgp() {
+	onclickBtnP9S() ;
+	/* set button states */
+	SBTab[compThis.stat]() ;
+	console.log("Exe-Tgp-P9S") ;
 }
-function aotWrnOpn() {
-	$('#ccInpOpen').focus().trigger('click') ;
-	console.log("Wrn/Opn") ;
-}
-function aotWrnRet() {
-	statThis.stat = State.CHANGED ;
-	StateSetter[statThis.stat]() ;
-	console.log("Wrn/Ret") ;
-}
-function aotErrRet() {
-	statThis.stat = $('#ccBtnExec').data('hist-state') ;
-	StateSetter[statThis.stat]() ;
+function eaErrPcd() {
+	$('#ccDgFail').modal('toggle') ;
 	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
-	console.log("Err/Ret") ;
+	/* set next FSM and button states */
+	compThis.stat = $('#ccBtnExec').data('stat-hist') ;
+	SBTab[compThis.stat]() ;
+	console.log("Err-Pcd-"+stateName[compThis.stat]) ;
+}
+function eaPolSer(creq) {
+	var applog, pdferr ;
+	clearInterval(hdExecPoll) ;
+	clearTimeout(hdExecPrgs) ;
+	clearTimeout(hdExecCanc) ;
+	applog = restGetHref(creq.hateoas, 'related', 'Charta Caeli') ;
+	if (typeof applog !== 'undefined') {
+		$('#ccDgFail .dgfail-poll500').find('.applog a').attr('href', applog) ;
+		$('#ccDgFail .dgfail-poll500').find('.applog').removeClass('d-none') ;
+	} else
+		$('#ccDgFail .dgfail-poll500').find('.applog').addClass('d-none') ;
+	pdferr = restGetHref(creq.hateoas, 'related', 'Ghostscript') ;
+	if (typeof pdferr !== 'undefined') {
+		$('#ccDgFail .dgfail-poll500').find('.pdferr a').attr('href', pdferr) ;
+		$('#ccDgFail .dgfail-poll500').find('.pdferr').removeClass('d-none') ;
+	} else
+		$('#ccDgFail .dgfail-poll500').find('.pdferr').addClass('d-none') ;
+	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
+	$('#ccDgFail').find('.dgfail-poll500').removeClass('d-none') ;
+	$('#ccDgFail').modal('toggle') ;
+	/* set next FSM and button states */
+	compThis.stat = State.ERR ;
+	SBTab[compThis.stat]() ;
+	console.log("Pol-Ser-Err") ;
+}
+function eaPolTmo() {
+	console.log("Pol-Tmo-Pol") ;
+}
+function eaPolPcd(creq) {
+	var pdf = restGetHref(creq.hateoas, 'next') ;
+	window.open(pdf) ;
+	clearInterval(hdExecPoll) ;
+	clearTimeout(hdExecPrgs) ;
+	clearTimeout(hdExecCanc) ;
+	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	/* set next FSM and button states */
+	compThis.stat = $('#ccBtnExec').data('stat-hist') ;
+	SBTab[compThis.stat]() ;
+	console.log("Pol-Pcd-"+stateName[compThis.stat]) ;
+}
+function eaPolTgd() {
+	onclickBtnD8N() ;
+	/* set button states */
+	SBTab[compThis.stat]() ;
+	console.log("Pol-Tgd-D8N") ;
+}
+function eaPolTgp() {
+	onclickBtnP9S() ;
+	/* set button states */
+	SBTab[compThis.stat]() ;
+	console.log("Pol-Tgp-P9S") ;
 }
 
-/* button states setter functions table */
-var StateSetter = Object.freeze([
-	function () { // State.NONE
-	},
-	function () { // State.EMPTY
+/* state/ button states table */
+var SBTab = Object.freeze([
+	function () { // State.EMP
 		$('#ccBtnNew').prop('disabled', true) ;
 		$('#ccBtnOpen').prop('disabled', false) ;
 		$('#ccBtnExec').prop('disabled', true) ;
 	},
-	function () { // State.OPENED
+	function () { // State.OPN
 		$('#ccBtnNew').prop('disabled', false) ;
 		$('#ccBtnOpen').prop('disabled', false) ;
 		$('#ccBtnExec').prop('disabled', false) ;
 	},
-	function () { // State.CHANGED
+	function () { // State.CHG
 		$('#ccBtnNew').prop('disabled', false) ;
 		$('#ccBtnOpen').prop('disabled', false) ;
 		$('#ccBtnExec').prop('disabled', false) ;
 	},
-	function () { // State.RUNNING
-		$('#ccBtnNew').prop('disabled', true) ;
-		$('#ccBtnOpen').prop('disabled', true) ;
+	function () { // State.WRN
+	},
+	function () { // State.EXE
+		$('#ccBtnNew').prop('disabled', false) ;
+		$('#ccBtnOpen').prop('disabled', false) ;
 		$('#ccBtnExec').prop('disabled', true) ;
 	},
-	function () { // State.WARNING
+	function () { // State.ERR
 	},
-	function () { // State.ERROR
+	function () { // State.POL
 	}
 ]) ;
+
+/* clear Composer */
+function onclickBtnNew() {
+	compThis.open = compThis.defdef ;
+	loadXonomy('#ccXonomy') ;
+	$('html, body').animate({scrollTop: $('#ccComposer').offset().top}, 800) ;
+}
+
+/* load Composer from gallery */
+function onclickBtnLoad() {
+	var href, chart, prefs ;
+	/* fetch definition */
+	href = $('.carousel .active').attr('data-load-chart') ;
+	$.ajax({url: href,
+		dataType: 'text',
+		dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
+		success: function (data) {
+			chart = data ;
+			compD8N.open = chart ;
+			/* fetch preferences */
+			href = $('.carousel .active').attr('data-load-prefs') ;
+			if (href) {
+				$.ajax({url: href,
+					dataType: 'text',
+					dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
+					success: function (data) {
+						prefs = data ;
+						compP9S.open = prefs ;
+						loadXonomy('#ccXonomy') ;
+						compP9S.stat = State.OPN ;
+						compD8N.stat = State.OPN ;
+						/* set button states */
+						SBTab[compThis.stat]() ;
+					}}) ;
+			} else {
+				loadXonomy('#ccXonomy') ;
+				compD8N.stat = State.OPN ;
+				compP9S.stat = State.EMP ;
+				/* set button states */
+				SBTab[compThis.stat]() ;
+			}
+		}
+	}) ;
+}
+
+/* toggle to preferences button */
+function onclickBtnP9S() {
+	$('#ccBtnTglP')
+	.toggleClass('d-md-block')
+	.prop('disabled', true) ;
+	$('#ccBtnTglD')
+	.toggleClass('d-md-block')
+	.prop('disabled', false) ;
+	/* save current Composer */
+	compThis.open = grabXonomy() ;
+	/* toggle runtime state objects */
+	compThis = compP9S ;
+	compExch = compD8N ;
+	/* load Composer from toggled state object */
+	loadXonomy('#ccXonomy') ;
+	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
+}
+
+/* toggle to definition button */
+function onclickBtnD8N() {
+	$('#ccBtnTglD')
+	.toggleClass('d-md-block')
+	.prop('disabled', true) ;
+	$('#ccBtnTglP')
+	.toggleClass('d-md-block')
+	.prop('disabled', false) ;
+	/* save current Composer */
+	compThis.open = grabXonomy() ;
+	/* toggle runtime state objects */
+	compThis = compD8N ;
+	compExch = compP9S ;
+	/* load Composer from toggled state object */
+	loadXonomy('#ccXonomy') ;
+	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
+}
+
+function onclickBtnOpen() {
+	var file = new FileReader() ;
+	file.onload = function () {
+		compThis.open = this.result.replace(/(\r?\n|\r)\s*/g, "") ;
+		loadXonomy('#ccXonomy') ;
+		$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
+		compThis.stat = State.OPN ;
+		/* set button states */
+		SBTab[compThis.stat]() ;
+	} ;
+	file.readAsText($('#ccInpOpen')[0].files[0]) ;
+	/* allow to select same file several times in a row (SO #12030686) */ 
+	document.getElementById('ccInpOpen').value = null ;
+}
+
+function onclickBtnExec() {
+	var exec, chart, prefs ;
+	hdExecCanc = setTimeout(function () {
+		EATab[compThis.stat][Event.TMO]() ;
+	}, 30*60*1000) ; /* 30 min */
+	/* issue POST */
+	compThis.open = grabXonomy() ;
+	chart = compD8N.open ;
+	prefs = compP9S.open ;
+	exec = $('#ccBtnExec').attr('data-rest-api') ;
+	$.ajax({
+		url: exec,
+		method: 'POST',
+		data: { chart: chart, prefs: prefs },
+		dataType: 'json',
+		statusCode: {
+			202: function (creq) {EATab[compThis.stat][Event.PCD](creq)},
+			400: function (xhr) {EATab[compThis.stat][Event.CER]($.parseJSON(xhr.responseText))},
+			500: function (xhr) {EATab[compThis.stat][Event.SER]($.parseJSON(xhr.responseText))}
+		}
+	}) ;
+}
 
 /* register events */
 document.addEventListener('DOMContentLoaded', function (event) {
@@ -226,248 +555,23 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	for (var i=0 ; a.length>i ; i++ ) {
 		a[i].addEventListener('click', smoothScrollToAnchor) ;
 	}
-	document.querySelector('#ccBtnLoad').addEventListener('click', btnLoad) ;
+	document.querySelector('#ccBtnLoad').addEventListener('click', function () {EATab[compThis.stat][Event.LOD]()}) ;
 	document.querySelector('.navbar-toggler').addEventListener('click', btnToggleMenu) ;
-	document.querySelector('#ccBtnNew').addEventListener('click', btnNew) ;
-	document.querySelector('#ccBtnOpen').addEventListener('click', btnOpen) ;
-	document.querySelector('#ccInpOpen').addEventListener('change', inpOpen) ;
-	document.querySelector('#ccBtnExec').addEventListener('click', btnExec) ;
-	document.querySelector('#ccBtnTglP').addEventListener('click', btnTglP) ;
-	document.querySelector('#ccBtnTglD').addEventListener('click', btnTglD) ;
-	document.querySelector('#ccDgWarnKey1st').addEventListener('click', dgWarnKey1st) ;
-	document.querySelector('#ccDgWarnKey2nd').addEventListener('click', dgWarnKey2nd) ;
-	document.querySelector('#ccDgFailKey').addEventListener('click', dgFailKey) ;
-	document.querySelector('#ccDgInfoKey').addEventListener('click', dgInfoKey) ;
+	document.querySelector('#ccBtnTglP').addEventListener('click', function () {EATab[compThis.stat][Event.TGP]()}) ;
+	document.querySelector('#ccBtnTglD').addEventListener('click', function () {EATab[compThis.stat][Event.TGD]()}) ;
+	document.querySelector('#ccBtnNew').addEventListener('click', function () {EATab[compThis.stat][Event.NEW]()}) ;
+	document.querySelector('#ccBtnOpen').addEventListener('click', function () {$('#ccInpOpen').focus().trigger('click')}) ;
+	document.querySelector('#ccInpOpen').addEventListener('change', function () {EATab[compThis.stat][Event.OPN]()}) ;
+	document.querySelector('#ccBtnExec').addEventListener('click', function () {EATab[compThis.stat][Event.EXE]()}) ;
+	document.querySelector('#ccDgWarnKey1st').addEventListener('click', function () {EATab[compThis.stat][Event.CNC]()}) ;
+	document.querySelector('#ccDgWarnKey2nd').addEventListener('click', function () {EATab[compThis.stat][Event.PCD]()}) ;
+	document.querySelector('#ccDgFailKey').addEventListener('click', function () {EATab[compThis.stat][Event.PCD]()}) ;
+	document.querySelector('#ccDgInfoKey').addEventListener('click', function () {$('#ccDgInfo').modal('toggle')}) ;
 }) ;
-
-function dgInfoKey(event) {
-	$('#ccDgInfo').modal('toggle') ;
-}
-
-function dgFailKey(event) {
-	Transition[statThis.stat][Event.RETURN]() ;
-	$('#ccDgFail').modal('toggle') ;
-}
-
-function dgWarnKey2nd(event) {
-	Transition[statThis.stat][$(this).data('hist-event')]() ;
-	$('#ccDgWarn2Key').modal('toggle') ;
-}
-function dgWarnKey1st(event) {
-	Transition[statThis.stat][Event.RETURN]() ;
-	$('#ccDgWarn2Key').modal('toggle') ;
-}
-
-/* toggle to definition button */
-function btnTglD(event) {
-	$(this)
-	.toggleClass('d-md-block')
-	.prop('disabled', true) ;
-	$('#ccBtnTglP')
-	.toggleClass('d-md-block')
-	.prop('disabled', false) ;
-	/* save current Composer */
-	statThis.open = grabXonomy() ;
-	/* toggle runtime state objects */
-	statThis = statD8N ;
-	statExch = statP9S ;
-	/* load Composer from toggled state object */
-	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
-	StateSetter[statThis.stat]() ;
-}
-
-/* toggle to preferences button */
-function btnTglP(event) {
-	$(this)
-	.toggleClass('d-md-block')
-	.prop('disabled', true) ;
-	$('#ccBtnTglD')
-	.toggleClass('d-md-block')
-	.prop('disabled', false) ;
-	/* save current Composer */
-	statThis.open = grabXonomy() ;
-	/* toggle runtime state objects */
-	statThis = statP9S ;
-	statExch = statD8N ;
-	/* load Composer from toggled state object */
-	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
-	StateSetter[statThis.stat]() ;
-}
-
-function btnExec(event) {
-	var exec, chart, prefs, xhr ;
-	hdExecCanc = setTimeout(function () {
-		clearInterval(hdExecPoll) ;
-		Transition[statThis.stat][Event.RETURN]() ;
-		xhr.abort() ;
-	}, 30*60*1000) ; /* 30 min */
-	Transition[statThis.stat][Event.EXEC]() ;
-	/* issue POST */
-	statThis.open = grabXonomy() ;
-	chart = statD8N.open ;
-	prefs = statP9S.open ;
-	exec = $(this).attr('data-rest-api') ;
-	xhr = $.ajax({
-		url: exec,
-		method: 'POST',
-		data: { chart: chart, prefs: prefs },
-		dataType: 'json',
-		statusCode: {
-			202: exec202,
-			400: function (xhr) {exec400($.parseJSON(xhr.responseText))},
-			500: function (xhr) {exec500($.parseJSON(xhr.responseText))}
-		}
-	}) ;
-}
-
-function hoasGetHref(hoas, rel, title) {
-	var elem ;
-	if (typeof title === 'undefined')
-		elem = hoas.find(function (link) {return link.rel == rel}) ;
-	else
-		elem = hoas.find(function (link) {return link.rel == rel && link.title.includes(title)}) ;
-
-	if (typeof elem !== 'undefined')
-		return elem.href ;
-	return elem ;
-}
-
-function exec202(creq) {
-	var next = hoasGetHref(creq.hateoas, 'next') ;
-	$('#ccDgInfo').find('.dginfo-progress a').attr('href', next) ;
-	hdExecPoll = setInterval(function () {
-		$.ajax({
-			url: next,
-			method: 'GET',
-			success: function(creq) {
-				switch (creq.stat) {
-					case 'accepted':
-					case 'started':
-						console.log(creq.stat) ;
-						break ;
-					case 'finished':
-						var pdf = hoasGetHref(creq.hateoas, 'next') ;
-						window.open(pdf) ;
-						clearInterval(hdExecPoll) ;
-						clearTimeout(hdExecPrgs) ;
-						clearTimeout(hdExecCanc) ;
-						Transition[statThis.stat][Event.RETURN]() ;
-						break ;
-					default:
-						console.log('unexpected state: '+creq.stat) ;
-						break ;
-				}
-			},
-			error: function (xhr) {poll500($.parseJSON(xhr.responseText))}
-		}) ;
-	}, 5*1000) ; /* 5 sec */
-	hdExecPrgs = setTimeout(function () {
-		$('#ccDgInfo').modal('toggle') ;
-	}, 15*1000) ; /* 15 sec */
-}
-
-function poll500(creq) {
-	var applog, pdferr ;
-	clearInterval(hdExecPoll) ;
-	clearTimeout(hdExecPrgs) ;
-	clearTimeout(hdExecCanc) ;
-	applog = hoasGetHref(creq.hateoas, 'related', 'Charta Caeli') ;
-	if (typeof applog !== 'undefined') {
-		$('#ccDgFail .dgfail-poll500').find('.applog a').attr('href', applog) ;
-		$('#ccDgFail .dgfail-poll500').find('.applog').removeClass('d-none') ;
-	} else
-		$('#ccDgFail .dgfail-poll500').find('.applog').addClass('d-none') ;
-	pdferr = hoasGetHref(creq.hateoas, 'related', 'Ghostscript') ;
-	if (typeof pdferr !== 'undefined') {
-		$('#ccDgFail .dgfail-poll500').find('.pdferr a').attr('href', pdferr) ;
-		$('#ccDgFail .dgfail-poll500').find('.pdferr').removeClass('d-none') ;
-	} else
-		$('#ccDgFail .dgfail-poll500').find('.pdferr').addClass('d-none') ;
-	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
-	$('#ccDgFail').find('.dgfail-poll500').removeClass('d-none') ;
-	$('#ccDgFail').modal('toggle') ;
-	Transition[statThis.stat][Event.ERROR]() ;
-}
-
-function exec400(creq) {
-	clearTimeout(hdExecCanc) ;
-	$('#ccDgFail .dgfail-exec400 .creq-info').text(creq.info) ;
-	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
-	$('#ccDgFail').find('.dgfail-exec400').removeClass('d-none') ;
-	$('#ccDgFail').modal('toggle') ;
-	Transition[statThis.stat][Event.ERROR]() ;
-}
-
-function exec500(creq) {
-	clearTimeout(hdExecCanc) ;
-	$('#ccDgFail .dgfail-exec500 .creq-info').text(creq.info) ;
-	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
-	$('#ccDgFail').find('.dgfail-exec500').removeClass('d-none') ;
-	$('#ccDgFail').modal('toggle') ;
-	Transition[statThis.stat][Event.ERROR]() ;
-}
-
-function btnOpen(event) {
-	Transition[statThis.stat][Event.OPEN]() ;
-}
-
-function inpOpen(event) {
-	var file = new FileReader() ;
-	file.onload = function (e) {
-		statThis.open = this.result.replace(/(\r?\n|\r)\s*/g, "") ;
-		loadXonomy('#ccXonomy') ;
-		$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
-		statThis.stat = State.OPENED ;
-		StateSetter[statThis.stat]() ;
-	} ;
-	file.readAsText($(this)[0].files[0]) ;
-	/* allow to select same file several times in a row (SO #12030686) */ 
-	this.value = null ;
-}
-
-function btnNew(event) {
-	Transition[statThis.stat][Event.NEW]() ;
-}
 
 /* toggle burger and cross icons */
 function btnToggleMenu(event) {
 	$(this).find('i').toggleClass('fa-bars fa-times') ;
-}
-
-/* load Composer with files defined by active carosuel item */
-function btnLoad(event) {
-	var href, chart, prefs ;
-	/* fetch definition */
-	href = $('.carousel .active').attr('data-load-chart') ;
-	$.ajax({url: href,
-		dataType: 'text',
-		dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
-		success: function (data) {
-			chart = data ;
-			statD8N.open = chart ;
-			/* fetch preferences */
-			href = $('.carousel .active').attr('data-load-prefs') ;
-			if (href) {
-				$.ajax({url: href,
-					dataType: 'text',
-					dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
-					success: function (data) {
-						prefs = data ;
-						statP9S.open = prefs ;
-						loadXonomy('#ccXonomy') ;
-						statP9S.stat = State.OPENED ;
-						statD8N.stat = State.OPENED ;
-						StateSetter[statThis.stat]() ;
-					}}) ;
-			} else {
-				loadXonomy('#ccXonomy') ;
-				statD8N.stat = State.OPENED ;
-				StateSetter[statThis.stat]() ;
-			}
-		}
-	}) ;
 }
 
 function smoothScrollToAnchor(event) {
@@ -498,12 +602,9 @@ function updateBtnConf(event) {
 	document.getElementById('ccBtnView').href = view ;
 	var info = $('.carousel .active').attr('data-info') ;
 	document.getElementById('ccBtnInfo').href = info ;
-	// enable Load if D8N available...
+	// enable Load if D8N available
 	var load = $('.carousel .active').attr('data-load-chart') ;
-	// ...AND Composer NOT in state changed
-	var d8n = statD8N.stat === State.CHANGED ;
-	var p9s = statP9S.stat === State.CHANGED ;
-	if (load && !(d8n || p9s)) {
+	if (load) {
 		$('#ccBtnLoad').removeClass('disabled') ;
 	} else {
 		$('#ccBtnLoad').addClass('disabled') ;
