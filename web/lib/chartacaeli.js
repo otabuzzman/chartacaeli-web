@@ -153,6 +153,7 @@ function eaOpnTgp() {
 }
 function eaChgNew() {
 	$('#ccDgWarn2Key').data('event-hist', Event.NEW) ;
+	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
 	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
 	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
 	$('#ccDgWarn2Key').modal('toggle') ;
@@ -163,6 +164,7 @@ function eaChgNew() {
 }
 function eaChgOpn() {
 	$('#ccDgWarn2Key').data('event-hist', Event.OPN) ;
+	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
 	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
 	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
 	$('#ccDgWarn2Key').modal('toggle') ;
@@ -173,6 +175,7 @@ function eaChgOpn() {
 }
 function eaChgLod() {
 	$('#ccDgWarn2Key').data('event-hist', Event.LOD) ;
+	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
 	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
 	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
 	$('#ccDgWarn2Key').modal('toggle') ;
@@ -221,14 +224,16 @@ function eaWrnPcd() {
 			onclickBtnLoad() ;
 		break ;
 	}
-	console.log("Wrn-Pcd-New|Opn") ;
+	console.log("Wrn-Pcd-EMP|OPN") ;
 }
 function eaWrnCnc() {
 	$('#ccDgWarn2Key').modal('toggle') ;
+	compThis.stat = $('#ccDgWarn2Key').data('state-hist') ;
 	console.log("Wrn-Cnc-"+stateName[compThis.stat]) ;
 }
 function eaExeNew() {
 	$('#ccDgWarn2Key').data('event-hist', Event.NEW) ;
+	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
 	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
 	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
 	$('#ccDgWarn2Key').modal('toggle') ;
@@ -239,6 +244,7 @@ function eaExeNew() {
 }
 function eaExeOpn() {
 	$('#ccDgWarn2Key').data('event-hist', Event.OPN) ;
+	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
 	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
 	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
 	$('#ccDgWarn2Key').modal('toggle') ;
@@ -249,6 +255,7 @@ function eaExeOpn() {
 }
 function eaExeLod() {
 	$('#ccDgWarn2Key').data('event-hist', Event.LOD) ;
+	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
 	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
 	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
 	$('#ccDgWarn2Key').modal('toggle') ;
@@ -259,7 +266,6 @@ function eaExeLod() {
 }
 function eaExePcd(creq) {
 	var next = restGetHref(creq.hateoas, 'next') ;
-	$('#ccDgInfo').find('.dginfo-progress a').attr('href', next) ;
 	hdExecPoll = setInterval(function () {
 		$.ajax({
 			url: next,
@@ -346,6 +352,8 @@ function eaPolSer(creq) {
 	clearInterval(hdExecPoll) ;
 	clearTimeout(hdExecPrgs) ;
 	clearTimeout(hdExecCanc) ;
+	if ($('#ccDgInfo').hasClass('show'))
+		$('#ccDgInfo').modal('toggle') ;
 	applog = restGetHref(creq.hateoas, 'related', 'Charta Caeli') ;
 	if (typeof applog !== 'undefined') {
 		$('#ccDgFail .dgfail-poll500').find('.applog a').attr('href', applog) ;
@@ -370,11 +378,10 @@ function eaPolTmo() {
 	console.log("Pol-Tmo-Pol") ;
 }
 function eaPolPcd(creq) {
-	var pdf = restGetHref(creq.hateoas, 'next') ;
-	window.open(pdf) ;
 	clearInterval(hdExecPoll) ;
 	clearTimeout(hdExecPrgs) ;
 	clearTimeout(hdExecCanc) ;
+	window.open(restGetHref(creq.hateoas, 'next')) ;
 	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
 	/* set next FSM and button states */
 	compThis.stat = $('#ccBtnExec').data('stat-hist') ;
@@ -540,6 +547,19 @@ function onclickBtnExec() {
 			500: function (xhr) {EATab[compThis.stat][Event.SER]($.parseJSON(xhr.responseText))}
 		}
 	}) ;
+}
+
+function restGetHref(hateoas, rel, title) {
+	var elem ;
+
+	if (typeof title === 'undefined')
+		elem = hateoas.find(function (link) {return link.rel == rel}) ;
+	else
+		elem = hateoas.find(function (link) {return link.rel == rel && link.title.includes(title)}) ;
+
+	if (typeof elem !== 'undefined')
+		return elem.href ;
+	return elem ;
 }
 
 /* register events */
