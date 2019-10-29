@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.ServletContext;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -31,7 +32,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.hibernate.exception.GenericJDBCException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -148,7 +148,7 @@ public class ChartsResource {
 					.type( type )
 					.entity( creq )
 					.build() ;
-		} catch ( GenericJDBCException e ) {
+		} catch ( PersistenceException e ) {
 			log.info( e.getMessage() ) ;
 
 			creq.setStatNum( Chart.ST_REJECTED ) ;

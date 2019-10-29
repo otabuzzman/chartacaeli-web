@@ -46,7 +46,7 @@ while true ; do
 	info "about to exec '$APPEXE $xml' ..."
 	# run Charta Caeli app
 	( cd $APPDIR ; ./$APPEXE $xml 2>$log |\
-	$GS -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=$pdf -_ >$err 2>&1 ) \
+	$GS -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=$pdf -_ >$err 2>&1 ; (( ! (${PIPESTATUS[0]}>0 || ${PIPESTATUS[1]}>0) )) ; exit $? ) \
 	&& ( info "...success" ; updateDB $id finished || fail "database problem occurred with $id. Cleanup manually." ) \
 	|| ( warn "...failure" ; updateDB $id failed || fail "database problem occurred with $id. Cleanup manually." )
 
