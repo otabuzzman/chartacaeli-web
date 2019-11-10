@@ -168,8 +168,4 @@ public class Chart {
 
 		hateoas.add( link ) ;
 	}
-
-	public String getPath() {
-		return "/"+getId()+"/"+getName() ;
-	}
 }

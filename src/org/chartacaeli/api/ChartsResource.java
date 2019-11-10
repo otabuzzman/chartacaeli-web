@@ -42,12 +42,11 @@ public class ChartsResource {
 	private final static String MK_ED8NINV = "ed8ninv" ;
 	private final static String MK_EP9SINV = "ep9sinv" ;
 	private final static String MK_EREQINI = "ereqini" ;
+	private final static String MK_ENOENT  = "enoent" ;
 
-	// Mediatypes
-	private final static String MT_APPLICATION_PDF = "application/pdf" ;
-	private final static String MT_TEXT_PLAIN_UTF8 = MediaType.TEXT_PLAIN+";charset="+StandardCharsets.UTF_8 ;
-
-	// rfc 5988 title strings
+	// rfc5988 title strings
+	private final static String L_D8NFIL = "Star chart definition (D8N) file" ;
+	private final static String L_P9SFIL = "Star chart preferences (P9S) file" ;
 	private final static String L_APPLOG = "Charta Caeli core application log file" ;
 	private final static String L_PDFERR = "Ghostscript PDF conversion error file" ;
 
@@ -71,20 +70,14 @@ public class ChartsResource {
 	@Produces( {
 		MediaType.APPLICATION_JSON,
 		MediaType.APPLICATION_XML } )
-	public Response charts(
+	public Response postChart(
 			@HeaderParam( "Accept" ) String accept,
 			@FormParam( "chart")  String chart,
 			@FormParam( "prefs" ) String prefs ) {
 		Chart creq ;
-		Link self, next ;
-		URI nextURI ;
-		String type ;
+		Link self, next, d8n, p9s ;
+		URI nextURI, d8nURI, p9sURI ;
 		CompositeResult result ;
-
-		if ( accept.equals( MediaType.APPLICATION_XML ) )
-			type = MediaType.APPLICATION_XML ;
-		else
-			type = MediaType.APPLICATION_JSON ;
 
 		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
 
@@ -100,37 +93,48 @@ public class ChartsResource {
 
 			return Response.status( Response.Status.BAD_REQUEST )
 					.links( self )
-					.type( type )
-					.entity( creq )
-					.build() ;
-		}
-
-		if ( ! ( result = validateD8N( chart ) ).ok() ) {
-			creq.setStatNum( Chart.ST_REJECTED ) ;
-			creq.setInfo( result.message() ) ;
-
-			return Response.status( result.getRC() )
-					.links( self )
-					.type( type )
-					.entity( creq )
-					.build() ;
-		} else
-			creq.setName( result.message() ) ;
-
-		if ( ! ( result = validateP9S( prefs ) ).ok() ) {
-			creq.setStatNum( Chart.ST_REJECTED ) ;
-			creq.setInfo( result.message() ) ;
-
-			return Response.status( result.getRC() )
-					.links( self )
-					.type( type )
+					.type( accept )
 					.entity( creq )
 					.build() ;
 		}
 
 		try {
-			createFile( getD8NFilename( creq ), chart ) ;
-			createFile( getP9SFilename( creq ), prefs ) ;
+			if ( ! ( result = validateD8N( chart ) ).ok() ) {
+				creq.setStatNum( Chart.ST_REJECTED ) ;
+				creq.setInfo( result.message() ) ;
+
+				return Response.status( result.getRC() )
+						.links( self )
+						.type( accept )
+						.entity( creq )
+						.build() ;
+			}
+
+			creq.setName( result.message() ) ;
+
+			d8nURI = uri.getAbsolutePathBuilder().path( creq.getId() ).path( creq.getName()+".xml" ).build() ;
+			d8n = Link.fromUri( d8nURI ).rel( "related" ).title( L_D8NFIL ).build() ;
+			creq.setHateoas( d8n ) ;
+
+			createFile( createFilename( d8nURI, creq.getId() ), chart ) ;
+			log.info( d8nURI.getPath().substring( d8nURI.getPath().indexOf( creq.getId() ) ) ) ;
+
+			if ( ! ( result = validateP9S( prefs ) ).ok() ) {
+				creq.setStatNum( Chart.ST_REJECTED ) ;
+				creq.setInfo( result.message() ) ;
+
+				return Response.status( result.getRC() )
+						.links( self )
+						.type( accept )
+						.entity( creq )
+						.build() ;
+			}
+
+			p9sURI = uri.getAbsolutePathBuilder().path( creq.getId() ).path( creq.getName()+".preferences" ).build() ;
+			p9s = Link.fromUri( p9sURI ).rel( "related" ).title( L_P9SFIL ).build() ;
+			creq.setHateoas( p9s ) ;
+
+			createFile( createFilename( p9sURI, creq.getId() ), prefs ) ;
 
 			creq.setStatNum( Chart.ST_ACCEPTED ) ;
 			creq.setModified( System.currentTimeMillis() ) ;
@@ -145,7 +149,7 @@ public class ChartsResource {
 
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 					.links( self )
-					.type( type )
+					.type( accept )
 					.entity( creq )
 					.build() ;
 		} catch ( PersistenceException e ) {
@@ -156,19 +160,19 @@ public class ChartsResource {
 
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 					.links( self )
-					.type( type )
+					.type( accept )
 					.entity( creq )
 					.build() ;
 		}
 
 		nextURI = uri.getAbsolutePathBuilder().path( creq.getId() ).build() ;
 		next = Link.fromUri( nextURI ).rel( "next" ).build() ;
-
 		creq.setHateoas( next ) ;
 
+
 		return Response.status( Response.Status.ACCEPTED )
-				.links( self, next )
-				.type( type )
+				.links( self, next, d8n, p9s )
+				.type( accept )
 				.entity( creq )
 				.build() ;
 	}
@@ -178,49 +182,62 @@ public class ChartsResource {
 		MediaType.APPLICATION_JSON,
 		MediaType.APPLICATION_XML } )
 	@Path( "/{id}" )
-	public Response chart(
+	public Response getChart(
 			@HeaderParam( "Accept" ) String accept,
 			@PathParam( value = "id" ) String id ) {
 		Optional<Chart> qres ;
 		Chart creq ;
-		Link self, next, log, err ;
-		URI nextURI, logURI, errURI ;
-		String type ;
+		Link self, next, d8n, p9s, log, err ;
+		URI nextURI, d8nURI, p9sURI, logURI, errURI ;
 		ResponseBuilder response ;
-
-		if ( accept.equals( MediaType.APPLICATION_XML ) )
-			type = MediaType.APPLICATION_XML ;
-		else
-			type = MediaType.APPLICATION_JSON ;
 
 		qres = chartDB.findById( id ) ;
 
-		if ( qres.isPresent() )
-			creq = qres.get() ;
-		else
-			return Response.status( Response.Status.NOT_FOUND )
-					.build() ;
-
 		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
 
-		creq.setHateoas( self ) ;
+		if ( qres.isPresent() ) {
+			creq = qres.get() ;
+			creq.setHateoas( self ) ;
+		} else {
+			creq = new Chart() ;
+			creq.setId( id ) ;
+			creq.setCreated( System.currentTimeMillis() ) ;
+			creq.setModified( creq.getCreated() ) ;
+			creq.setStatNum( Chart.ST_NONE ) ;
+			creq.setHateoas( self ) ;
+			creq.setInfo( MessageCatalog.getMessage( this, MK_ENOENT, null ) ) ;
+
+			return Response.status( Response.Status.NOT_FOUND )
+					.links( self )
+					.type( accept )
+					.entity( creq )
+					.build() ;
+		}
+
+		d8nURI = uri.getAbsolutePathBuilder().path( creq.getId() ).path( creq.getName()+".xml" ).build() ;
+		d8n = Link.fromUri( d8nURI ).rel( "related" ).title( L_D8NFIL ).build() ;
+
+		p9sURI = uri.getAbsolutePathBuilder().path( creq.getId() ).path( creq.getName()+".preferences" ).build() ;
+		p9s = Link.fromUri( p9sURI ).rel( "related" ).title( L_P9SFIL ).build() ;
 
 		switch ( creq.getStatNum() ) {
 		case Chart.ST_ACCEPTED:
 		case Chart.ST_STARTED:
 			next = Link.fromUri( uri.getAbsolutePath() ).rel( "next" ).build() ;
-
 			creq.setHateoas( next ) ;
 
+			creq.setHateoas( d8n ) ;
+			creq.setHateoas( p9s ) ;
+
 			return Response.status( Response.Status.OK )
-					.links( self, next )
-					.type( type )
+					.links( self, next, d8n, p9s )
+					.type( accept )
 					.entity( creq )
 					.build() ;
 		case Chart.ST_CLEANED:
 			return Response.status( Response.Status.OK )
 					.links( self )
-					.type( type )
+					.type( accept )
 					.entity( creq )
 					.build() ;
 		case Chart.ST_FINISHED:
@@ -229,21 +246,24 @@ public class ChartsResource {
 			logURI = uri.getAbsolutePathBuilder().path( creq.getName()+".log" ).build() ;
 			log = Link.fromUri( logURI ).rel( "related" ).title( L_APPLOG ).build() ;
 
-			if ( ! probeFile( getPDFFilename( creq ) ) )
+			creq.setHateoas( d8n ) ;
+			creq.setHateoas( p9s ) ;
+
+			if ( ! probeFile( createFilename( nextURI, creq.getId() ) ) )
 				return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
-						.links( self )
-						.type( type )
+						.links( self, d8n, p9s )
+						.type( accept )
 						.entity( creq )
 						.build();
 
 			creq.setHateoas( next ) ;
 
 			response = Response.status( Response.Status.OK )
-					.links( self, next )
-					.type( type )
+					.links( self, d8n, p9s, next )
+					.type( accept )
 					.entity( creq ) ;
 
-			if ( probeFile( getLogFilename( creq ) ) ) {
+			if ( probeFile( createFilename( logURI, creq.getId() ) ) ) {
 				creq.setHateoas( log ) ;
 
 				response.links( log ) ;
@@ -256,18 +276,21 @@ public class ChartsResource {
 			errURI = uri.getAbsolutePathBuilder().path( creq.getName()+".err" ).build() ;
 			err = Link.fromUri( errURI ).rel( "related" ).title( L_PDFERR ).build() ;
 
+			creq.setHateoas( d8n ) ;
+			creq.setHateoas( p9s ) ;
+
 			response = Response.status( Response.Status.INTERNAL_SERVER_ERROR )
-					.links( self )
-					.type( type )
+					.links( self, d8n, p9s )
+					.type( accept )
 					.entity( creq ) ;
 
-			if ( probeFile( getLogFilename( creq ) ) ) {
+			if ( probeFile( createFilename( logURI, creq.getId() ) ) ) {
 				creq.setHateoas( log ) ;
 
 				response.links( log ) ;
 			}
 
-			if ( probeFile( getErrFilename( creq ) ) ) {
+			if ( probeFile( createFilename( errURI, creq.getId() ) ) ) {
 				creq.setHateoas( err ) ;
 
 				response.links( err ) ;
@@ -277,37 +300,64 @@ public class ChartsResource {
 		case Chart.ST_RECEIVED:
 		case Chart.ST_REJECTED:
 		default:
+			creq.setHateoas( d8n ) ;
+			creq.setHateoas( p9s ) ;
+
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
-					.links( self )
-					.type( type )
+					.links( self, d8n, p9s )
+					.type( accept )
 					.entity( creq )
 					.build() ;
 		}
 	}
 
 	@GET
-	@Path( "/{id}/{file: .+[.](pdf|log|err)$}" )
-	public Response chart(
-			@HeaderParam( "Accept" ) String accept,
+	@Path( "/{id}/{file: .+[.](pdf|log|err|xml|preferences)$}" )
+	public Response getChartFile(
 			@PathParam( value = "id" ) String id,
 			@PathParam( value = "file" ) String file ) {
-		String path ;
+		String path, suffix ;
+		Chart creq ;
+		Link self ;
 		ResponseBuilder response ;
 
 		path = getOutputDirectroy()
 				+"/"+id
 				+"/"+file ;
 
-		if ( ! probeFile( path ) )
+		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
+
+		if ( ! probeFile( path ) ) {
+			creq = new Chart() ;
+			creq.setId( id ) ;
+			creq.setCreated( System.currentTimeMillis() ) ;
+			creq.setModified( creq.getCreated() ) ;
+			creq.setStatNum( Chart.ST_NONE ) ;
+			creq.setHateoas( self ) ;
+			creq.setInfo( MessageCatalog.getMessage( this, MK_ENOENT, null ) ) ;
+
 			return Response.status( Response.Status.NOT_FOUND )
+					.links( self )
+					.type( MediaType.APPLICATION_JSON )
+					.entity( creq )
 					.build() ;
+		}
 
-		response = Response.ok( new File( path ) ) ;
+		response = Response.ok( new File( path ) )
+				.links( self ) ;
 
-		if ( file.substring( file.length()-4).equals( ".pdf" ) )
-			response.type( MT_APPLICATION_PDF ) ;
-		else
-			response.type( MT_TEXT_PLAIN_UTF8 ) ;
+		suffix = file.substring( file.length()-4) ;
+
+		if ( suffix.equals( ".pdf" ) )
+			response.type( "application/pdf" ) ;
+		else if ( suffix.equals( ".log" ) )
+			response.type( MediaType.TEXT_PLAIN+";charset="+StandardCharsets.UTF_8 ) ;
+		else if ( suffix.equals( ".err" ) )
+			response.type( MediaType.TEXT_PLAIN+";charset="+StandardCharsets.UTF_8 ) ;
+		else if ( suffix.equals( ".xml" ) )
+			response.type( MediaType.APPLICATION_XML ) ;
+		else // if ( suffix.equals( ".preferences" ) )
+			response.type( MediaType.APPLICATION_XML ) ;
 
 		return response.build() ;
 	}
@@ -345,7 +395,7 @@ public class ChartsResource {
 	private CompositeResult validateP9S( final String prefs ) {
 
 		if ( prefs == null )
-			return new SuccessResult() ;
+			return new FailureResult( MessageCatalog.getMessage( this, MK_EP9SINV, null ) ) ;
 
 		try {
 			new P9SParser( context ).parse( prefs ) ;
@@ -364,34 +414,8 @@ public class ChartsResource {
 		return new SuccessResult() ;
 	}
 
-	private String getD8NFilename( final Chart creq ) {
-		return getOutputDirectroy()
-				+creq.getPath()
-				+".xml" ;
-	}
-
-	private String getP9SFilename( final Chart creq ) {
-		return getOutputDirectroy()
-				+creq.getPath()
-				+".preferences" ;
-	}
-
-	private String getPDFFilename( final Chart creq ) {
-		return getOutputDirectroy()
-				+creq.getPath()
-				+".pdf" ;
-	}
-
-	private String getLogFilename( final Chart creq ) {
-		return getOutputDirectroy()
-				+creq.getPath()
-				+".log" ;
-	}
-
-	private String getErrFilename( final Chart creq ) {
-		return getOutputDirectroy()
-				+creq.getPath()
-				+".err" ;
+	private String createFilename( final URI uri, final String id ) {
+		return getOutputDirectroy()+"/"+uri.getPath().substring( uri.getPath().indexOf( id ) ) ;
 	}
 
 	private void createFile( final String filename, final String data ) throws IOException {

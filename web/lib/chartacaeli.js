@@ -279,9 +279,10 @@ function eaExePcd(creq) {
 				case 'finished':
 					EATab[compThis.stat][Event.PCD](creq) ;
 					break ;
+				case 'failed':
 				default:
 					EATab[compThis.stat][Event.SER](creq) ;
-				break ;
+					break ;
 				}
 			},
 			error: function (xhr) {

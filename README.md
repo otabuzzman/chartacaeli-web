@@ -175,16 +175,16 @@ JSON Chart object representation sample
 |`/`           |Entry point|
 |`/charts`     |New chart|
 |`/charts/{id}`|Get chart state|
-|`/charts/{id}/{file}`|Get chart file<br>`file` being one of *.pdf, *.log, *.err|
+|`/charts/{id}/{file}`|Get chart file with `file` being one of *.pdf, *.log, *.err, *.xml, *.preferences|
 
 **Requests**
 
-|Method|URI|HATEOAS|Comment|
+|URI|Method|HATEOAS|Comment|
 |--|--|--|--|
-|GET|`/`|self, new|Status 200. Content with Root object representation.|
-|POST|`/charts`|self, next|Status 202. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header.<br>Status 400 in case of schema violation.<br>Status 500 in case of server errors.|
-|GET|`/charts/{id}`|self, next, related|Status 200. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header. HATEOAS relations updated according to state.<br>Status 404 in case of invalid `{id}`.<br>Status 500 in case of server errors.|
-|GET|`/charts/{id}/{file}`|self|Status 200.<br>Status 404 in case of invalid `{file}`.|
+|`/`|GET|self, new|Status 200. Content with Root object representation.|
+|`/charts`|POST|self, next, related|Status 202. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header.<br>Status 400 in case of schema violation.<br>Status 500 in case of server errors.|
+|`/charts/{id}`|GET|self, next, related|Status 200. Content with Chart object representation. Encoding XML or JSON (default) according to Accept header. HATEOAS relations updated according to state.<br>Status 404 in case of invalid `{id}`.<br>Status 500 in case of server errors.|
+|`/charts/{id}/{file}`|GET|self|Status 200. No HATEOAS.<br>Status 404 in case of invalid `{id}/{file}`.|
 
 **Parameters**
 
@@ -193,7 +193,7 @@ JSON Chart object representation sample
 |`/charts`|chart|Data parameter|String|mandatory|x-www-form-urlencoded|XML document conforming to Chart Specification XSD|
 ||prefs|Data parameter|String|optional|x-www-form-urlencoded|XML document conforming to Java Preferences DTD|
 
-#### RESTful API test setup
+#### RESTful API setup
 - Open bash and start H2 database
 
   ```bash
@@ -235,27 +235,6 @@ JSON Chart object representation sample
 
 - Start Charta Caeli RESTful web service (either Eclipse IDE or Tomcat)
 - Run test cases with [Postman API Development Environment](https://www.getpostman.com/)
-
-#### RESTful API test cases
-
-|Request|Status|HATEOAS|Content|Check|Cause|
-|:--|:--|:--|:--|:--|:--|
-|`GET /api`|200|self, new|Welcome message|- Welcome message present<br>-new equals New chart URI<br>- self equals URI||
-|`POST /api/charts`|202|self, next|Chart object representation|- self equals URI<br>- next points at valid `/charts/{id}` resource.||
-||400|self|Chart object representation|- stat element equals rejected<br>- info element set<br>- self equals URI|- Invalid or missing D8N.<br>- Invalid P9S.|
-||500|self|Chart object representation|- stat element equals rejected<br>- info element set<br>- self equals URI||
-|`GET /api/charts/{id}`|200|self, next|Chart object representation|- stat element equals accepted &#124; started<br>- self equals URI<br>- next equals URI||
-||200|self|Chart object representation|- stat element equals cleaned<br>- self equals URI||
-||200|self, next, related|Chart object representation|- stat element equals finished<br>- related (optional) equals *.log<br>- self equals URI<br>||
-||500|self|Chart object representation|- stat element equals finished<br>- self equals URI<br>|PDF file missing on server.|
-||500|self, related|Chart object representation|- stat element equals failed<br>- related equal *.log or *.err<br>- self equals URI<br>|Charta Caeli core app or PDF conversion process failed|
-||500|self|Chart object representation|- stat element equals received &#124; rejected<br>- self equals URI<br>|Illegal values for stat element.|
-|`GET /api/charts/{id}/{name}.pdf`|200|self|Chart PDF file|||
-||404||||Invalid resource name|
-|`GET /api/charts/{id}/{name}.log`|200|self|Charta Caeli core app log file|||
-||404||||Invalid resource name|
-|`GET /api/charts/{id}/{name}.log`|200|self|PDF conversion error file (stderr)|||
-||404||||Invalid resource name|
 
 #### Database setup
 The configuration provides for the [Hibernate](https://hibernate.org/) ORM implementation twinned with an [H2](http://www.h2database.com/html/main.html) database.
@@ -355,6 +334,7 @@ Copy `META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catal
 - List of [media queries](https://css-tricks.com/snippets/css/media-queries-for-standard-devices/) grouped by device type
 - The [Harel statechart definition](http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf). A handy [variation of the statechart notation](http://dec.bournemouth.ac.uk/staff/kphalp/statecharts.pdf) as proposed by Harel. A [theoretical application example](https://de.slideshare.net/lmatteis/are-statecharts-the-next-big-ui-paradigm) (mind the links on 2nd last slide) and finally [bureaucracy](https://github.com/samroberton/bureaucracy), the practical implementation in Clojure on GitHub (visit links in README.md and especially take a look at [Kevin Lynagh's Sketch.system](https://sketch.systems/tutorials/five-minute-introduction/) implementation).
 - A [hierarchical FSM implementation](https://xstate.js.org/docs/#hierarchical-nested-state-machines) in JavaScript (mind the visualizer)
+- The [JAX-RS API specification](https://download.oracle.com/otn-pub/jcp/jaxrs-2_1-final-eval-spec/jaxrs-2_1-final-spec.pdf) for RESTful Web Services
 - [SO Answer](https://stackoverflow.com/questions/45625925/what-exactly-is-the-resourceconfig-class-in-jersey-2?answertab=active#tab-top) on various options to configure JAX-RS servlet container
 - Article collection on long running asynchronous web applications: a [MS article](https://docs.microsoft.com/de-de/azure/architecture/best-practices/api-design#using-the-hateoas-approach-to-enable-navigation-to-related-resources) (German) on REST API design (contains section on asynchronous operations), [The RESTful Cookbook](http://restcookbook.com/), the [REST Guidelines](https://www.gcloud.belgium.be/rest/) ressource with a [chapter on long running tasks](https://www.gcloud.belgium.be/rest/#long-running-tasks), a [case study](https://www.endpoint.com/blog/2011/03/08/jquery-and-long-running-web-app) on long running web apps triggered by `jQuery.ajax()`, the [Jersey UG chapter](https://jersey.github.io/documentation/latest/async.html) on asynchronous services and clients, a [SO answer](https://stackoverflow.com/questions/18004527/implement-a-long-running-process-in-a-web-app?answertab=active#tab-top) that states OOTB features of HTTP 1.1 and Servlet 3.0.
 - Considerations on [REST and HATEOAS maturity level](https://m.heise.de/developer/artikel/Hoechster-Reifegrad-fuer-REST-mit-HATEOAS-3550392.html), a practical [HATEOAS implementation example](https://jaxenter.de/wer-rest-will-muss-mit-hateoas-ernst-machen-489) (both German), [REST API design](https://restfulapi.net/rest-api-design-tutorial-with-example/) and associated [implementation](https://restfulapi.net/create-rest-apis-with-jax-rs-2-0/) tutorials and [REST API design best practices in a nutshell](https://phauer.com/2015/restful-api-design-best-practices/).
