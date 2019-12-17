@@ -78,6 +78,7 @@ public class ChartsResource {
 		Link self, next, d8n, p9s ;
 		URI nextURI, d8nURI, p9sURI ;
 		CompositeResult result ;
+		log.info( accept ) ;
 
 		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
 
@@ -117,7 +118,6 @@ public class ChartsResource {
 			creq.setHateoas( d8n ) ;
 
 			createFile( createFilename( d8nURI, creq.getId() ), chart ) ;
-			log.info( d8nURI.getPath().substring( d8nURI.getPath().indexOf( creq.getId() ) ) ) ;
 
 			if ( ! ( result = validateP9S( prefs ) ).ok() ) {
 				creq.setStatNum( Chart.ST_REJECTED ) ;

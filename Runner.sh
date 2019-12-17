@@ -9,7 +9,9 @@ this=$(basename $0)
 
 trap signalhandler 1 2 3 6 15
 
+# mind order
 probeJRE || { fail "Java not available. Start canceled." ; exit 1 ; }
+probeBASDIR || { fail "BASDIR '$BASDIR' invalid. Start canceled" ; exit 1 ; }
 probeDB || { fail "database '$DBURL' not available. Start canceled." ; exit 1 ; }
 probeOUTDIR || { fail "OUTDIR '$OUTDIR' invalid. Start canceled" ; exit 1 ; }
 probeAPPDIR || { fail "APPDIR '$APPDIR' invalid. Start canceled." ; exit 1 ; }
@@ -19,7 +21,7 @@ probeGS || { fail "Ghostscript not available. Start canceled." ; exit 1 ; }
 while true ; do
 	# lookup oldest chart creation request in 'accepted' state
 	# `stat` column is workaround for CRLF output of H2 Shell Tool
-	creq=$(java -cp $CLASSPATH org.h2.tools.Shell \
+	creq=$(java -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "SELECT TOP 1 id, name, stat FROM charts WHERE stat = 'accepted' ORDER BY created ASC" |\
 	gawk '$1~/[0-9A-Za-z]{8}/ {print $0}')

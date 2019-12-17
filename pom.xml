@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>chartacaeli-web</groupId>
 	<artifactId>chartacaeli-web</artifactId>
-	<version>0029</version>
+	<version>0052</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>

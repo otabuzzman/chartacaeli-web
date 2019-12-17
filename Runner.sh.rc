@@ -18,29 +18,35 @@ probeJRE() {
 	return $?
 }
 
+probeBASDIR() {
+	( cd ${BASDIR:=/opt/chartacaeli/db} ) >/dev/null 2>&1
+
+	return $?
+}
+
+probeDB() {
+	java -cp ${CLASSPATH:=web/WEB-INF/lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	-url ${DBURL:=jdbc:h2:tcp://localhost/./ChartDB;IF_EXISTS=TRUE} \
+	-user ${DBUSER:=chartacaeli} -password ${DBPASS:=chartaca3li} \
+	-sql "" >/dev/null 2>&1
+
+	return $?
+}
+
 probeOUTDIR() {
-	( cd ${OUTDIR:=~/db} ) >/dev/null 2>&1
+	( cd ${OUTDIR:=/opt/chartacaeli/db} ) >/dev/null 2>&1
 
 	return $?
 }
 
 probeAPPDIR() {
-	( cd ${APPDIR:=~/web/WEB-INF} ) >/dev/null 2>&1
+	( cd ${APPDIR:=/opt/chartacaeli/app/WEB-INF} ) >/dev/null 2>&1
 
 	return $?
 }
 
 probeAPPEXE() {
 	probeAPPDIR && test -x $APPDIR/${APPEXE:=chartacaeli.sh}
-
-	return $?
-}
-
-probeDB() {
-	java -cp ${CLASSPATH:=web/WEB-INF/lib/h2-*.jar} org.h2.tools.Shell \
-	-url ${DBURL:=jdbc:h2:tcp://localhost/~/db/ChartDB;IF_EXISTS=TRUE} \
-	-user ${DBUSER:=chartacaeli} -password ${DBPASS:=chartaca3li} \
-	-sql "" >/dev/null 2>&1
 
 	return $?
 }
@@ -56,7 +62,7 @@ signalhandler() {
 
 	rm -f $pdf $log $err
 
-	java -cp $CLASSPATH org.h2.tools.Shell \
+	java -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "UPDATE charts SET stat = 'accepted', modified = '$(date +%s)000' WHERE id = '$id'"
 
@@ -64,7 +70,7 @@ signalhandler() {
 }
 
 updateDB() {
-	java -cp $CLASSPATH org.h2.tools.Shell \
+	java -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "UPDATE charts SET stat = '$2', modified = '$(date +%s)000' WHERE id = '$1'"
 

@@ -1,4 +1,5 @@
-/db/
+/generated-sources
+/maven-status
 /artistic-star-chart.pdf
 /artistic-star-chart.png
 /artistic-star-chart--artwork.pdf

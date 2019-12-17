@@ -1,19 +1,24 @@
 # Charta Caeli web service
-A web frontend to the Charta Caeli star chart creation tool. The web service is basically made up of an UI and a RESTful API connecting the UI with the Charta Caeli core application. The UI utilizes Bootstrap 4 for responsiveness. [Xonomy XML editor](https://github.com/michmech/xonomy) provides a way to edit star chart definitions on devices with appropriate display sizes.
+A web service for the Charta Caeli star chart creation tool. The service is made up of a frontend that communicates with a backend. The frontend utilizes Bootstrap 4 for responsiveness and [Xonomy XML editor](https://github.com/michmech/xonomy) to edit star chart definitions on devices with appropriate display sizes. The backend connects the frontend with the Charta Caeli core application. The backend consists of a web application providing a RESTful API, a database and a Runner process for the actual star charts creation.
 
 ### Build
-The project depends on the [repository](https://github.com/otabuzzman/chartacaeli) of the Charta Caeli star chart creation tool (core application). Thus, to setup the web service, one first has to download and build the core app according to instructions given there. Afterwards clone this repository and follow steps listed below. Run clone commands from same folder to make sure top-level directories of core app and web service share the same parent folder.
+The project depends on the Charta Caeli star chart creation tool (core application). Thus, to setup the web service, one first has to download and build the [core application](https://github.com/otabuzzman/chartacaeli) according to instructions given there. Afterwards clone this repository and follow steps listed below. Make sure top-level directories of core application and web service share the same folder.
 - Change directory (bash) to top-level directory of Charta Caeli web service.
-- Run build commands.
+- Run frontend build commands.
   ```bash
   make all
   ```
 
-- Rebuild images to check if core app works.
+- Run backend build commands.
+  ```bash
+  mvn compile
+  ```
+
+- Rebuild images to check if core application works.
 
   ```bash
   # Windows (Cygwin)
-  export GS_FONTPATH=c:/users/jschuck/src/chartacaeli-web\;c:/users/jschuck/src/chartacaeli
+  export GS_FONTPATH=c:/users/$USERNAME/src/chartacaeli-web\;c:/users/$USERNAME/src/chartacaeli
   # Linux
   export GS_FONTPATH=~/lab/chartacaeli-web:~/lab/chartacaeli
 
@@ -74,6 +79,11 @@ Basic color palette and usage. Click on hex value to get derived palettes.
 
 Subordinate styles of buttons and links.
 
+|Type|Comment|
+|----|-------|
+|Navigation menu entry|Primary color 10% darkened for `:hover` and 15% for `:active`.|
+|URL in text (inline)|Same as for navigation menu entries. No text decorations.|
+
 #### Thoughts on links
 Purposes of links in running text is provision of background information or to give credit to the efforts of individual projects used by the site. Another reason is to ease access to sites which might somewhat tricky to find with Google even if propper keywords are given. Some general rules of thumb:
 - No reference of sites everbody knows (e.g. Amazon, Google, Micosoft).
@@ -82,11 +92,6 @@ Purposes of links in running text is provision of background information or to g
 - Preference of Wikipedia entries because site structure of Wikipedia is considered stable (based on the assumption that entries are kept up-to-date).
 - References of books on Amazon with unambiguous search queries because direct links tend to be very long.
 - Unsecure sites referenced with unambiguous Google search queries resulting (ideally) in a top-ranked result.
-
-|Type|Comment|
-|----|-------|
-|Navigation menu entry|Primary color 10% darkened for `:hover` and 15% for `:active`.|
-|URL in text (inline)|Same as for navigation menu entries. No text decorations.|
 
 #### RESTful API design
 RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful Web Service framework. HATEOAS using Link header based on [RFC5988](https://tools.ietf.org/html/rfc5988).
@@ -194,65 +199,66 @@ JSON Chart object representation sample
 ||prefs|Data parameter|String|optional|x-www-form-urlencoded|XML document conforming to Java Preferences DTD|
 
 #### RESTful API setup
-- Open bash and start H2 database
+- Change to top-level directory of Charta Caeli RESTful web service.
+- Start H2 database.
 
   ```bash
   # Windows (Cygwin)
   export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
   export PATH=$JAVA_HOME/bin:$PATH
+  export BASDIR=$(cygpath -m /opt/chartacaeli/db)
   # Linux
   export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
   export PATH=$JAVA_HOME/bin:$PATH
+  export BASDIR=/opt/chartacaeli/db
 
   java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Server \
+	-baseDir $BASDIR \
 	-tcp \
 	-web &
   ```
 
-- Start browser and connect with H2 Console (optional)
-- In H2 Console clear CHARTS table (optional)
-- Change to top-level directory of Charta Caeli RESTful web service
-- Set environment (or use default values in script) and start `Runner.sh`
+- Start Runner process.
 
   ```bash
   # Windows (Cygwin)
   export PATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
   export GS=gswin64c
-  export DBURL="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO"
-  export OUTDIR=$(cygpath -m ~/src/chartacaeli-web/db)
-  export APPDIR=~/src/chartacaeli/mvn/web/WEB-INF
-  export INTERVAL=10
-  export LOGLEVEL=3
   # Linux
-  export DBURL="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO"
-  export OUTDIR=~/src/chartacaeli-web/db
-  export APPDIR=~/src/chartacaeli/mvn/web/WEB-INF
+  export DBURL="jdbc:h2:tcp://localhost/./ChartDB;FILE_LOCK=NO"
+  export OUTDIR=$BASDIR
+  export APPDIR=/opt/chartacaeli/app/WEB-INF
   export INTERVAL=10
   export LOGLEVEL=3
 
   sh Runner.sh &
   ```
 
-- Start Charta Caeli RESTful web service (either Eclipse IDE or Tomcat)
-- Run test cases with [Postman API Development Environment](https://www.getpostman.com/)
+- Start RESTful API (either Eclipse IDE or Tomcat).
+- Run test cases with [Postman API Development Environment](https://www.getpostman.com/).
 
-#### Database setup
+#### Database initialization
 The configuration provides for the [Hibernate](https://hibernate.org/) ORM implementation twinned with an [H2](http://www.h2database.com/html/main.html) database.
 
 - Change directory (bash) to top-level directory of Charta Caeli RESTful web service.
 - Run commands to initialize database:
 
   ```bash
-  # initialize database with H2 Shell tool
-  mkdir ~/src/chartacaeli-web/db
+  # Windows (Cygwin)
+  export BASDIR=$(cygpath -m /opt/chartacaeli/db)
+  # Linux
+  export BASDIR=/opt/chartacaeli/db
 
-  java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Shell \
-	-url jdbc:h2:~/src/chartacaeli-web/db/ChartDB \
-	-user chartacaeli -password chartaca3li \
+  mkdir $BASDIR
+
+  # initialize database with H2 Shell tool
+  java -cp web/WEB-INF/lib/h2-1.4.199.jar -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	-url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
 	-sql ""
 
   # start H2 Server on newly created database
   java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Server \
+	-baseDir $BASDIR \
 	-tcp \
 	-web
   ```
@@ -263,7 +269,7 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
   |Parameter|Value|
   |--|--|
   |Saved Settings|Generic H2 (Server)|
-  |JDBC URL|jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO|
+  |JDBC URL|jdbc:h2:tcp://localhost/./ChartDB;FILE_LOCK=NO|
   |User Name|chartacaeli|
   |Password|chartaca3li|
 
@@ -309,7 +315,7 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
   INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('2e541e9d-67b3-44d8-9b91-f513704f054a', '1566126479000', '1566126479003', 'scientific-star-chart', 'cleaned') ;
   ```
 
-#### Tomcat setup
+#### Tomcat initialization
 Installation and configuration of Tomcat performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
 
 Copy `META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`. Update Context element to `<Context docBase="<appbase>" path="" reloadable="true"/>` with `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web`). This makes Charta Caeli the default web app (start on domain URL).
@@ -329,10 +335,10 @@ Copy `META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catal
 - Discussion about [using IMG element or background-image property](https://stackoverflow.com/questions/492809/when-to-use-img-vs-css-background-image)
 - Thoughts on [using style tags outside CSS stylesheets](https://www.elegantthemes.com/blog/resources/when-and-why-to-use-the-style-tag-outside-of-css-stylesheets)
 - [Blog post](https://icons8.com/articles/choosing-the-right-size-and-format-for-icons/) on how to choose right icon sizes
-- SO article on [best practices for where to add event listeners](https://stackoverflow.com/questions/26104525/best-practices-for-where-to-add-event-listeners)
+- SO article on [best practices regarding number and position of event listeners in DOM](https://stackoverflow.com/questions/26104525/best-practices-for-where-to-add-event-listeners)
 - SO article on an [animated hamburger icon](https://stackoverflow.com/questions/37758887/animated-x-icon-for-bootstrap-toggle) and an [update for Bootstrap 4](http://kylegoslan.co.uk/bootstrap-4-hamburger-menu-animation/)
 - List of [media queries](https://css-tricks.com/snippets/css/media-queries-for-standard-devices/) grouped by device type
-- The [Harel statechart definition](http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf). A handy [variation of the statechart notation](http://dec.bournemouth.ac.uk/staff/kphalp/statecharts.pdf) as proposed by Harel. A [theoretical application example](https://de.slideshare.net/lmatteis/are-statecharts-the-next-big-ui-paradigm) (mind the links on 2nd last slide) and finally [bureaucracy](https://github.com/samroberton/bureaucracy), the practical implementation in Clojure on GitHub (visit links in README.md and especially take a look at [Kevin Lynagh's Sketch.system](https://sketch.systems/tutorials/five-minute-introduction/) implementation).
+- The [Harel statechart definition](http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf). A handy [variation of the statechart notation](http://dec.bournemouth.ac.uk/staff/kphalp/statecharts.pdf) as proposed by Harel. A [theoretical application example](https://de.slideshare.net/lmatteis/are-statecharts-the-next-big-ui-paradigm) (mind the links on 2nd last slide) and finally [bureaucracy](https://github.com/samroberton/bureaucracy), the practical implementation in Clojure on GitHub (visit links in README.md and especially take a look at [Kevin Lynagh's Sketch.systems](https://sketch.systems/tutorials/five-minute-introduction/) implementation).
 - A [hierarchical FSM implementation](https://xstate.js.org/docs/#hierarchical-nested-state-machines) in JavaScript (mind the visualizer)
 - The [JAX-RS API specification](https://download.oracle.com/otn-pub/jcp/jaxrs-2_1-final-eval-spec/jaxrs-2_1-final-spec.pdf) for RESTful Web Services
 - [SO Answer](https://stackoverflow.com/questions/45625925/what-exactly-is-the-resourceconfig-class-in-jersey-2?answertab=active#tab-top) on various options to configure JAX-RS servlet container

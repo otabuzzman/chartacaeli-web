@@ -270,6 +270,7 @@ function eaExePcd(creq) {
 		$.ajax({
 			url: next,
 			method: 'GET',
+			headers: { Accept: "application/json" },
 			success: function(creq) {
 				switch (creq.stat) {
 				case 'accepted':
@@ -540,6 +541,7 @@ function onclickBtnExec() {
 	$.ajax({
 		url: exec,
 		method: 'POST',
+		headers: { Accept: "application/json" },
 		data: { chart: chart, prefs: prefs },
 		dataType: 'json',
 		statusCode: {

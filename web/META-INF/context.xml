@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
-	<Resource name="jdbc/ChartDB" auth="Container" type="javax.sql.DataSource" driverClassName="org.h2.Driver" url="jdbc:h2:tcp://localhost/~/src/chartacaeli-web/db/ChartDB;FILE_LOCK=NO" username="chartacaeli" password="chartaca3li" maxTotal="64" maxIdle="16" maxWaitMillis="16364"/>
+	<Resource name="jdbc/ChartDB" auth="Container" type="javax.sql.DataSource" driverClassName="org.h2.Driver" url="jdbc:h2:tcp://localhost/./ChartDB;FILE_LOCK=NO" username="chartacaeli" password="chartaca3li" maxTotal="64" maxIdle="16" maxWaitMillis="16364"/>
 </Context>
