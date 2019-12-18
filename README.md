@@ -2,7 +2,7 @@
 A web service for the Charta Caeli star chart creation tool. The service is made up of a frontend that communicates with a backend. The frontend utilizes Bootstrap 4 for responsiveness and [Xonomy XML editor](https://github.com/michmech/xonomy) to edit star chart definitions on devices with appropriate display sizes. The backend connects the frontend with the Charta Caeli core application. The backend consists of a web application providing a RESTful API, a database and a Runner process for the actual star charts creation.
 
 ### Build
-The project depends on the Charta Caeli star chart creation tool (core application). Thus, to setup the web service, one first has to download and build the [core application](https://github.com/otabuzzman/chartacaeli) according to instructions given there. Afterwards clone this repository and follow steps listed below. Make sure top-level directories of core application and web service share the same folder.
+The project depends on the Charta Caeli star chart creation tool (core application). Thus, to setup the web service, one first has to build and install the [core application](https://github.com/otabuzzman/chartacaeli) according to instructions given there. Afterwards clone this repository and follow steps listed below.
 - Change directory (bash) to top-level directory of Charta Caeli web service.
 - Run frontend build commands.
   ```bash
@@ -18,13 +18,47 @@ The project depends on the Charta Caeli star chart creation tool (core applicati
 
   ```bash
   # Windows (Cygwin)
-  export GS_FONTPATH=c:/users/$USERNAME/src/chartacaeli-web\;c:/users/$USERNAME/src/chartacaeli
+  gs_fontpath=~/src/chartacaeli-web:~/src/chartacaeli
+  export GS_FONTPATH=$(cygpath -mp $gs_fontpath)
   # Linux
   export GS_FONTPATH=~/lab/chartacaeli-web:~/lab/chartacaeli
 
   make pdf png gng
   make install
   ```
+
+### Install
+- Initialize Tomcat 8.5 according to [section](#tomcat-initialization).
+- Initialize H2 database according to [section](#h2-initialization).
+- Start H2 database.
+  ```bash
+  # Windows (Cygwin)
+  export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+  export BASDIR=$(cygpath -m /opt/chartacaeli/db)
+  # Linux
+  export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+  export BASDIR=/opt/chartacaeli/db
+
+  export PATH=$JAVA_HOME/bin:$PATH
+  java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Server \
+	-baseDir $BASDIR \
+	-tcp \
+	-web &
+  ```
+
+- Start Runner process.
+  ```bash
+  # Windows (Cyqwin)
+  export PATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
+  export GS=gswin64c
+  # Linux
+
+  sh Runner.sh &
+  ```
+
+- Start RESTful API (Eclipse IDE or Tomcat).
+- Run RESTful API test cases using [Postman](https://www.getpostman.com/).
+- Perform E2E test with browser pointing at [localhost](http://localhost:4711/index.html).
 
 ### Development notes
 
@@ -198,50 +232,9 @@ JSON Chart object representation sample
 |`/charts`|chart|Data parameter|String|mandatory|x-www-form-urlencoded|XML document conforming to Chart Specification XSD|
 ||prefs|Data parameter|String|optional|x-www-form-urlencoded|XML document conforming to Java Preferences DTD|
 
-#### RESTful API setup
-- Change to top-level directory of Charta Caeli RESTful web service.
-- Start H2 database.
-
-  ```bash
-  # Windows (Cygwin)
-  export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
-  export PATH=$JAVA_HOME/bin:$PATH
-  export BASDIR=$(cygpath -m /opt/chartacaeli/db)
-  # Linux
-  export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
-  export PATH=$JAVA_HOME/bin:$PATH
-  export BASDIR=/opt/chartacaeli/db
-
-  java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Server \
-	-baseDir $BASDIR \
-	-tcp \
-	-web &
-  ```
-
-- Start Runner process.
-
-  ```bash
-  # Windows (Cygwin)
-  export PATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
-  export GS=gswin64c
-  # Linux
-  export DBURL="jdbc:h2:tcp://localhost/./ChartDB;FILE_LOCK=NO"
-  export OUTDIR=$BASDIR
-  export APPDIR=/opt/chartacaeli/app/WEB-INF
-  export INTERVAL=10
-  export LOGLEVEL=3
-
-  sh Runner.sh &
-  ```
-
-- Start RESTful API (either Eclipse IDE or Tomcat).
-- Run test cases with [Postman API Development Environment](https://www.getpostman.com/).
-
-#### Database initialization
-The configuration provides for the [Hibernate](https://hibernate.org/) ORM implementation twinned with an [H2](http://www.h2database.com/html/main.html) database.
-
+#### H2 initialization
 - Change directory (bash) to top-level directory of Charta Caeli RESTful web service.
-- Run commands to initialize database:
+- Run commands to initialize [H2](http://www.h2database.com/html/main.html) database:
 
   ```bash
   # Windows (Cygwin)
@@ -263,7 +256,7 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
 	-web
   ```
 
-- Open H2 Console URL `http://localhost:8082` in browser.
+- Open H2 Console URL [http://localhost:8082](http://localhost:8082) in browser.
 - Provide parameters on login page and click Connect button.
 
   |Parameter|Value|
@@ -295,7 +288,7 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
   ) ;
   ```
 
-- Create some entries and populate database:
+- Create some entries to populate database with H2 Console (optional):
 
   ```bash
   for s in none received accepted rejected started finished failed cleaned ; do sleep 1 ; \
@@ -303,6 +296,8 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
 		"INSERT INTO \`CHARTS\` (\`ID\`, \`CREATED\`, \`MODIFIED\`, \`NAME\`, \`STAT\`) \
 		VALUES ('$i', '$c', '$m', 'scientific-star-chart', '$s') ;" ; done
   ```
+
+- Sample entries to populate database.
 
   ```sql
   INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('fccc5742-9999-40a7-bf50-bbd1f79719d9', '1566126471000', '1566126471003', 'scientific-star-chart', 'none') ;
@@ -316,9 +311,9 @@ The configuration provides for the [Hibernate](https://hibernate.org/) ORM imple
   ```
 
 #### Tomcat initialization
-Installation and configuration of Tomcat performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
+Installation and configuration of [Tomcat](https://tomcat.apache.org/index.html) performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
 
-Copy `META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`. Update Context element to `<Context docBase="<appbase>" path="" reloadable="true"/>` with `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web`). This makes Charta Caeli the default web app (start on domain URL).
+Copy `META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`. Update Context element to `<Context docBase="<appbase>" path="" reloadable="true"/>` with `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web` for testing on Windows). This makes Charta Caeli the default web app (start on domain URL).
 
 - To start Tomcat on Windows enter these commands in `cmd.exe`:
 
