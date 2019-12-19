@@ -19,14 +19,15 @@ probeJRE() {
 }
 
 probeBASDIR() {
-	( cd ${BASDIR:=/opt/chartacaeli/db} ) >/dev/null 2>&1
+	dir=${BASDIR:=/opt/chartacaeli/db}
+	( cd $dir ) >/dev/null 2>&1
 
 	return $?
 }
 
 probeDB() {
 	java -cp ${CLASSPATH:=web/WEB-INF/lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
-	-url ${DBURL:=jdbc:h2:tcp://localhost/./ChartDB;IF_EXISTS=TRUE} \
+	-url ${DBURL:=jdbc:h2:tcp://localhost/./ChartDB;FILE_LOCK=NO} \
 	-user ${DBUSER:=chartacaeli} -password ${DBPASS:=chartaca3li} \
 	-sql "" >/dev/null 2>&1
 
@@ -34,13 +35,15 @@ probeDB() {
 }
 
 probeOUTDIR() {
-	( cd ${OUTDIR:=/opt/chartacaeli/db} ) >/dev/null 2>&1
+	dir=${OUTDIR:=/opt/chartacaeli/db}
+	( cd $dir ) >/dev/null 2>&1
 
 	return $?
 }
 
 probeAPPDIR() {
-	( cd ${APPDIR:=/opt/chartacaeli/app/WEB-INF} ) >/dev/null 2>&1
+	dir=${APPDIR:=/opt/chartacaeli/app/WEB-INF}
+	( cd $dir ) >/dev/null 2>&1
 
 	return $?
 }

@@ -51,6 +51,10 @@ The project depends on the Charta Caeli star chart creation tool (core applicati
   # Windows (Cyqwin)
   export PATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
   export GS=gswin64c
+
+  export OUTDIR=$(cygpath -m /opt/chartacaeli/db)
+  export INTERVAL=10
+  export LOGLEVEL=3
   # Linux
 
   sh Runner.sh &
@@ -313,7 +317,7 @@ JSON Chart object representation sample
 #### Tomcat initialization
 Installation and configuration of [Tomcat](https://tomcat.apache.org/index.html) performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
 
-Copy `META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`. Update Context element to `<Context docBase="<appbase>" path="" reloadable="true"/>` with `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web` for testing on Windows). This makes Charta Caeli the default web app (start on domain URL).
+Copy `META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`. Update Context element to `<Context docBase="<appbase>" path="" reloadable="true">` with `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web` for testing on Windows). This makes Charta Caeli the default web app (start on domain URL).
 
 - To start Tomcat on Windows enter these commands in `cmd.exe`:
 

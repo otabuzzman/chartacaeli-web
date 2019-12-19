@@ -78,7 +78,6 @@ public class ChartsResource {
 		Link self, next, d8n, p9s ;
 		URI nextURI, d8nURI, p9sURI ;
 		CompositeResult result ;
-		log.info( accept ) ;
 
 		self = Link.fromUri( uri.getAbsolutePath() ).rel( "self" ).build() ;
 
