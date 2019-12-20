@@ -2840,7 +2840,7 @@
 						<Script purpose="none" value="none"/>
 					</AnnotationStraight>
 					<Catalog>
-						<CatalogADC6049 url="ftp://cdsarc.u-strasbg.fr/ftp/cats/VI/49/bound_20.dat">
+						<CatalogADC6049 url="ftp://cdsarc.u-strasbg.fr/ftp/cats/VI/49/bound_20.dat.gz">
 							<CatalogADC6049Record select="{abbreviation~&#x0022;Aql&#x0022;||abbreviation~&#x0022;Aur&#x0022;||abbreviation~&#x0022;Cam&#x0022;||abbreviation~&#x0022;Crv&#x0022;||abbreviation~&#x0022;Leo&#x0022;||abbreviation~&#x0022;Lib&#x0022;||abbreviation~&#x0022;Mon&#x0022;||abbreviation~&#x0022;Per&#x0022;||abbreviation~&#x0022;Psc&#x0022;||abbreviation~&#x0022;Pup&#x0022;||abbreviation~&#x0022;Sex&#x0022;||abbreviation~&#x0022;Sgr&#x0022;||abbreviation~&#x0022;UMi&#x0022;||con~&#x0022;SER1&#x0022;}">
 								<Annotation>
 									<AnnotationStraight reverse="false" anchor="bottomleft" radiant="false">

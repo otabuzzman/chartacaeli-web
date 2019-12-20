@@ -53,9 +53,12 @@ The project depends on the Charta Caeli star chart creation tool (core applicati
   export GS=gswin64c
 
   export OUTDIR=$(cygpath -m /opt/chartacaeli/db)
-  export INTERVAL=10
-  export LOGLEVEL=3
   # Linux
+  :
+
+  # optional
+  export INTERVAL=10 # default 1
+  export LOGLEVEL=3  # default 0 (no output)
 
   sh Runner.sh &
   ```
