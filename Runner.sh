@@ -7,18 +7,18 @@ this=$(basename $0)
 
 ( LOGLEVEL=3 info started )
 
-trap signalhandler 1 2 3 6 15
-
 # mind order
 probeJRE || { fail "Java not available. Start canceled." ; exit 1 ; }
 probeBASDIR || { fail "BASDIR '$BASDIR' invalid. Start canceled" ; exit 1 ; }
-probeDB || { fail "database '$DBURL' not available. Start canceled." ; exit 1 ; }
 probeOUTDIR || { fail "OUTDIR '$OUTDIR' invalid. Start canceled" ; exit 1 ; }
 probeAPPDIR || { fail "APPDIR '$APPDIR' invalid. Start canceled." ; exit 1 ; }
 probeAPPEXE || { fail "APPEXE '$APPEXE' invalid. Start canceled." ; exit 1 ; }
 probeGS || { fail "Ghostscript not available. Start canceled." ; exit 1 ; }
 
+trap signalhandler 1 2 3 6 15
+
 while true ; do
+	probeDB || { fail "database '$DBURL' not available. Will try again..." ; sleep ${INTERVAL:-1} ; continue ; }
 	# lookup oldest chart creation request in 'accepted' state
 	# `stat` column is workaround for CRLF output of H2 Shell Tool
 	creq=$(java -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
@@ -59,5 +59,4 @@ while true ; do
 	unset id name
 	unset xml pdf
 	unset log err
-	trap - 1 2 3 6 15
 done

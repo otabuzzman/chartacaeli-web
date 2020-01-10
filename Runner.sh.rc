@@ -60,8 +60,18 @@ probeGS() {
 	return $?
 }
 
+updateDB() {
+	java -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	-url $DBURL -user $DBUSER -password $DBPASS \
+	-sql "UPDATE charts SET stat = '$2', modified = '$(date +%s)000' WHERE id = '$1'"
+
+	return $?
+}
+
 signalhandler() {
-	( LOGLEVEL=3 info "rollback $id and exit upon signal" )
+	[ -z "$id" ] && { LOGLEVEL=3 info "terminate upon signal" ; exit 0 ; }
+
+	( LOGLEVEL=3 info "rollback $id and exit upon signal and terminate" )
 
 	rm -f $pdf $log $err
 
@@ -70,12 +80,4 @@ signalhandler() {
 	-sql "UPDATE charts SET stat = 'accepted', modified = '$(date +%s)000' WHERE id = '$id'"
 
 	exit 0
-}
-
-updateDB() {
-	java -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
-	-url $DBURL -user $DBUSER -password $DBPASS \
-	-sql "UPDATE charts SET stat = '$2', modified = '$(date +%s)000' WHERE id = '$1'"
-
-	return $?
 }
