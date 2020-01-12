@@ -38,7 +38,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 
 /* gallery */
 .carousel-caption { padding-bottom: 0 ; position: relative ; left: auto ; right: auto ; }
-.carousel-caption h3 { color: #007bff ; font-weight: 400 ; }
+.carousel-caption h3 { margin-top: .5rem ; color: #007bff ; font-weight: 400 ; }
 .info-txt {  }
 .info-img { width: 360px ; }
 #ccGallery .btn-box {  }

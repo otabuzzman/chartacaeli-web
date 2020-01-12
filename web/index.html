@@ -69,7 +69,7 @@
 			<!-- gallery caption -->
 			<h2 class="headline">gallery</h2>
 			<hr class="ruler-top">
-			<p class="lead">See what Charta Caeli can do. View full size gallery items in PDF and read about their features or load chart definitions from gallery into composer as templates for your own beautiful star charts.
+			<p class="lead">See what Charta Caeli can do. The buttons below the gallery apply to the visible item. Click 'em to view a full-size star chart in PDF, to get information about its features or to load the chart definition into composer as a template for your own beautiful star chart.
 			</p>
 			<!-- gallery items carousel -->
 			<div id="ccGalleryCarousel" class="carousel slide" data-ride="carousel">
@@ -134,11 +134,11 @@
 						<h4>The Chart element</h4>
 						<p>This outermost piece of XML data starts a chart definition. Actually, there is one more element above Chart but that’s essentially to group multiple chart definitions in a single file. Chart is of XSD type choice and serves to define the projection type, which in turn is a child of Chart. Furthermore, Chart defines page dimensions and a viewport, which is a kind of passe-partout.</p>
 						<h4>The Horizon element</h4>
-						<p>Similar to Chart this element serves to define a horizon type, which is sort of a synonym for coordinate system. Interpretation of object coordinates depends on their horizon type. Three of these are almost fix coordinate systems as they change due to sky mechanics: the equatorial, the ecliptical and the galactical one. The local horizon is a variable one because it’s defined by earth coordinates.</p>
+						<p>Similar to Chart this element serves to define a horizon type, which is sort of a synonym for coordinate system. Interpretation of object coordinates depends on their horizon type. For humans, three of these appear to be fix coordinate systems as they change only slowly due to sky mechanics: the equatorial, the ecliptical and the galactical one. Compared to these, the local horizon appears to be variable because its definition contains local time.</p>
 						<h4>The Circle element</h4>
-						<p>These serve to define grids. Not surprisingly, Circle as well is a choice to pick a type. Meridian and parallel circles draw lines of height and length, respectively. They are horizon dependent and correspond if for instance defined for a local horizon with its latitudes and longitudes. There are four special Circle elements of type parallel to define the northern and southern tropic and polar circles.</p>
+						<p>These serve to define grids. Not surprisingly, Circle as well is a choice to pick a particular type. Meridian and parallel circles draw lines of length and height, respectively. They are horizon dependent and correspond with longitudes and latitudes if for instance defined for a local horizon. There are four special Circle elements of type parallel to define the northern and southern tropic and polar circles.</p>
 						<h4>The Dial element</h4>
-						<p>Attached to a circle a Dial provide a means of scale. The two types of dials are day and degree with the day type being a special one. The other one is fairly universal and suitable for appending a scale to any circle in a chart definition.</p>
+						<p>Attached to a circle a Dial provides a means of scale. The two types of dials are day and degree with the day type being a special one. The other one is fairly universal and suitable for appending a scale to any circle in a chart definition.</p>
 						<h4>The Annotation element</h4>
 						<p>The specification foresees straight and curved annotations. The latter are useful to add comments that follow the paths of circles. Straight annotations happen to appear at the point where drawing stops. They refer to the page coordinate system. Many elements support annotations and thus a way to provide further explanations on them. A special case is the Frame element defined by the Layout element, which allows a more flexible positioning of straight annotations.</p>
 						<h4>The Catalog element</h4>
@@ -243,7 +243,7 @@
 			<hr class="ruler-top">
 			<p>Here is the place to jump-start your Charta Caeli experience. This specialized XML editor is for instant creating simple chart definitions from scratch. It supports the whole chart specification as defined by XSD although UX/UI regarding hints on syntax or numerical ranges is poor. The editor even serves well in playing around with values of larger definitions as provided by the gallery. Things get hard however when it comes to chart definitions with hundreds of elements and in particular on mobile devices. Due to this, if you plan to define a large chart from scratch consider using your favorite XML editor locally and upload the file when ready.</p>
 			<div class="alert alert-primary d-sm-block d-md-none" role="alert">
-				<p>Crap! Display too small to edit but loaded anyway. Try composer on tablet or PC.</p>
+				<p>Too bad your display is too small for composer. You can still load and execute definitions from gallery or local files. To edit however you need a tablet or PC.</p>
 			</div>
 			<hr class="ruler-sep">
 			<div id="ccXonomy" class="d-none d-md-block"></div>
