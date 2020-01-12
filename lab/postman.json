@@ -103,6 +103,11 @@
 						"name": "Content-Type",
 						"value": "application/x-www-form-urlencoded",
 						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -147,6 +152,11 @@
 						"name": "Content-Type",
 						"value": "application/x-www-form-urlencoded",
 						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -190,6 +200,11 @@
 						"key": "Content-Type",
 						"name": "Content-Type",
 						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/xml",
 						"type": "text"
 					}
 				],
@@ -236,6 +251,11 @@
 						"name": "Content-Type",
 						"value": "application/x-www-form-urlencoded",
 						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -280,6 +300,11 @@
 						"key": "Content-Type",
 						"name": "Content-Type",
 						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/xml",
 						"type": "text"
 					}
 				],
@@ -362,7 +387,7 @@
 						"charts"
 					]
 				},
-				"description": "setgray changed to setgrey. Run GET until failed state returned."
+				"description": "setgray changed to setgrey. Run GET on next until failed state returned."
 			},
 			"response": []
 		}
