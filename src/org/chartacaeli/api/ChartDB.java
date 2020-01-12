@@ -12,7 +12,7 @@ public class ChartDB implements DAO<Chart> {
 		EntityManager em ;
 		Optional<Chart> chart ;
 
-		em = ServletContextListener.createEntityManager() ;
+		em = AppInit.createEntityManager() ;
 		try {
 			chart = Optional.ofNullable( em
 					.createNamedQuery( "Chart.findById", Chart.class )
@@ -31,7 +31,7 @@ public class ChartDB implements DAO<Chart> {
 		EntityManager em ;
 		List<Chart> list ;
 
-		em = ServletContextListener.createEntityManager() ;
+		em = AppInit.createEntityManager() ;
 		list = em.createNamedQuery( "Chart.findAll", Chart.class )
 				.getResultList() ;
 		em.close() ;
@@ -43,7 +43,7 @@ public class ChartDB implements DAO<Chart> {
 	public void insert( Chart chart ) {
 		EntityManager em ;
 
-		em = ServletContextListener.createEntityManager() ;
+		em = AppInit.createEntityManager() ;
 
 		em.getTransaction().begin() ;
 		em.persist( chart ) ;
@@ -56,7 +56,7 @@ public class ChartDB implements DAO<Chart> {
 	public void update( Chart chart ) {
 		EntityManager em ;
 
-		em = ServletContextListener.createEntityManager() ;
+		em = AppInit.createEntityManager() ;
 
 		em.getTransaction().begin() ;
 		em.merge( chart ) ;
@@ -69,7 +69,7 @@ public class ChartDB implements DAO<Chart> {
 	public void delete( Chart chart ) {
 		EntityManager em ;
 
-		em = ServletContextListener.createEntityManager() ;
+		em = AppInit.createEntityManager() ;
 
 		em.getTransaction().begin() ;
 		em.remove( chart ) ;

@@ -8,7 +8,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
 @WebListener
-public class ServletContextListener implements javax.servlet.ServletContextListener {
+public class AppInit implements javax.servlet.ServletContextListener {
 
 	private static EntityManagerFactory factory ;
 

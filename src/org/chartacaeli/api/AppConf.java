@@ -2,11 +2,8 @@
 package org.chartacaeli.api;
 
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 
-@ApplicationPath( "/api/*" )
-public class ResourceConfig extends org.glassfish.jersey.server.ResourceConfig {
-
-	public ResourceConfig() {
-		packages( RootResource.class.getPackage().getName() ) ;
-	}
+@ApplicationPath( "api" )
+public class AppConf extends Application {
 }
