@@ -1,9 +1,10 @@
 docdir = web
 libdir = $(docdir)/lib
-labdir = $(docdir)/lab
 # the (W)EB-INF l(ib) folder
 wibdir = $(docdir)/WEB-INF/lib
 clsdir = $(docdir)/WEB-INF/classes
+
+instdir = /opt/chartacaeli
 
 PDF = general-features-selection.pdf \
 	scientific-star-chart.pdf \
@@ -27,8 +28,8 @@ GNG = ccGallery_general-features-selection.png \
 
 .PHONY: all clean lclean rclean tidy pdf png gng
 
-vpath %.xml $(labdir)
-vpath %.preferences $(labdir)
+vpath %.xml $(docdir)
+vpath %.preferences $(docdir)
 
 # top-level folder of core app (as seen from web service)
 appdir = ../chartacaeli
@@ -64,6 +65,16 @@ artistic-star-chart.pdf: artistic-star-chart--toppage.pdf artistic-star-chart--a
 
 install: $(PDF) $(PNG) $(GNG)
 	( for img in $^ ; do install $$img $(docdir) ; done )
+
+$(instdir):
+	mkdir -p $@
+
+instweb: $(instdir)
+	mvn compile
+	tar cf - web | ( cd $< ; tar xf - )
+	install -m 0755 -o root -g root cc-db.sh $<
+	install -m 0755 -o root -g root cc-runner.sh $<
+	install -m 0755 -o root -g root cc-cleaner.sh $<
 
 clean:
 	rm -f $(PDF) $(PNG) $(GNG)
