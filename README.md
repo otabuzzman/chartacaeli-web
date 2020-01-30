@@ -27,7 +27,7 @@ The project depends on the Charta Caeli star chart creation tool (core applicati
   make install
   ```
 
-### Install
+### Deploy
 - Initialize Tomcat 8.5 according to [section](#tomcat-initialization).
 - Initialize H2 database according to [section](#h2-initialization).
 - Start H2 database.
@@ -57,10 +57,23 @@ The project depends on the Charta Caeli star chart creation tool (core applicati
   :
 
   # optional
-  export INTERVAL=10 # default 1
   export LOGLEVEL=3  # default 0 (no output)
 
-  sh Runner.sh &
+  ( cd web/WEB-INF ; ./Runner.sh )
+  ```
+
+- Start Cleaner process.
+  ```bash
+  # Windows (Cyqwin)
+  export OUTDIR=$(cygpath -m /opt/chartacaeli/db)
+  # Linux
+  :
+
+  # optional
+  export LOGLEVEL=3  # default 0 (no output)
+  export REQAGE=600  # default 28800 (8 hours)
+
+  ( cd web/WEB-INF ; ./Cleaner.sh )
   ```
 
 - Start RESTful API (Eclipse IDE or Tomcat).
