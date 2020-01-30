@@ -1,4 +1,4 @@
-# Runner.sh.rc - run commands on Runner.sh startup
+# Runner.sh.rc - run commands on Runner.sh and Cleaner.sh startup. Store and exec in WEB-INF directory.
 #
 
 # enum LOGLEVEL { NONE, FAIL, WARN, INFO }
@@ -10,6 +10,12 @@ warn() {
 }
 fail() {
 	(( ${LOGLEVEL:-0} > 0 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : FAIL : Charta Caeli Web Service : $this : $1
+}
+
+checkNPrc() {
+	test ${NPRC:=1} -ge $( cat /proc/[1-9]*/cmdline | xargs -0 | tr ' ' '\n' | grep -c $this )
+
+	return $?
 }
 
 probeJRE() {
@@ -26,7 +32,7 @@ probeBASDIR() {
 }
 
 probeDB() {
-	java -cp ${CLASSPATH:=web/WEB-INF/lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	java -cp ${CLASSPATH:=lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url ${DBURL:=jdbc:h2:tcp://localhost/./ChartDB;FILE_LOCK=NO} \
 	-user ${DBUSER:=chartacaeli} -password ${DBPASS:=chartaca3li} \
 	-sql "" >/dev/null 2>&1
@@ -68,16 +74,22 @@ updateDB() {
 	return $?
 }
 
-signalhandler() {
-	[ -z "$id" ] && { LOGLEVEL=3 info "terminate upon signal" ; exit 0 ; }
-
-	( LOGLEVEL=3 info "rollback $id and exit upon signal and terminate" )
+termrnnr() {
+	[ -z "$id" ] \
+	&& { LOGLEVEL=3 info "terminate upon signal" ; exit 0 ; } \
+	|| ( LOGLEVEL=3 info "rollback $id and exit upon signal" )
 
 	rm -f $pdf $log $err
 
 	java -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "UPDATE charts SET stat = 'accepted', modified = '$(date +%s)000' WHERE id = '$id'"
+
+	exit 0
+}
+
+termclnr() {
+	( LOGLEVEL=3 info "terminate upon signal" )
 
 	exit 0
 }
