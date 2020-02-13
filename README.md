@@ -24,7 +24,6 @@ The project depends on the Charta Caeli star chart creation tool (core applicati
   export GS_FONTPATH=~/lab/chartacaeli-web:~/lab/chartacaeli
 
   make pdf png gng
-  make install
   ```
 
 ### Deploy

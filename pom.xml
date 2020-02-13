@@ -3,11 +3,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>chartacaeli-web</groupId>
 	<artifactId>chartacaeli-web</artifactId>
-	<version>0052</version>
+	<!-- ${git-commit} -->
+	<version>0065</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<git-commit>0065</git-commit>
 	</properties>
 	<build>
 		<defaultGoal>compile</defaultGoal>
@@ -35,11 +37,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<resources>
-			<resource>
-				<directory>src</directory>
-			</resource>
-		</resources>
 	</build>
 	<dependencies>
 		<dependency>

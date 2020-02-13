@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 public class MessageCatalog {
 
 	private final static ResourceBundle bundle = ResourceBundle.getBundle(
-			"chartacaeli-web",
+			"chartacaeli",
 			Locale.getDefault(),
 			Thread.currentThread().getContextClassLoader() ) ;
 

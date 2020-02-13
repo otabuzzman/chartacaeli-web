@@ -1,10 +1,18 @@
+ifeq ($(OS),Windows_NT)
+	winos := 1
+else
+	linos := 1
+endif
+
+APP		= chartacaeli
+
 docdir = web
 libdir = $(docdir)/lib
 # the (W)EB-INF l(ib) folder
 wibdir = $(docdir)/WEB-INF/lib
 clsdir = $(docdir)/WEB-INF/classes
 
-instdir = /opt/chartacaeli
+instdir = /opt/$(APP)
 
 PDF = general-features-selection.pdf \
 	scientific-star-chart.pdf \
@@ -41,8 +49,13 @@ webdir = ../chartacaeli-web
 	@test -f $(appdir)/$@ && mv $(appdir)/$@ .
 
 .pdf.png:
+ifdef winos
+	$${GS:-gswin64c.exe} -q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
+	magick convert png:- -background "rgb(255,255,255)" -flatten $@
+else
 	$${GS:-gs} -q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
 	magick convert png:- -background "rgb(255,255,255)" -flatten $@
+endif
 
 all: $(libdir)/xonomy $(libdir)/Justv2.ttf $(libdir)/Justv22.ttf
 
@@ -63,13 +76,13 @@ artistic-star-chart--artwork.pdf: artistic-star-chart--artwork.xml artistic-star
 artistic-star-chart.pdf: artistic-star-chart--toppage.pdf artistic-star-chart--artwork.pdf
 	pdftk $< background artistic-star-chart--artwork.pdf output $@
 
-install: $(PDF) $(PNG) $(GNG)
+instimg: $(PDF) $(PNG) $(GNG)
 	( for img in $^ ; do install $$img $(docdir) ; done )
 
 $(instdir):
 	mkdir -p $@
 
-instweb: $(instdir)
+install: $(instdir)
 	mvn compile
 	tar cf - web | ( cd $< ; tar xf - )
 	install -m 0755 -o root -g root cc-db.sh $<
