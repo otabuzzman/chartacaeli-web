@@ -39,14 +39,22 @@ GNG = ccGallery_general-features-selection.png \
 vpath %.xml $(docdir)
 vpath %.preferences $(docdir)
 
-# top-level folder of core app (as seen from web service)
-appdir = ../chartacaeli
-# top-level folder of web service (as seen from core app)
-webdir = ../chartacaeli-web
-
 .xml.pdf:
-	( export _JAVA_OPTIONS=-Duser.language=en ; cd $(appdir) ; make $@ VPATH=$(webdir)/$(docdir)/lab)
-	@test -f $(appdir)/$@ && mv $(appdir)/$@ .
+	@test -f ./ARIALUNI.TTF || { echo "*** font file ARIALUNI.TFF missing ***" ; false ; }
+ifdef winos
+	( unset LANG ; cdefs=$$(cygpath -m $$(realpath $<)) ; cd $(instdir)/web/WEB-INF ; \
+	PATH=lib:/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$$PATH \
+	CLASSPATH=$$(cygpath -mp lib:classes:lib/*) \
+	GS_FONTPATH=$$(cygpath -mp $$(pwd)) \
+	./chartacaeli.sh -k $$cdefs |\
+	$${GS:-gswin64c.exe} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
+else
+	( unset LANG ; cdefs=$$(cygpath -m $$(realpath $<)) ; cd $(instdir)/web/WEB-INF ; \
+	CLASSPATH=lib:classes:lib/* \
+	GS_FONTPATH=$$(pwd) \
+	./chartacaeli.sh -k $$cdefs |\
+	$${GS:-gs} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
+endif
 
 .pdf.png:
 ifdef winos
