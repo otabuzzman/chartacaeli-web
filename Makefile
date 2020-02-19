@@ -58,12 +58,12 @@ endif
 
 .pdf.png:
 ifdef winos
-	$${GS:-gswin64c.exe} \
-else
-	$${GS:-gs} \
-endif
-	-q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
+	$${GS:-gswin64c.exe} -q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
 	magick convert png:- -background "rgb(255,255,255)" -flatten $@
+else
+	$${GS:-gs} -q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
+	magick convert png:- -background "rgb(255,255,255)" -flatten $@
+endif
 
 all: $(libdir)/xonomy $(libdir)/Justv2.ttf $(libdir)/Justv22.ttf
 
@@ -93,9 +93,9 @@ $(instdir):
 install: $(instdir)
 	mvn compile
 	tar cf - web | ( cd $< ; tar xf - )
-	install -m 0755 -o root -g root cc-db.sh $<
-	install -m 0755 -o root -g root cc-runner.sh $<
-	install -m 0755 -o root -g root cc-cleaner.sh $<
+	install -m 0755 ccws-db.sh $<
+	install -m 0755 ccws-runner.sh $<
+	install -m 0755 ccws-cleaner.sh $<
 
 clean:
 	rm -f $(PDF) $(PNG) $(GNG)

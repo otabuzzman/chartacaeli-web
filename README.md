@@ -132,7 +132,7 @@ export PATH=lib:/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
 export CLASSPATH=$(cygpath -mp lib:classes:lib/*)
 export GS_FONTPATH=$(cygpath -mp /opt/chartacaeli)
 
-# start H2 database
+# start H2 database server
 ( cd /opt/chartacaeli/web/WEB-INF ; java -cp lib/h2-1.4.199.jar org.h2.tools.Server \
 	-baseDir $BASDIR \
 	-tcp \
