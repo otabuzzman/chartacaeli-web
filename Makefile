@@ -42,14 +42,14 @@ vpath %.preferences $(docdir)
 .xml.pdf:
 	@test -f ./ARIALUNI.TTF || { echo "*** font file ARIALUNI.TFF missing ***" ; false ; }
 ifdef winos
-	( unset LANG ; cdefs=$$(cygpath -m $$(realpath $<)) ; cd $(instdir)/web/WEB-INF ; \
+	( unset LANG ; cdefs=$$(cygpath -m $$(realpath $<)) ; cd $(instdir)/web/WEB-INF
 	PATH=lib:/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$$PATH \
 	CLASSPATH=$$(cygpath -mp lib:classes:lib/*) \
 	GS_FONTPATH=$$(cygpath -mp $$(pwd)) \
 	./chartacaeli.sh -k $$cdefs |\
 	$${GS:-gswin64c.exe} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
 else
-	( unset LANG ; cdefs=$$(cygpath -m $$(realpath $<)) ; cd $(instdir)/web/WEB-INF ; \
+	( unset LANG ; cdefs=$$(realpath $<) ; cd $(instdir)/web/WEB-INF
 	CLASSPATH=lib:classes:lib/* \
 	GS_FONTPATH=$$(pwd) \
 	./chartacaeli.sh -k $$cdefs |\
@@ -58,12 +58,12 @@ endif
 
 .pdf.png:
 ifdef winos
-	$${GS:-gswin64c.exe} -q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
-	magick convert png:- -background "rgb(255,255,255)" -flatten $@
+	$${GS:-gswin64c.exe} \
 else
-	$${GS:-gs} -q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
-	magick convert png:- -background "rgb(255,255,255)" -flatten $@
+	$${GS:-gs} \
 endif
+	-q -o - -r$${RES:-150} -sDEVICE=pngalpha -sPAPERSIZE=a2 -dFIXEDMEDIA -dPDFFitPage -dCompatibilityLevel=1.4 $< |\
+	magick convert png:- -background "rgb(255,255,255)" -flatten $@
 
 all: $(libdir)/xonomy $(libdir)/Justv2.ttf $(libdir)/Justv22.ttf
 

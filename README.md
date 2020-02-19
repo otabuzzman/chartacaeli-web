@@ -1,87 +1,163 @@
 # Charta Caeli web service
 A web service for the Charta Caeli star chart creation tool. The service is made up of a frontend that communicates with a backend. The frontend utilizes Bootstrap 4 for responsiveness and [Xonomy XML editor](https://github.com/michmech/xonomy) to edit star chart definitions on devices with appropriate display sizes. The backend connects the frontend with the Charta Caeli core application. The backend consists of a web application providing a RESTful API, a database and a Runner process for the actual star charts creation.
 
-### Build
-The project depends on the Charta Caeli star chart creation tool (core application). Thus, to setup the web service, one first has to build and install the [core application](https://github.com/otabuzzman/chartacaeli) according to instructions given there. Afterwards clone this repository and follow steps listed below.
-- Change directory (bash) to top-level directory of Charta Caeli web service.
-- Run frontend build commands.
-  ```bash
-  make all
-  ```
+## Build
+The project depends on the Charta Caeli star chart creation tool. Thus, to setup the web service, one first has to build and install that [core application](https://github.com/otabuzzman/chartacaeli) according to instructions given there. Afterwards run build commands listed below.
 
-- Run backend build commands.
-  ```bash
-  mvn compile
-  ```
+**Linux build commands**
 
-- Rebuild images to check if core application works.
+```bash
+# setup environment (sample values)
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+export PATH=$JAVA_HOME/bin:$PATH
 
-  ```bash
-  # Windows (Cygwin)
-  gs_fontpath=~/src/chartacaeli-web:~/src/chartacaeli
-  export GS_FONTPATH=$(cygpath -mp $gs_fontpath)
-  # Linux
-  export GS_FONTPATH=~/lab/chartacaeli-web:~/lab/chartacaeli
+# Clone Charta Caeli web service
+cd ~/lab ; git clone https://github.com/otabuzzman/chartacaeli-web.git ; cd chartacaeli-web
 
-  make pdf png gng
-  ```
+# build frontend
+make all
 
-### Deploy
-- Initialize Tomcat 8.5 according to [section](#tomcat-initialization).
-- Initialize H2 database according to [section](#h2-initialization).
-- Start H2 database.
-  ```bash
-  # Windows (Cygwin)
-  export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
-  export BASDIR=$(cygpath -m /opt/chartacaeli/db)
-  # Linux
-  export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
-  export BASDIR=/opt/chartacaeli/db
+# build backend
+mvn compile
+```
 
-  export PATH=$JAVA_HOME/bin:$PATH
-  java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Server \
+**Windows/ Cygwin build commands**
+
+```bash
+# setup environment (sample values)
+export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+export PATH=$JAVA_HOME/bin:$PATH
+
+# Clone Charta Caeli web service
+cd ~/lab ; git clone https://github.com/otabuzzman/chartacaeli-web.git ; cd chartacaeli-web
+
+# build frontend
+make all
+
+# build backend
+mvn compile
+```
+
+The `Makefile` provides targets to check if the Charta Caeli core application prerequisite works properly. What these targets  do is generating PDF and PNG files referenced by the HTML of the frontend. On success, a couple of PDF and PNG files should live in CWD (but not installed to actually be used by the frontend). Mind this is not a test of the Charta Caeli web service.
+
+```bash
+# make PNG and PNG files
+make pdf
+make png
+# make specific PNG files
+make gng
+```
+
+## Install
+
+**Linux**
+```bash
+# setup environment (sample values)
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+export PATH=$JAVA_HOME/bin:$PATH
+
+make install
+```
+
+**Windows/ Cygwin**
+```bash
+# setup environment (sample values)
+export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+export PATH=$JAVA_HOME/bin:$PATH
+
+make install
+```
+
+## Run
+The web service needs a Tomcat 8.5 servlet container and a H2 database. While the build process puts H2 into place provision of Tomcat is a manual task. Install and configure it (for simplicity) to make the ROOT application reference the Charta Caeli web service (hints given in [section](#tomcat-initialization) below). H2 needs some manual initialization as well which can be lookup [here](#h2-initialization). After having Tomcat configured and running issue commands given below. A special font (`ARIALUNI.TTF`) is assumed to live in the `/opt/chartacaeli` folder.
+
+**Run web service on Linux** (intended)
+
+```bash
+# setup environment (sample values)
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+export PATH=$JAVA_HOME/bin:$PATH
+
+# H2 env
+export BASDIR=/opt/chartacaeli/db
+
+# Runner env
+export LOGLEVEL=3  # default 0 (no output)
+
+# Cleaner env
+export LOGLEVEL=3  # default 0 (no output)
+export REQAGE=600  # default 28800 (8 hours)
+
+# chartacaeli.sh env
+export GS_FONTPATH=/opt/chartacaeli
+
+# start H2 database
+( cd /opt/chartacaeli/web/WEB-INF ; java -cp lib/h2-1.4.199.jar org.h2.tools.Server \
 	-baseDir $BASDIR \
 	-tcp \
-	-web &
-  ```
+	-web ) &
 
-- Start Runner process.
-  ```bash
-  # Windows (Cyqwin)
-  export PATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
-  export GS=gswin64c
+# start Runner process
+#
+# omit -i <interval> for one-shot
+( cd /opt/chartacaeli/web/WEB-INF ; unset LANG ; ./Runner.sh -i 5 ) &
 
-  export OUTDIR=$(cygpath -m /opt/chartacaeli/db)
-  # Linux
-  :
+# start Cleaner process
+#
+# omit -i <interval> for one-shot
+( cd /opt/chartacaeli/web/WEB-INF ; unset LANG ; ./Cleaner.sh -i 5 ) &
+```
 
-  # optional
-  export LOGLEVEL=3  # default 0 (no output)
+**Run web service on Windwos/ Cygwin** (testing)
 
-  ( cd web/WEB-INF ; ./Runner.sh )
-  ```
+```bash
+# setup environment (sample values)
+export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+export PATH=$JAVA_HOME/bin:$PATH
 
-- Start Cleaner process.
-  ```bash
-  # Windows (Cyqwin)
-  export OUTDIR=$(cygpath -m /opt/chartacaeli/db)
-  # Linux
-  :
+# H2 env
+export BASDIR=$(cygpath -m /opt/chartacaeli/db)
 
-  # optional
-  export LOGLEVEL=3  # default 0 (no output)
-  export REQAGE=600  # default 28800 (8 hours)
+# Runner env
+export OUTDIR=$(cygpath -m /opt/chartacaeli/db)
+export LOGLEVEL=3  # default 0 (no output)
 
-  ( cd web/WEB-INF ; ./Cleaner.sh )
-  ```
+# Cleaner env
+export OUTDIR=$(cygpath -m /opt/chartacaeli/db)
+export LOGLEVEL=3  # default 0 (no output)
+export REQAGE=600  # default 28800 (8 hours)
 
-- Start RESTful API (Eclipse IDE or Tomcat).
-- Run RESTful API test cases using [Postman](https://www.getpostman.com/).
-- Perform E2E test with browser pointing at [localhost](http://localhost:4711/index.html).
+# chartacaeli.sh env
+export PATH=lib:/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
+export CLASSPATH=$(cygpath -mp lib:classes:lib/*)
+export GS_FONTPATH=$(cygpath -mp /opt/chartacaeli)
 
-### Development notes
+# start H2 database
+( cd /opt/chartacaeli/web/WEB-INF ; java -cp lib/h2-1.4.199.jar org.h2.tools.Server \
+	-baseDir $BASDIR \
+	-tcp \
+	-web ) &
 
-#### Xonomy web XML editor
+# start Runner process
+#
+# omit -i <interval> for one-shot
+( cd /opt/chartacaeli/web/WEB-INF ; unset LANG ; ./Runner.sh -i 5 ) &
+
+# start Cleaner process
+#
+# omit -i <interval> for one-shot
+( cd /opt/chartacaeli/web/WEB-INF ; unset LANG ; ./Cleaner.sh -i 5 ) &
+```
+
+## Check
+
+Perform E2E test with browser pointing at [localhost](http://localhost:4711/index.html) and run RESTful API test cases using [Postman](https://www.getpostman.com/).
+
+---
+
+## Development notes
+
+### Xonomy web XML editor
 Install XMLStarlet
 - needs libxml2 and libxslt
 - expects /usr/include/libxml
@@ -109,13 +185,13 @@ for p in `xml sel -t -v "//xs:pattern/@value" ../chartacaeli/chartacaeli.xsd | s
 	grep '0$'
 ```
 
-#### Favicon creation
+### Favicon creation
 - Icon sketched with Google Slides but defined with Microsoft Powerpoint because Slides lacks some GUI features (e.g. setting arbitrary linewidths, capstyles and numerical rotation angles).
 - Icon text in Justinian font made with Powerpoint. Set background transparent. Save text element as graphic via context menu.
 - Combine icon and text images with Slides.
 - Use the [IcoMoon](https://icomoon.io/) Chrome extension to generate custom fonts from SVG icons. Avoid using strokes. If not possible use [INKSCAPE](https://inkscape.org/) to [convert strokes to fills](https://inkscape.org/doc/tutorials/advanced/tutorial-advanced.html) ([tooltip](lab/inkscape-tooltip-stroke-to-fill.png)).
 
-#### Style guide
+### Style guide
 Basic color palette and usage. Click on hex value to get derived palettes.
 
 |Color|Usage|
@@ -137,7 +213,7 @@ Subordinate styles of buttons and links.
 |Navigation menu entry|Primary color 10% darkened for `:hover` and 15% for `:active`.|
 |URL in text (inline)|Same as for navigation menu entries. No text decorations.|
 
-#### Thoughts on links
+### Thoughts on links
 Purposes of links in running text is provision of background information or to give credit to the efforts of individual projects used by the site. Another reason is to ease access to sites which might somewhat tricky to find with Google even if propper keywords are given. Some general rules of thumb:
 - No reference of sites everbody knows (e.g. Amazon, Google, Micosoft).
 - Only one reference at first occurence.
@@ -146,7 +222,7 @@ Purposes of links in running text is provision of background information or to g
 - References of books on Amazon with unambiguous search queries because direct links tend to be very long.
 - Unsecure sites referenced with unambiguous Google search queries resulting (ideally) in a top-ranked result.
 
-#### RESTful API design
+### RESTful API design
 RESTful API implementation made with [Jersey](https://jersey.github.io/) RESTful Web Service framework. HATEOAS using Link header based on [RFC5988](https://tools.ietf.org/html/rfc5988).
 
 **Object model and representations**
@@ -251,7 +327,7 @@ JSON Chart object representation sample
 |`/charts`|chart|Data parameter|String|mandatory|x-www-form-urlencoded|XML document conforming to Chart Specification XSD|
 ||prefs|Data parameter|String|optional|x-www-form-urlencoded|XML document conforming to Java Preferences DTD|
 
-#### H2 initialization
+### H2 initialization
 - Change directory (bash) to top-level directory of Charta Caeli RESTful web service.
 - Run commands to initialize [H2](http://www.h2database.com/html/main.html) database:
 
@@ -268,7 +344,7 @@ JSON Chart object representation sample
 	-url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
 	-sql ""
 
-  # start H2 Server on newly created database
+  # start H2 Server on newly created database (optional)
   java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Server \
 	-baseDir $BASDIR \
 	-tcp \
@@ -329,20 +405,20 @@ JSON Chart object representation sample
   INSERT INTO `CHARTS` (`ID`, `CREATED`, `MODIFIED`, `NAME`, `STAT`)  VALUES ('2e541e9d-67b3-44d8-9b91-f513704f054a', '1566126479000', '1566126479003', 'scientific-star-chart', 'cleaned') ;
   ```
 
-#### Tomcat initialization
+### Tomcat initialization
 Installation and configuration of [Tomcat](https://tomcat.apache.org/index.html) performed according to these [practice notes](http://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) from [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore). Page provides useful newbie information on TC setup including first *Hello World* servlet.
 
-Copy `META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`. Update Context element to `<Context docBase="<appbase>" path="" reloadable="true">` with `<appbase>` set appropriately (e.g. `c:\users\<user>\src\chartacaeli-web\web` for testing on Windows). This makes Charta Caeli the default web app (start on domain URL).
+Copy `META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`. Update Context element to `<Context docBase="<appbase>" path="" reloadable="true">` with `<appbase>` set appropriately (e.g. `/opt/chartacaeli/web` or `c:\users\<user>\opt\chartacaeli\web` for testing on Linux or Windows respectively). This makes Charta Caeli the default web application (start on domain URL).
 
 - To start Tomcat on Windows enter these commands in `cmd.exe`:
 
-  ```bash
+  ```cmd
   set "JAVA_HOME=C:\Program Files\Java\jdk1.8.0_151"
   cd AppData\Local\Apache\apache-tomcat-8.5.37\bin
   startup.bat
   ```
 
-#### Helpful links
+### Helpful links
 - [CSS reference]( https://www.w3schools.com/cssref/default.asp) on [w3schools.com](https://www.w3schools.com/)
 - [YT tutorial](https://www.youtube.com/watch?v=emBwAyYBkC4) about a simple modern looking webpage. Actually this video started the project.
 - [YT tutorial](https://www.youtube.com/watch?v=eIWRbvE1B2E) on how to setup a responsive [Bootstrap](https://getbootstrap.com/docs/4.2/getting-started/introduction/) webpage from scratch

@@ -48,7 +48,7 @@ probeOUTDIR() {
 }
 
 probeAPPDIR() {
-	dir=${APPDIR:=/opt/chartacaeli/app/WEB-INF}
+	dir=${APPDIR:=/opt/chartacaeli/web/WEB-INF}
 	( cd $dir ) >/dev/null 2>&1
 
 	return $?
