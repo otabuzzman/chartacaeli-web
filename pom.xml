@@ -37,6 +37,11 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>${basedir}/src</directory>
+			</resource>
+		</resources>
 	</build>
 	<dependencies>
 		<dependency>

@@ -8,8 +8,6 @@ this=$(basename $0)
 ( LOGLEVEL=3 info started )
 
 # mind order
-checkNPrc || { fail "Maximum of $NPRC instances already running." ; exit 1 ; }
-
 probeJRE || { fail "Java not found." ; exit 1 ; }
 probeBASDIR || { fail "BASDIR '$BASDIR' invalid." ; exit 1 ; }
 probeDB || { fail "database '$DBURL' not available." ; exit 1 ; }
@@ -23,10 +21,10 @@ trap termrnnr 1 2 3 6 15
 
 doit() {
 	# lookup chart requests in 'accepted' state sorted by oldest first
-	creq=$(java -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	creq=$($JAVA -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "SELECT id, name, stat FROM charts WHERE stat = 'accepted' ORDER BY created ASC" |\
-	gawk '$1~/[0-9A-Za-z]{8}/ {print $1 " " $3}')
+	gawk --posix '$1~/[0-9A-Za-z]{8}/ {print $1 " " $3}')
 
 	# check and log
 	[ -n "$creq" ] \

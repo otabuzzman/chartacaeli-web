@@ -34,7 +34,7 @@ GNG = ccGallery_general-features-selection.png \
 
 .SUFFIXES: .xml .pdf .png
 
-.PHONY: all clean lclean rclean tidy pdf png gng
+.PHONY: all clean instimg install lclean rclean tidy pdf png gng
 
 vpath %.xml $(docdir)
 vpath %.preferences $(docdir)
@@ -87,15 +87,17 @@ artistic-star-chart.pdf: artistic-star-chart--toppage.pdf artistic-star-chart--a
 instimg: $(PDF) $(PNG) $(GNG)
 	( for img in $^ ; do install $$img $(docdir) ; done )
 
-$(instdir):
-	mkdir -p $@
-
 install: $(instdir)
-	mvn compile
+ifdef winos
 	tar cf - web | ( cd $< ; tar xf - )
+else
+	[ "$USER" == "ccaeli" ] || { echo '*** must exec as `ccaeli´ ***' ; false ; }
+	tar cf - --owner=$USER --group=$USER web | ( cd $< ; tar xf - )
+endif
 	install -m 0755 ccws-db.sh $<
 	install -m 0755 ccws-runner.sh $<
 	install -m 0755 ccws-cleaner.sh $<
+	install -m 0644 ChartDB.sql $<
 
 clean:
 	rm -f $(PDF) $(PNG) $(GNG)

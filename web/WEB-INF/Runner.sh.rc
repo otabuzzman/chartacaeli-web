@@ -12,14 +12,8 @@ fail() {
 	(( ${LOGLEVEL:-0} > 0 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : FAIL : Charta Caeli Web Service : $this : $1
 }
 
-checkNPrc() {
-	test ${NPRC:=1} -ge $( cat /proc/[1-9]*/cmdline | xargs -0 | tr ' ' '\n' | grep -c $this )
-
-	return $?
-}
-
 probeJRE() {
-	( java -version 2>&1 | grep version ) >/dev/null
+	( ${JAVA:=java} -version 2>&1 | grep version ) >/dev/null
 
 	return $?
 }
@@ -32,7 +26,7 @@ probeBASDIR() {
 }
 
 probeDB() {
-	java -cp ${CLASSPATH:=lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	$JAVA -cp ${CLASSPATH:=lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url ${DBURL:=jdbc:h2:tcp://localhost/./ChartDB;FILE_LOCK=NO} \
 	-user ${DBUSER:=chartacaeli} -password ${DBPASS:=chartaca3li} \
 	-sql "" >/dev/null 2>&1
@@ -61,13 +55,14 @@ probeAPPEXE() {
 }
 
 probeGS() {
-	( ${GS:=gs} -version 2>&1 | grep Ghostscript ) >/dev/null
+	type ${GS:=gs} >/dev/null 2>&1 \
+	&& ( $GS -version | grep Ghostscript >/dev/null )
 
 	return $?
 }
 
 updateDB() {
-	java -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	$JAVA -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "UPDATE charts SET stat = '$2', modified = '$(date +%s)000' WHERE id = '$1'"
 
@@ -81,7 +76,7 @@ termrnnr() {
 
 	rm -f $pdf $log $err
 
-	java -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	$JAVA -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "UPDATE charts SET stat = 'accepted', modified = '$(date +%s)000' WHERE id = '$id'"
 
