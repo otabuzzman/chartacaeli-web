@@ -168,7 +168,7 @@ rm -rf ~/lab/chartacaeli-web
 rm -rf ~/lab/META-INF
 rm -rf ~/lab/pj2 lab/pj2src lab/pj2src.jar
 
-# delete Java system and user preferences
+# delete Java system and user preferences (SO #1320709)
 sudo rm -rf $JAVA_HOME/jre/.systemPrefs
 rm -rf ~/.java/.userprefs
 ```
@@ -188,7 +188,7 @@ rm -rf ~/src/pj2 lab/pj2src lab/pj2src.jar
 ```
 
 ```cmd
-rem delete Java system preferences
+rem delete Java system preferences (SO #1320709)
 rem become admin by Ctrl+Shft+Enter
 rem
 reg delete HKLM\SOFTWARE\JavaSoft\Prefs /f
