@@ -48,7 +48,6 @@ ifdef winos
 	CLASSPATH=$$(cygpath -mp lib:classes:lib/*) ./chartacaeli.sh -k $$cdefs |\
 	$${GS:-gswin64c.exe} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
 else
-	[ "$USER" == "ccaeli" ] || { echo '*** must exec as `ccaeli´ ***' ; false ; }
 	sudo -u ccaeli -- bash -c "( unset LANG ; cdefs=$$(realpath $<) ; cd $(instdir)/web/WEB-INF
 	export GS_FONTPATH=$$(pwd)
 	export JAVA=$$JAVA_HOME/bin/java ; CLASSPATH=lib:classes:lib/* ./chartacaeli.sh -k $$cdefs |\
@@ -90,8 +89,7 @@ install: $(instdir)
 ifdef winos
 	tar cf - web | ( cd $< ; tar xf - )
 else
-	[ "$USER" == "ccaeli" ] || { echo '*** must exec as `ccaeli´ ***' ; false ; }
-	tar cf - --owner=$USER --group=$USER web | ( cd $< ; tar xf - )
+	tar cf - --owner=ccaeli --group=ccaeli web | ( cd $< ; tar xf - )
 	install -m 0755 ccws-db.sh $<
 	install -m 0755 ccws-runner.sh $<
 	install -m 0755 ccws-cleaner.sh $<

@@ -143,6 +143,11 @@ sudo bash -c "( echo ; echo '# Charta Caeli web service' ; echo umask 0002 ) >>/
 # add Charta Caeli user `ccaeli´ to `tomcat´ group (if missing)
 # so Runner can write in `/opt/chartacaeli/db/<id>´ folder created by web application with GID `tomcat´
 sudo usermod -a -G tomcat ccaeli
+
+# make service start on boot
+sudo chkconfig tomcat8 on
+# check service start (optional)
+chkconfig --list tomcat8
 ```
 
 - Update JAVA_HOME (e.g. `/usr/lib/jvm/java-1.8.0-openjdk`) in `/usr/share/tomcat8/tomcat8.conf`.
@@ -158,19 +163,24 @@ sudo fuser -v -n tcp 8080
 **Remove installation on Linux**
 
 ```bash
+# setup environment (sample values)
+JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+
 # delete Charta Caeli installation
 sudo rm -rf /opt/chartacaeli/*
+
+# delete Java system and user preferences (SO #1320709)
+sudo rm -rf $JAVA_HOME/jre/.systemPrefs
+sudo rm -rf /opt/chartacaeli/.java/.userPrefs
+# user preferences of login user (not `ccaeli´)
+rm -rf ~/.java/.userPrefs
 
 # delete build artefacts
 rm -rf ~/.m2
 rm -rf ~/lab/chartacaeli-app
 rm -rf ~/lab/chartacaeli-web
 rm -rf ~/lab/META-INF
-rm -rf ~/lab/pj2 lab/pj2src lab/pj2src.jar
-
-# delete Java system and user preferences (SO #1320709)
-sudo rm -rf $JAVA_HOME/jre/.systemPrefs
-rm -rf ~/.java/.userprefs
+rm -rf ~/lab/pj2 ~/lab/pj2src ~/lab/pj2src.jar
 ```
 
 **Remove installation on Windows/ Cygwin**
@@ -184,7 +194,7 @@ rm -rf ~/.m2
 rm -rf ~/src/chartacaeli-app
 rm -rf ~/src/chartacaeli-web
 rm -rf ~/src/META-INF
-rm -rf ~/src/pj2 lab/pj2src lab/pj2src.jar
+rm -rf ~/src/pj2 ~/lab/pj2src ~/lab/pj2src.jar
 ```
 
 ```cmd
@@ -218,14 +228,13 @@ sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF
 #
 # omit -i <interval> for one-shot
 sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF ; unset LANG
-	export GS_FONTPATH=/opt/chartacaeli
+	export GS_FONTPATH=/opt/chartacaeli:/opt/chartacaeli/web/lib
 	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Runner.sh -i 5 ) &"
 
 # start Cleaner process
 #
 # omit -i <interval> for one-shot
 sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF ; unset LANG
-	export GS_FONTPATH=/opt/chartacaeli
 	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Cleaner.sh -i 5 ) &"
 ```
 
@@ -259,7 +268,7 @@ export REQAGE=600  # default 28800 (8 hours)
 # chartacaeli.sh env
 export PATH=lib:/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH
 export CLASSPATH=$(cygpath -mp lib:classes:lib/*)
-export GS_FONTPATH=$(cygpath -mp /opt/chartacaeli)
+export GS_FONTPATH=$(cygpath -mp /opt/chartacaeli:/opt/chartacaeli/web/lib)
 
 # start H2 database server
 ( cd /opt/chartacaeli/web/WEB-INF ; java -cp lib/h2-1.4.199.jar org.h2.tools.Server \
