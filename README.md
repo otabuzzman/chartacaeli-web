@@ -33,17 +33,6 @@ make all
 mvn compile
 ```
 
-The `Makefile` provides targets to check if the Charta Caeli core application prerequisite works properly. What these targets  do is generating PDF and PNG files referenced by the HTML of the frontend. On success, a couple of PDF and PNG files should live in CWD (but not installed to actually be used by the frontend). Mind this is not a test of the Charta Caeli web service.
-
-```bash
-# make PNG and PNG files
-make pdf
-make png
-
-# make specific PNG files
-make gng
-```
-
 ## Install
 The web service needs a [Tomcat](https://tomcat.apache.org/index.html) 8.5 servlet container and an [H2](http://www.h2database.com/html/main.html) database. Setting up the latter is part of the build process described above. However, Tomcat requires some manual setup steps which furthermore differ for Linux and Windows/ Cygwin. More prerequisites are the Charta Caeli folder, user and group `/opt/chartacaeli`, `ccaeli` and `ccaeli` respectively.
 
@@ -188,7 +177,7 @@ rm -rf ~/.java/.userprefs
 
 ```bash
 # delete Charta Caeli installation
-rm -rf ~/opt/chartacaeli
+rm -rf ~/opt/chartacaeli/*
 
 # delete build artefacts
 rm -rf ~/.m2
@@ -289,6 +278,27 @@ export GS_FONTPATH=$(cygpath -mp /opt/chartacaeli)
 ```
 
 ## Check
+
+The `Makefile` provides targets to check if the Charta Caeli core application prerequisite works properly. What these targets  do is generating PDF and PNG files referenced by the HTML of the frontend. On success, a couple of PDF and PNG files should live in CWD (but not installed to actually be used by the frontend). Mind this is not a test of the Charta Caeli web service.
+
+```bash
+# setup Windows/ Cygwin environment (sample values)
+JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+export PATH=$JAVA_HOME/bin:$PATH
+# setup Linux environment (sample values)
+JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+
+# make PDF of `general-features-selection´
+make general-features-selection.pdf
+
+# make PDF and PNG files
+make pdf
+make png
+
+# make gallery PNG files
+make gng
+```
+
 Perform E2E test with browser (on Windows/ Cygwin use [localhost](http://localhost:4711/index.html)) and run RESTful API test cases using [Postman](https://www.getpostman.com/).
 
 ---

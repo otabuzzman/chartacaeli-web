@@ -43,17 +43,16 @@ vpath %.preferences $(docdir)
 	@test -f ./ARIALUNI.TTF || { echo "*** font file ARIALUNI.TFF missing ***" ; false ; }
 ifdef winos
 	( unset LANG ; cdefs=$$(cygpath -m $$(realpath $<)) ; cd $(instdir)/web/WEB-INF
-	PATH=lib:/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$$PATH \
-	CLASSPATH=$$(cygpath -mp lib:classes:lib/*) \
-	GS_FONTPATH=$$(cygpath -mp $$(pwd)) \
-	./chartacaeli.sh -k $$cdefs |\
+	export PATH=lib:/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$$PATH \
+	export GS_FONTPATH=$$(cygpath -mp $$(pwd))
+	CLASSPATH=$$(cygpath -mp lib:classes:lib/*) ./chartacaeli.sh -k $$cdefs |\
 	$${GS:-gswin64c.exe} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
 else
-	( unset LANG ; cdefs=$$(realpath $<) ; cd $(instdir)/web/WEB-INF
-	CLASSPATH=lib:classes:lib/* \
-	GS_FONTPATH=$$(pwd) \
-	./chartacaeli.sh -k $$cdefs |\
-	$${GS:-gs} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
+	[ "$USER" == "ccaeli" ] || { echo '*** must exec as `ccaeli´ ***' ; false ; }
+	sudo -u ccaeli -- bash -c "( unset LANG ; cdefs=$$(realpath $<) ; cd $(instdir)/web/WEB-INF
+	export GS_FONTPATH=$$(pwd)
+	export JAVA=$$JAVA_HOME/bin/java ; CLASSPATH=lib:classes:lib/* ./chartacaeli.sh -k $$cdefs |\
+	$${GS:-gs} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - )" >$@
 endif
 
 .pdf.png:
@@ -93,10 +92,10 @@ ifdef winos
 else
 	[ "$USER" == "ccaeli" ] || { echo '*** must exec as `ccaeli´ ***' ; false ; }
 	tar cf - --owner=$USER --group=$USER web | ( cd $< ; tar xf - )
-endif
 	install -m 0755 ccws-db.sh $<
 	install -m 0755 ccws-runner.sh $<
 	install -m 0755 ccws-cleaner.sh $<
+endif
 	install -m 0644 ChartDB.sql $<
 
 clean:
