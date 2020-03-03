@@ -50,7 +50,7 @@ doit() {
 
 		info "running '$APPEXE $xml' on request $id ..."
 		# run Charta Caeli app
-		( cd $APPDIR ; CLASSPATH=lib:classes:lib/* ./$APPEXE $xml 2>$log |\
+		( cd $APPDIR ; ./$APPEXE $xml 2>$log |\
 		$GS -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=$pdf -_ >$err 2>&1 ; (( ! (${PIPESTATUS[0]}>0 || ${PIPESTATUS[1]}>0) )) ; exit $? ) \
 		&& ( info "request $id successfully processed." ; updateDB $id finished || fail "database problem occurred with $id." ) \
 		|| ( warn "failed to process request $id." ; updateDB $id failed || fail "database problem occurred with $id." )
