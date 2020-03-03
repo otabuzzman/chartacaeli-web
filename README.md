@@ -4,27 +4,32 @@ A web service for the Charta Caeli star chart creation tool. The service is made
 ## Build
 The project depends on the Charta Caeli star chart creation tool. Thus, to setup the web service, one first has to build that [core application](https://github.com/otabuzzman/chartacaeli) according to instructions given there. Afterwards run build commands listed below.
 
-**Build setup on Linux**
+**Build commands on Linux**
 
 ```bash
 # setup environment (sample values)
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
 export PATH=$JAVA_HOME/bin:$PATH
+
+# Clone Charta Caeli web service
+cd ~/lab ; git clone https://github.com/otabuzzman/chartacaeli-web.git ; cd chartacaeli-web
+
+# build frontend
+make all
+
+# build backend
+mvn compile
 ```
 
-**Build setup on Windows/ Cygwin**
+**Build commands on Windows/ Cygwin**
 
 ```bash
 # setup environment (sample values)
 export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
 export PATH=$JAVA_HOME/bin:$PATH
-```
 
-**Build commands (Linux and Windows/ Cygwin)**
-
-```bash
 # Clone Charta Caeli web service
-cd ~/lab ; git clone https://github.com/otabuzzman/chartacaeli-web.git ; cd chartacaeli-web
+cd ~/src ; git clone https://github.com/otabuzzman/chartacaeli-web.git ; cd chartacaeli-web
 
 # build frontend
 make all
@@ -84,7 +89,7 @@ sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli
 **Initialize H2 on Windows/ Cygwin**
 
 ```bash
-mkdir ${BASDIR=$(cygpath -m /opt/chartacaeli/db)}
+mkdir ${BASDIR:=$(cygpath -m /opt/chartacaeli/db)}
 
 # initialize database with H2 Shell tool
 java -cp web/WEB-INF/lib/h2-1.4.199.jar -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
@@ -102,7 +107,7 @@ An alternative way is to use the H2 web console. Omit the `RUNSCRIPT` expression
 |Password|chartaca3li|
 
 ```bash
-mkdir ${BASDIR=$(cygpath -m /opt/chartacaeli/db)}
+mkdir ${BASDIR:=$(cygpath -m /opt/chartacaeli/db)}
 
 # initialize H2 omitting 'RUNSCRIPT'
 java -cp web/WEB-INF/lib/h2-1.4.199.jar -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
@@ -229,13 +234,13 @@ sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF
 # omit -i <interval> for one-shot
 sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF ; unset LANG
 	export GS_FONTPATH=/opt/chartacaeli:/opt/chartacaeli/web/lib
-	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Runner.sh -i 5 ) &"
+	export JAVA=$JAVA_HOME/bin/java ; export CLASSPATH=lib:classes:lib/* ; LOGLEVEL=3 ./Runner.sh -i 5 ) &"
 
 # start Cleaner process
 #
 # omit -i <interval> for one-shot
 sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF ; unset LANG
-	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Cleaner.sh -i 5 ) &"
+	export JAVA=$JAVA_HOME/bin/java ; export CLASSPATH=lib:classes:lib/* ; LOGLEVEL=3 ./Cleaner.sh -i 5 ) &"
 ```
 
 **Run web service on Windwos/ Cygwin** (testing)

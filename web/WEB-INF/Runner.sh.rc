@@ -13,7 +13,7 @@ fail() {
 }
 
 probeJRE() {
-	( ${JAVA:=java} -version 2>&1 | grep version ) >/dev/null
+	${JAVA:=java} -version >/dev/null 2>&1
 
 	return $?
 }
