@@ -21,7 +21,7 @@ trap termrnnr 1 2 3 6 15
 
 doit() {
 	# lookup chart requests in 'accepted' state sorted by oldest first
-	creq=$($JAVA -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	creq=$($JAVA -cp ${CLASSPATH:-lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "SELECT id, name, stat FROM charts WHERE stat = 'accepted' ORDER BY created ASC" |\
 	gawk --posix '$1~/[0-9A-Za-z]{8}/ {print $1 " " $3}')
@@ -50,7 +50,7 @@ doit() {
 
 		info "running '$APPEXE $xml' on request $id ..."
 		# run Charta Caeli app
-		( cd $APPDIR ; ./$APPEXE $xml 2>$log |\
+		( cd $APPDIR ; CLASSPATH=${CLASSPATH:-lib:classes:lib/*} ./$APPEXE $xml 2>$log |\
 		$GS -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=$pdf -_ >$err 2>&1 ; (( ! (${PIPESTATUS[0]}>0 || ${PIPESTATUS[1]}>0) )) ; exit $? ) \
 		&& ( info "request $id successfully processed." ; updateDB $id finished || fail "database problem occurred with $id." ) \
 		|| ( warn "failed to process request $id." ; updateDB $id failed || fail "database problem occurred with $id." )

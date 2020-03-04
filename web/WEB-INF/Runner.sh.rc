@@ -26,7 +26,7 @@ probeBASDIR() {
 }
 
 probeDB() {
-	$JAVA -cp ${CLASSPATH:=lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	$JAVA -cp ${CLASSPATH:-lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url ${DBURL:=jdbc:h2:tcp://localhost/./ChartDB;FILE_LOCK=NO} \
 	-user ${DBUSER:=chartacaeli} -password ${DBPASS:=chartaca3li} \
 	-sql "" >/dev/null 2>&1
@@ -62,7 +62,7 @@ probeGS() {
 }
 
 updateDB() {
-	$JAVA -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	$JAVA -cp ${CLASSPATH:-lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "UPDATE charts SET stat = '$2', modified = '$(date +%s)000' WHERE id = '$1'"
 
@@ -76,7 +76,7 @@ termrnnr() {
 
 	rm -f $pdf $log $err
 
-	$JAVA -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	$JAVA -cp ${CLASSPATH:-lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "UPDATE charts SET stat = 'accepted', modified = '$(date +%s)000' WHERE id = '$id'"
 

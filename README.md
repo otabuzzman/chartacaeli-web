@@ -234,13 +234,13 @@ sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF
 # omit -i <interval> for one-shot
 sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF ; unset LANG
 	export GS_FONTPATH=/opt/chartacaeli:/opt/chartacaeli/web/lib
-	export JAVA=$JAVA_HOME/bin/java ; export CLASSPATH=lib:classes:lib/* ; LOGLEVEL=3 ./Runner.sh -i 5 ) &"
+	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Runner.sh -i 5 ) &"
 
 # start Cleaner process
 #
 # omit -i <interval> for one-shot
 sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF ; unset LANG
-	export JAVA=$JAVA_HOME/bin/java ; export CLASSPATH=lib:classes:lib/* ; LOGLEVEL=3 ./Cleaner.sh -i 5 ) &"
+	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Cleaner.sh -i 5 ) &"
 ```
 
 **Run web service on Windwos/ Cygwin** (testing)
