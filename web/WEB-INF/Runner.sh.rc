@@ -3,13 +3,13 @@
 
 # enum LOGLEVEL { NONE, FAIL, WARN, INFO }
 info() {
-	(( ${LOGLEVEL:-0} > 2 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : INFO : Charta Caeli Web Service : $this : $1
+	(( ${LOGLEVEL:-0} > 2 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : INFO : Charta Caeli Web Service : $this : $1 ; return 0
 }
 warn() {
-	(( ${LOGLEVEL:-0} > 1 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : WARN : Charta Caeli Web Service : $this : $1
+	(( ${LOGLEVEL:-0} > 1 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : WARN : Charta Caeli Web Service : $this : $1 ; return 0
 }
 fail() {
-	(( ${LOGLEVEL:-0} > 0 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : FAIL : Charta Caeli Web Service : $this : $1
+	(( ${LOGLEVEL:-0} > 0 )) && echo $(date +%Y/%m/%d\ %H:%M:%S) : FAIL : Charta Caeli Web Service : $this : $1 ; return 0
 }
 
 probeJRE() {

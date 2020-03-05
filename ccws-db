@@ -1,0 +1,137 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          ccws-db
+# Required-Start:    $local_fs $network
+# Required-Stop:     $local_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: initscript for Charta Caeli web service DB
+### END INIT INFO
+
+# Author: #USERNAME# <#EMAIL#>
+
+# Do NOT "set -e"
+
+# PATH should only include /usr/* if it runs after the mountnfs.sh script
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="Charta Caeli web service DB"
+NAME=ccws-db
+
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+
+DAEMON_USR=${DAEMON_USR:-ccaeli}
+DAEMON_DIR=${DAEMON_DIR:-/opt/chartacaeli/web/WEB-INF}
+DAEMON=${DAEMON:-$JAVA_HOME/bin/java}
+DAEMON_CMD=${DAEMON_CMD:-$DAEMON -cp lib/h2-1.4.199.jar org.h2.tools.Server -baseDir /opt/chartacaeli/db -tcp}
+
+PIDFILE=/opt/chartacaeli/$NAME.pid
+LOGFILE=/opt/chartacaeli/$NAME.log
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+#
+# Function that starts the daemon/service
+#
+do_start()
+{
+	# Return
+	#   0 if daemon has been started
+	#   1 if daemon was already running
+	#   2 if daemon could not be started
+
+	if test -s $PIDFILE ; then
+		pid=$(cat $PIDFILE)
+		if test -d /proc/$pid ; then
+			cat /proc/$pid/cmdline | grep -qs $DAEMON && return 1
+		else
+			# remove abandoned PID file
+			rm -f $PIDFILE
+		fi
+	fi
+
+	sudo -u $DAEMON_USR -- bash -c "cd $DAEMON_DIR ; $DAEMON_CMD >>$LOGFILE 2>&1 & echo \$! >$PIDFILE"
+
+	if test $? -eq 0 ; then
+		return 0
+	fi
+
+	return 2
+}
+
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+	# Return
+	#   0 if daemon has been stopped
+	#   1 if daemon was already stopped
+	#   2 if daemon could not be stopped
+	#   other if a failure occurred
+
+	if test -s $PIDFILE ; then
+		pid=$(cat $PIDFILE)
+		if test -d /proc/$pid ; then
+			cat /proc/$pid/cmdline | grep -qs $DAEMON \
+			&& { sudo -u $DAEMON_USR -- bash -c "kill $pid ; rm -f $PIDFILE" ; return 0 ; }
+		else
+			# remove abandoned PID file
+			rm -f $PIDFILE
+		fi
+	fi
+
+	return 1
+}
+
+do_status()
+{
+	# Return
+	#   0 if daemon is running
+	#   1 if daemon not running
+
+	if test -s $PIDFILE ; then
+		pid=$(cat $PIDFILE)
+		if test -d /proc/$pid ; then
+			cat /proc/$pid/cmdline | grep -qs $DAEMON \
+			&& return 0
+		else
+			# remove abandoned PID file
+			rm -f $PIDFILE
+		fi
+	fi
+
+	return 1
+}
+
+case "$1" in
+  start)
+	[ "$VERBOSE" != no ] && echo "Starting $DESC" "$NAME"
+	do_start
+	case "$?" in
+		0) [ "$VERBOSE" != no ] && echo "$NAME : $DAEMON started" ; exit 0 ;;
+		1) [ "$VERBOSE" != no ] && echo "$NAME : $DAEMON already running" ; exit 0 ;;
+		2) [ "$VERBOSE" != no ] && echo "$NAME : failed to start $DAEMON" ; exit 1 ;;
+	esac
+	;;
+  stop)
+	[ "$VERBOSE" != no ] && echo "Stopping $DESC" "$NAME"
+	do_stop
+	case "$?" in
+		0) [ "$VERBOSE" != no ] && echo "$NAME : $DAEMON stopped" ; exit 0 ;;
+		1) [ "$VERBOSE" != no ] && echo "$NAME : $DAEMON already stopped" ; exit 0 ;;
+		2) [ "$VERBOSE" != no ] && echo "$NAME : failed to stop $DAEMON" ; exit 1 ;;
+	esac
+	;;
+  status)
+	do_status && exit 0 || exit $?
+	;;
+  *)
+	echo "Usage: $SCRIPTNAME {start|stop|status}" >&2
+	exit 3
+	;;
+esac

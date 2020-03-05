@@ -42,16 +42,16 @@ vpath %.preferences $(docdir)
 .xml.pdf:
 	@test -f ./ARIALUNI.TTF || { echo "*** font file ARIALUNI.TFF missing ***" ; false ; }
 ifdef winos
-	( unset LANG ; cdefs=$$(cygpath -m $$(realpath $<)) ; cd $(instdir)/web/WEB-INF
-	export PATH=lib:/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$$PATH \
-	export GS_FONTPATH=$$(cygpath -mp $$(pwd))
-	CLASSPATH=$$(cygpath -mp lib:classes:lib/*) ./chartacaeli.sh -k $$cdefs |\
+	( unset LANG ; cdefs=$$(realpath $<) ; cd $(instdir)/web/WEB-INF ; \
+	export PATH=lib:/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$$PATH ; \
+	export GS_FONTPATH=$$(cygpath -mp $(instdir)) ; \
+	CLASSPATH=$$(cygpath -mp lib:classes:lib/*) ./chartacaeli.sh -k $$(cygpath -m $$cdefs) |\
 	$${GS:-gswin64c.exe} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
 else
-	sudo -u ccaeli -- bash -c "( unset LANG ; cdefs=$$(realpath $<) ; cd $(instdir)/web/WEB-INF
-	export GS_FONTPATH=$$(pwd)
-	export JAVA=$$JAVA_HOME/bin/java ; CLASSPATH=lib:classes:lib/* ./chartacaeli.sh -k $$cdefs |\
-	$${GS:-gs} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - )" >$@
+	( unset LANG ; cdefs=$$(realpath $<) ; cd $(instdir)/web/WEB-INF ; \
+	export GS_FONTPATH=$(instdir) ; \
+	JAVA=$$JAVA_HOME/bin/java ; CLASSPATH=lib:classes:lib/* ./chartacaeli.sh -k $$cdefs |\
+	$${GS:-gs} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
 endif
 
 .pdf.png:
@@ -90,9 +90,9 @@ ifdef winos
 	tar cf - web | ( cd $< ; tar xf - )
 else
 	tar cf - --owner=ccaeli --group=ccaeli web | ( cd $< ; tar xf - )
-	install -m 0755 ccws-db.sh $<
-	install -m 0755 ccws-runner.sh $<
-	install -m 0755 ccws-cleaner.sh $<
+	install -m 0755 ccws-db $<
+	install -m 0755 ccws-runner $<
+	install -m 0755 ccws-cleaner $<
 endif
 	install -m 0644 ChartDB.sql $<
 

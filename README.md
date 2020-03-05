@@ -80,10 +80,10 @@ make install
 sudo -u ccaeli -- mkdir -m 0775 ${BASDIR:=/opt/chartacaeli/db}
 
 # initialize database with H2 Shell tool
-sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli
+sudo -u ccaeli -- bash -c "cd /opt/chartacaeli
 	$JAVA_HOME/bin/java -cp web/WEB-INF/lib/h2-1.4.199.jar -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
-	-sql \"RUNSCRIPT FROM 'ChartDB.sql'\" )"
+	-sql \"RUNSCRIPT FROM 'ChartDB.sql'\""
 ```
 
 **Initialize H2 on Windows/ Cygwin**
@@ -224,23 +224,23 @@ JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
 BASDIR=/opt/chartacaeli/db
 
 # start H2 database
-sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF
+sudo -u ccaeli -- bash -c "cd /opt/chartacaeli/web/WEB-INF
 	$JAVA_HOME/bin/java -cp lib/h2-1.4.199.jar org.h2.tools.Server \
 	-baseDir $BASDIR \
-	-tcp ) &"
+	-tcp &"
 
 # start Runner process
 #
 # omit -i <interval> for one-shot
-sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF ; unset LANG
+sudo -u ccaeli -- bash -c "cd /opt/chartacaeli/web/WEB-INF ; unset LANG
 	export GS_FONTPATH=/opt/chartacaeli:/opt/chartacaeli/web/lib
-	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Runner.sh -i 5 ) &"
+	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Runner.sh -i 5 &"
 
 # start Cleaner process
 #
 # omit -i <interval> for one-shot
-sudo -u ccaeli -- bash -c "( cd /opt/chartacaeli/web/WEB-INF ; unset LANG
-	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Cleaner.sh -i 5 ) &"
+sudo -u ccaeli -- bash -c "cd /opt/chartacaeli/web/WEB-INF ; unset LANG
+	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Cleaner.sh -i 5 &"
 ```
 
 **Run web service on Windwos/ Cygwin** (testing)
@@ -295,22 +295,42 @@ export GS_FONTPATH=$(cygpath -mp /opt/chartacaeli:/opt/chartacaeli/web/lib)
 
 The `Makefile` provides targets to check if the Charta Caeli core application prerequisite works properly. What these targets  do is generating PDF and PNG files referenced by the HTML of the frontend. On success, a couple of PDF and PNG files should live in CWD (but not installed to actually be used by the frontend). Mind this is not a test of the Charta Caeli web service.
 
+A special font (`ARIALUNI.TTF`) is assumed to live in the `/opt/chartacaeli` folder.
+
+**Check on Linux**
+
 ```bash
-# setup Windows/ Cygwin environment (sample values)
-JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
-export PATH=$JAVA_HOME/bin:$PATH
 # setup Linux environment (sample values)
 JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+
+# make ~ searchable if user not `ccaeli´
+chmod go+x ~
 
 # make PDF of `general-features-selection´
 make general-features-selection.pdf
 
 # make PDF and PNG files
 make pdf
-make png
 
-# make gallery PNG files
-make gng
+# make PNG files (ImageMagick required)
+make png gng
+```
+
+**Check on Windows/ Cygwin**
+
+```bash
+# setup Windows/ Cygwin environment (sample values)
+JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+export PATH=$JAVA_HOME/bin:$PATH
+
+# make PDF of `general-features-selection´
+make general-features-selection.pdf
+
+# make PDF and PNG files
+make pdf
+
+# make PNG files (ImageMagick required)
+make png gng
 ```
 
 Perform E2E test with browser (on Windows/ Cygwin use [localhost](http://localhost:4711/index.html)) and run RESTful API test cases using [Postman](https://www.getpostman.com/).
