@@ -50,7 +50,7 @@ ifdef winos
 else
 	( unset LANG ; cdefs=$$(realpath $<) ; cd $(instdir)/web/WEB-INF ; \
 	export GS_FONTPATH=$(instdir) ; \
-	JAVA=$$JAVA_HOME/bin/java ; CLASSPATH=lib:classes:lib/* ./chartacaeli.sh -k $$cdefs |\
+	JAVA=$$JAVA_HOME/bin/java CLASSPATH=lib:classes:lib/* ./chartacaeli.sh -k $$cdefs |\
 	$${GS:-gs} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
 endif
 

@@ -48,6 +48,8 @@ The web service needs a [Tomcat](https://tomcat.apache.org/index.html) 8.5 servl
 sudo groupadd ccaeli
 # create Charta Caeli user (if missing)
 sudo useradd -c "Charta Caeli" -d /opt/chartacaeli -m -s /sbin/nologin -g ccaeli ccaeli
+
+sudo -u ccaeli -- bash -c "chmod 775 ~"
 ```
 
 **Prerequisites setup on Windows/ Cygwin**
@@ -62,6 +64,19 @@ export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
 export PATH=$JAVA_HOME/bin:$PATH
 
 sudo -u ccaeli -- make install
+
+# make services start on boot
+sudo install -m 755 /opt/chartacaeli/ccws-db /etc/init.d
+sudo chkconfig --add ccws-db
+sudo chkconfig ccws-db on
+
+sudo install -m 755 /opt/chartacaeli/ccws-runner /etc/init.d
+sudo chkconfig --add ccws-runner
+sudo chkconfig ccws-runner on
+
+sudo install -m 755 /opt/chartacaeli/ccws-cleaner /etc/init.d
+sudo chkconfig --add ccws-cleaner
+sudo chkconfig ccws-cleaner on
 ```
 
 **Install web service on Windows/ Cygwin**
@@ -150,6 +165,7 @@ sudo bash -c "( echo ; echo '# Charta Caeli web service' ; echo umask 0002 ) >>/
 sudo usermod -a -G tomcat ccaeli
 
 # make service start on boot
+sudo chkconfig --add tomcat8
 sudo chkconfig tomcat8 on
 # check service start (optional)
 chkconfig --list tomcat8
@@ -175,7 +191,7 @@ JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
 sudo rm -rf /opt/chartacaeli/*
 
 # delete Java system and user preferences (SO #1320709)
-sudo rm -rf $JAVA_HOME/jre/.systemPrefs
+sudo rm -rf $JAVA_HOME/jre/.systemPrefs /etc/.systemPrefs
 sudo rm -rf /opt/chartacaeli/.java/.userPrefs
 # user preferences of login user (not `ccaeli´)
 rm -rf ~/.java/.userPrefs
