@@ -21,27 +21,31 @@ doit() {
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "SELECT id, modified, stat FROM charts
 			WHERE stat IN ('finished', 'failed')
-			AND modified < '$(( $(date +%s) - ${REQAGE:-28800} ))000'" |\
-	gawk '$1~/[0-9A-Za-z]{8}/ {print $1}')
+			AND modified < '$(( $(date +%s) - ${REQAGE:-28800} ))000'" 2>&1 |\
+	gawk '$1~/[0-9A-Za-z]{8}/ {print $1}' ; exit ${PIPESTATUS[0]})
+
+	[ $? -eq 0 ] \
+	|| { fail "${creq:-org.h2.tools.Shell returned error.}" ; return 1 ; }
 
 	# check and log
 	[ -n "$creq" ] \
-	&& { set $creq ; info "$# record(s) found" ; } \
-	|| { info "nothing to do" ; return 0 ; }
+	&& { set $creq ; info "$# record(s) found." ; } \
+	|| { info "nothing to do." ; return 0 ; }
 
 	while test $# -gt 0 ; do
 		id=$1 ; shift
 
 		# check and log
 		[ -d $OUTDIR/$id ] && info "found OUTDIR for chart request $id." \
-		|| { warn "OUTDIR for chart request $id missing" ; continue ; }
+		|| { warn "OUTDIR for chart request $id missing." ; continue ; }
 
 		info "cleaning OUTDIR of request $id."
 		( cd $OUTDIR ; rm -rf $id )
 
 		# set 'cleaned' state
-		info "set state 'cleaned' for $id"
-		updateDB $id cleaned || fail "database problem occurred with $id."
+		updateDB $id cleaned \
+		&& info "$id set to \`cleaned´ : ${dbo:-null}" \
+		|| fail "database problem occurred with $id : ${dbo:-null}"
 	done
 
 	return 0

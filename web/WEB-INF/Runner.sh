@@ -23,13 +23,16 @@ doit() {
 	# lookup chart requests in 'accepted' state sorted by oldest first
 	creq=$($JAVA -cp ${CLASSPATH:-lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
-	-sql "SELECT id, name, stat FROM charts WHERE stat = 'accepted' ORDER BY created ASC" |\
-	gawk --posix '$1~/[0-9A-Za-z]{8}/ {print $1 " " $3}')
+	-sql "SELECT id, name, stat FROM charts WHERE stat = 'accepted' ORDER BY created ASC" 2>&1 |\
+	gawk --posix '$1~/[0-9A-Za-z]{8}/ {print $1 " " $3}' ; exit ${PIPESTATUS[0]})
+
+	[ $? -eq 0 ] \
+	|| { fail "${creq:-org.h2.tools.Shell returned error.}" ; return 1 ; }
 
 	# check and log
 	[ -n "$creq" ] \
-	&& { set $creq ; info "$(( $# / 2 )) record(s) found" ; } \
-	|| { info "nothing to do" ; return 0 ; }
+	&& { set $creq ; info "$(( $# / 2 )) record(s) found." ; } \
+	|| { info "nothing to do." ; return 0 ; }
 
 	while test $# -gt 0 ; do
 		id=$1 name=$2 ; shift 2
@@ -37,23 +40,24 @@ doit() {
 		xml=$bas.xml
 
 		# check and log
-		[ -s $xml ] && info "found chart definition file $xml" \
-		|| { warn "chart definition file $xml missing" ; updateDB $id failed || fail "database problem occurred with $id." ; continue ; }
+		[ -s $xml ] && info "found chart definition file $xml." \
+		|| { warn "chart definition file $xml missing" ; dbo=$(updateDB $id failed) && info "$id set to \`failed´ : ${dbo:-null}" || fail "database problem occurred with $id : ${dbo:-null}" ; continue ; }
 
 		pdf=$bas.pdf
 		log=$bas.log
 		err=$bas.err
 
 		# set 'started' state
-		info "set state 'started' for $id"
-		updateDB $id started || fail "database problem occurred with $id."
+		dbo=$(updateDB $id started) \
+		&& info "$id set to \`startet´ : ${dbo:-null}" \
+		|| fail "database problem occurred with $id : ${dbo:-null}"
 
-		info "running '$APPEXE $xml' on request $id ..."
+		info "running $APPEXE $xml on request $id ..."
 		# run Charta Caeli app
 		( cd $APPDIR ; CLASSPATH=${CLASSPATH:-lib:classes:lib/*} ./$APPEXE $xml 2>$log |\
 		$GS -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=$pdf -_ >$err 2>&1 ; (( ! (${PIPESTATUS[0]}>0 || ${PIPESTATUS[1]}>0) )) ; exit $? ) \
-		&& ( info "request $id successfully processed." ; updateDB $id finished || fail "database problem occurred with $id." ) \
-		|| ( warn "failed to process request $id." ; updateDB $id failed || fail "database problem occurred with $id." )
+		&& ( info "request $id successfully processed by $APPEXE." ; dbo=$(updateDB $id finished) && info "$id set to \`finished´ : ${dbo:-null}" || fail "database problem occurred with $id : ${dbo:-null}" ) \
+		|| ( warn "$APPEXE failed to process request $id." ; dbo=$(updateDB $id failed) && info "$id set to \`failed´ : ${dbo:-null}" || fail "database problem occurred with $id : ${dbo:-null}" )
 
 		# remove empty log files
 		[ -s $log ] || rm -f $log
