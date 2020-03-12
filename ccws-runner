@@ -25,7 +25,7 @@ JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
 DAEMON_USR=${DAEMON_USR:-ccaeli}
 DAEMON_DIR=${DAEMON_DIR:-/opt/chartacaeli/web/WEB-INF}
 DAEMON=${DAEMON:-./Runner.sh}
-DAEMON_CMD=${DAEMON_CMD:-unset LANG ; export GS_FONTPATH=/opt/chartacaeli:/opt/chartacaeli/web/lib ; JAVA=$JAVA_HOME/bin/java $DAEMON -i 5}
+DAEMON_CMD=${DAEMON_CMD:-unset LANG ; export GS_FONTPATH=/opt/chartacaeli:/opt/chartacaeli/web/lib ; JAVA=$JAVA_HOME/bin/java LOGLEVEL=1 $DAEMON -i 5}
 
 PIDFILE=/opt/chartacaeli/$NAME.pid
 LOGFILE=/opt/chartacaeli/$NAME.log
