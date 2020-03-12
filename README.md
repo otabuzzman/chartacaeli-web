@@ -349,7 +349,7 @@ make pdf
 make png gng
 ```
 
-Perform E2E test with browser (on Windows/ Cygwin use [localhost](http://localhost:4711/index.html)) and run RESTful API test cases using [Postman](https://www.getpostman.com/).
+Perform E2E test with browser (on Windows/ Cygwin use [localhost](http://localhost:4711/custom-star-maps.html)) and run RESTful API test cases using [Postman](https://www.getpostman.com/).
 
 ---
 
