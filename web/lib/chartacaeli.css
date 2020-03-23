@@ -80,7 +80,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 #ccCommunity img.d-sm-inline { height: 4rem ; }
 #ccCommunity img.d-md-inline { height: 4rem ; margin-top: 2rem ; margin-bottom: 1.2rem ; }
 #ccCommunity p, #ccCommunity a { font-size: 1.6rem ; color: #dadada ; }
-#ccCommunity .fab, #ccCommunity .fas { font-size: 1.85rem ; letter-spacing: 12px ; }
+#ccCommunity .fab, #ccCommunity .fas { font-size: 1.85rem ; letter-spacing: 10px ; }
 
 @media (min-width: 576px) and (orientation: portrait) {
 	/* general */

@@ -217,10 +217,13 @@
 			<h2 class="headline">overview<small class="text-muted d-none d-md-inline"> and a look under the hood</small></h2>
 			<hr class="ruler-top">
 			<p>Charta Caeli generates PDF star charts from XML chart definitions according to a XSD chart specification. The overall architecture is similar to a three-piece Russian doll: On the outside there is a web service as an interface to the user. The web service contains the application, a compilation of several programs. At its core is a Java program that does the actual work. Each component is fully functional within the scope of its specification.</p>
-			<p>AWS hosts the components that make up the web service. Among others, there is Route 53 to connect the portal to the public Domain Name Services (DNS). EC2 instances provide compute power for the application elements. EBS is utilized to persist the results, namely custom star charts rendered to PDF. Of course, there are also VPC, load balancer, security groups and more to glue it all together to a fully functioning cloud experience.</p>
+			<p>The web service consists of a couple of programs and scripts. First, there is a web server to provision the page to the user. Next, there is a REST API that connects the page with the application in the background which actually performs star chart generation. <a href="https://tomcat.apache.org/">Tomcat</a> provides web server and REST API functionalities. The latter utilizes the <a href="https://projects.eclipse.org/projects/ee4j.jersey/">Jersey</a> framework</p>
+			<p>ChartDB is the name of a database to persist requests and processing results. It is made up of a classical SQL database server and an additional folder structure located in the file system external to the server. An id stored with each database entry logically connects an entry with its particular folder and files.</p>
+			<p>RNNR is an abbreviation for Runner, a script that cyclically queries ChartDB for new requests. In case of one or more valid ones Runner takes the oldest and executes the Charta Caeli application on it. Finally, Runner updates ChartDB with processing results and puts generated star charts and logs into the appropriate folders.</p>
+			<p>Star charts are kept for a couple of hours. The Cleaner script checks periodically for old requests and deletes their remains on the file system.</p>
 			<figure id="ccFigWS" class="figure d-block mx-auto">
 				<a href="web-service-structure.svg"><img class="figure-img img-fluid" src="web-service-structure.svg" alt="Block diagram of the overall architecture of the Charta Caeli web service."></a>
-				<figcaption class="figure-caption">The Charta Caeli web service provides public access to the star chart application (Icons by <a href="https://aws.amazon.com/de/blogs/aws/introducing-aws-simple-icons-for-your-architecture-diagrams/">AWS</a> and <a href="https://iconmonstr.com/">iconmonstr</a>).</figcaption>
+				<figcaption class="figure-caption">The Charta Caeli web service provides public access to the star chart application (Icons by <a href="https://iconmonstr.com/">iconmonstr</a>).</figcaption>
 			</figure>
 			<p>The application is a compilation of several programs and configuration files that jointly perform the task of transforming star chart definitions provided in XML into custom star maps in PDF. Which particular programs are used depends on what the chart definition requires. The minimum used for every star map is the Java core program which actually outputs Postscript, and the Ghostscript application to finally produce a PDF file. If the definition foresees artwork filtering further programs might be used (e.g. ImagaMagick). If a GPU is available and artwork is to be rendered there, the application executes a so-called kernel on that device.</p>
 			<p>A set of surrounding files controls the process of star chart generation. First, a preferences file maps logical or abstract values from the star chart definition to absolute numerical numbers and Postscript code. The preferences file aims to free the author of a star map from technical details, at least to a given extent. Font file (TTF) mapping is another function fulfilled by the preferences file. Then, there are properties files that supply language-specific information for logging. Another feature of these files is the provision of language-specific variable names to be used in star chart definitions. TrueType font files might provide character sets for specific or even exotic fonts to be used by both the core program and Ghostscript.</p>
@@ -397,15 +400,13 @@
 				<div class="col text-center">
 					<a href="#ccHome"><img class="img-fluid d-sm-inline d-md-none" src="brandicon.png" alt="Charta Caeli brand icon showing an abstract star map with a simple grid chart and the stars of Cassiopeia."></a>
 					<a href="#ccHome"><img class="img-fluid d-none d-md-inline" src="brand.png" alt="Charta Caeli brand string rendered in a special font."></a>
-					<p>Stay tuned and share...
-					<br><span class="contact-social">
-						<a href="#"><i class="fab fa-facebook"></i></a>
-						<a href="#"><i class="fab fa-instagram"></i></a>
-						<a href="#"><i class="fab fa-youtube"></i></a>
-						<a href="#"><i class="fab fa-pinterest"></i></a>
-						<a href="#"><i class="fab fa-twitter"></i></a>
-						<a href="https://github.com/otabuzzman/chartacaeli"><i class="fab fa-github"></i></a>
-						<a href="#"><i class="fas fa-envelope"></i></a></span>
+					<p>Stay tuned and share...<br>
+					<a href="#"><i class="fab fa-facebook"></i></a>
+					<a href="#"><i class="fab fa-instagram"></i></a>
+					<a href="#"><i class="fab fa-youtube"></i></a>
+					<a href="#"><i class="fab fa-pinterest"></i></a>
+					<a href="#"><i class="fab fa-twitter"></i></a>
+					<a href="https://github.com/otabuzzman/chartacaeli"><i class="fab fa-github"></i></a>
 					</p>
 				</div>
 			</div>
