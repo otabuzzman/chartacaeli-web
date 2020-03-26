@@ -49,6 +49,7 @@ public class ChartsResource {
 	private final static String L_P9SFIL = "Star chart preferences (P9S) file" ;
 	private final static String L_APPLOG = "Charta Caeli core application log file" ;
 	private final static String L_PDFERR = "Ghostscript PDF conversion error file" ;
+	private final static String L_PDFICO = "Custom star chart preview file" ;
 
 	@Context
 	private UriInfo uri ;
@@ -186,8 +187,8 @@ public class ChartsResource {
 			@PathParam( value = "id" ) String id ) {
 		Optional<Chart> qres ;
 		Chart creq ;
-		Link self, next, d8n, p9s, log, err ;
-		URI nextURI, d8nURI, p9sURI, logURI, errURI ;
+		Link self, next, d8n, p9s, ico, log, err ;
+		URI nextURI, d8nURI, p9sURI, icoURI, logURI, errURI ;
 		ResponseBuilder response ;
 
 		qres = chartDB.findById( id ) ;
@@ -242,13 +243,17 @@ public class ChartsResource {
 		case Chart.ST_FINISHED:
 			nextURI = uri.getAbsolutePathBuilder().path( creq.getName()+".pdf" ).build() ;
 			next = Link.fromUri( nextURI ).rel( "next" ).build() ;
+			icoURI = uri.getAbsolutePathBuilder().path( creq.getName()+".png" ).build() ;
+			ico = Link.fromUri( icoURI ).rel( "related" ).title( L_PDFICO ).build() ;
 			logURI = uri.getAbsolutePathBuilder().path( creq.getName()+".log" ).build() ;
 			log = Link.fromUri( logURI ).rel( "related" ).title( L_APPLOG ).build() ;
 
 			creq.setHateoas( d8n ) ;
 			creq.setHateoas( p9s ) ;
 
-			if ( ! probeFile( createFilename( nextURI, creq.getId() ) ) )
+			if (
+					! probeFile( createFilename( nextURI, creq.getId() ) ) ||
+					! probeFile( createFilename( icoURI, creq.getId() ) ) )
 				return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
 						.links( self, d8n, p9s )
 						.type( accept )
@@ -256,9 +261,10 @@ public class ChartsResource {
 						.build();
 
 			creq.setHateoas( next ) ;
+			creq.setHateoas( ico ) ;
 
 			response = Response.status( Response.Status.OK )
-					.links( self, d8n, p9s, next )
+					.links( self, d8n, p9s, next, ico )
 					.type( accept )
 					.entity( creq ) ;
 
@@ -311,7 +317,7 @@ public class ChartsResource {
 	}
 
 	@GET
-	@Path( "/{id}/{file: .+[.](pdf|log|err|xml|preferences)$}" )
+	@Path( "/{id}/{file: .+[.](pdf|png|log|err|xml|preferences)$}" )
 	public Response getChartFile(
 			@PathParam( value = "id" ) String id,
 			@PathParam( value = "file" ) String file ) {
@@ -349,6 +355,8 @@ public class ChartsResource {
 
 		if ( suffix.equals( ".pdf" ) )
 			response.type( "application/pdf" ) ;
+		else if ( suffix.equals( ".png" ) )
+			response.type( "image/png" ) ;
 		else if ( suffix.equals( ".log" ) )
 			response.type( MediaType.TEXT_PLAIN+";charset="+StandardCharsets.UTF_8 ) ;
 		else if ( suffix.equals( ".err" ) )

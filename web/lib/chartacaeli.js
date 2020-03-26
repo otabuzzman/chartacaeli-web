@@ -292,7 +292,7 @@ function eaExePcd(creq) {
 		}) ;
 	}, 5*1000) ; /* 5 sec */
 	hdExecPrgs = setTimeout(function () {
-		$('#ccDgInfo').modal('toggle') ;
+		$('#ccDgInfoWork').modal('toggle') ;
 	}, 15*1000) ; /* 15 sec */
 	/* set next FSM and button states */
 	compThis.stat = State.POL ;
@@ -354,8 +354,8 @@ function eaPolSer(creq) {
 	clearInterval(hdExecPoll) ;
 	clearTimeout(hdExecPrgs) ;
 	clearTimeout(hdExecCanc) ;
-	if ($('#ccDgInfo').hasClass('show'))
-		$('#ccDgInfo').modal('toggle') ;
+	if ($('#ccDgInfoWork').hasClass('show'))
+		$('#ccDgInfoWork').modal('toggle') ;
 	applog = restGetHref(creq.hateoas, 'related', 'Charta Caeli') ;
 	if (typeof applog !== 'undefined') {
 		$('#ccDgFail .dgfail-poll500').find('.applog a').attr('href', applog) ;
@@ -380,10 +380,17 @@ function eaPolTmo() {
 	console.log("Pol-Tmo-Pol") ;
 }
 function eaPolPcd(creq) {
+	var pdf, ico ;
 	clearInterval(hdExecPoll) ;
 	clearTimeout(hdExecPrgs) ;
 	clearTimeout(hdExecCanc) ;
-	window.open(restGetHref(creq.hateoas, 'next')) ;
+	if ($('#ccDgInfoWork').hasClass('show'))
+		$('#ccDgInfoWork').modal('toggle') ;
+	pdf = restGetHref(creq.hateoas, 'next') ;
+	ico = restGetHref(creq.hateoas, 'related', 'preview') ;
+	$('#ccDgInfoDone a').attr('href', pdf) ;
+	$('#ccDgInfoDone img').attr('src', ico) ;
+	$('#ccDgInfoDone').modal('toggle') ;
 	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
 	/* set next FSM and button states */
 	compThis.stat = $('#ccBtnExec').data('stat-hist') ;
@@ -589,7 +596,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	document.querySelector('#ccDgWarnKey1st').addEventListener('click', function () {EATab[compThis.stat][Event.CNC]()}) ;
 	document.querySelector('#ccDgWarnKey2nd').addEventListener('click', function () {EATab[compThis.stat][Event.PCD]()}) ;
 	document.querySelector('#ccDgFailKey').addEventListener('click', function () {EATab[compThis.stat][Event.PCD]()}) ;
-	document.querySelector('#ccDgInfoKey').addEventListener('click', function () {$('#ccDgInfo').modal('toggle')}) ;
+	document.querySelector('#ccDgInfoDoneKey').addEventListener('click', function () {$('#ccDgInfoDone').modal('toggle')}) ;
 }) ;
 
 /* toggle burger and cross icons */

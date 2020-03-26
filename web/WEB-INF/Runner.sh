@@ -16,6 +16,7 @@ probeOUTDIR || { fail "OUTDIR '$OUTDIR' invalid." ; exit 1 ; }
 probeAPPDIR || { fail "APPDIR '$APPDIR' invalid." ; exit 1 ; }
 probeAPPEXE || { fail "APPEXE '$APPEXE' invalid." ; exit 1 ; }
 probeGS || { fail "Ghostscript not found." ; exit 1 ; }
+probeIM || { fail "ImageMagick not found." ; exit 1 ; }
 
 trap termrnnr 1 2 3 6 15
 
@@ -44,6 +45,7 @@ doit() {
 		|| { warn "chart definition file $xml missing" ; dbo=$(updateDB $id failed) && info "$id set to \`failed´ : ${dbo:-null}" || fail "database problem occurred with $id : ${dbo:-null}" ; continue ; }
 
 		pdf=$bas.pdf
+		png=$bas.png
 		log=$bas.log
 		err=$bas.err
 
@@ -56,7 +58,7 @@ doit() {
 		# run Charta Caeli app
 		( cd $APPDIR ; CLASSPATH=${CLASSPATH:-lib:classes:lib/*} ./$APPEXE $xml 2>$log |\
 		$GS -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=$pdf -_ >$err 2>&1 ; (( ! (${PIPESTATUS[0]}>0 || ${PIPESTATUS[1]}>0) )) ; exit $? ) \
-		&& ( info "request $id successfully processed by $APPEXE." ; dbo=$(updateDB $id finished) && info "$id set to \`finished´ : ${dbo:-null}" || fail "database problem occurred with $id : ${dbo:-null}" ) \
+		&& ( info "request $id successfully processed by $APPEXE." ; magick convert $pdf -thumbnail 320x320^ -gravity center -extent 320x320 $png ; dbo=$(updateDB $id finished) && info "$id set to \`finished´ : ${dbo:-null}" || fail "database problem occurred with $id : ${dbo:-null}" ) \
 		|| ( warn "$APPEXE failed to process request $id." ; dbo=$(updateDB $id failed) && info "$id set to \`failed´ : ${dbo:-null}" || fail "database problem occurred with $id : ${dbo:-null}" )
 
 		# remove empty log files
@@ -64,7 +66,8 @@ doit() {
 		[ -s $err ] || rm -f $err
 
 		unset id name
-		unset xml pdf
+		unset xml
+		unset pdf png
 		unset log err
 	done
 

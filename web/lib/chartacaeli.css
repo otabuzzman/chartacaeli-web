@@ -11,6 +11,7 @@ a:hover { text-decoration: none ; color: #0056b3!important ; }
 a:active { text-decoration: none ; color: #006adb!important ; }
 .ruler-top { border: 2px solid #007bff ; }
 .ruler-sep { border-color: #007bff ; }
+.text-sep { padding-bottom: .8rem ; font-size: 1.75rem ; color: #007bff ; }
 .btn { border-width: 2px ; }
 .section { margin-bottom: 4rem ; }
 .headline { padding-top: .8rem ; }
@@ -68,12 +69,12 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 .modal-footer { display: block ; }
 .modal-footer > :not(:first-child) { margin-left: 0 ; }
 #ccComposer .btn-box {  }
+#ccDgInfoWork .text-center { margin-top: 0 ; }
 
 /* concepts */
 .pragma-bg-headimg { background-image: url("../starchart.png") ; background-size: contain ; background-repeat: no-repeat ; background-position: left top ; transform: scale(-1, -1) ; min-height: 100vh ; display: flex ; }
 .pragma-bg-footimg { background-image: url("../starchart.png") ; background-size: contain ; background-repeat: no-repeat ; background-position: left top ; transform: scale(-1, -1) ; left: 0 ; top: 0 ; width: 100% ; height: 100% ; margin: 0 ;  }
 .pragma-bg-opacity { left: 0 ; top: 0 ; width: 100% ; height: 100% ; margin: 0 ; background: rgba(255, 255, 255, .64) ; }
-#ccConcepts .text-sep { padding-bottom: .8rem ; font-size: 1.75rem ; color: #007bff ; }
 
 /* community */
 #ccCommunity { background-color: #000000 ; background-image: url("../skyline.png") ; background-repeat: no-repeat ; background-position: left bottom ; min-height: 38vh ; display: flex ; padding-top: 2rem ; }

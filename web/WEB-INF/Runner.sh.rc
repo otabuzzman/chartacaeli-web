@@ -61,6 +61,13 @@ probeGS() {
 	return $?
 }
 
+probeIM() {
+	type magick >/dev/null 2>&1 \
+	&& ( magick -version | grep ImageMagick >/dev/null )
+
+	return $?
+}
+
 updateDB() {
 	$JAVA -cp ${CLASSPATH:-lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \

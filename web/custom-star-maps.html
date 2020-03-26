@@ -270,24 +270,36 @@
 				</div>
 			</div>
 		</div>
-		<div id="ccDgInfo" class="modal fade" role="dialog" tabindex="-1">
+		<div id="ccDgInfoWork" class="modal fade" role="dialog" tabindex="-1">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h4 class="modal-title">
-							<span class="dginfo-progress">Request still in progress</span>
-						</h4>
+						<h4 class="modal-title">Still rendering your custom star map</h4>
 						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
 					</div>
 					<div class="modal-body info-txt lead">
-						<p>
-							<span class="dginfo-progress">Custom star chart generation may take a couple of minutes. Your star map will open automatically if you leave this page open while doing other things.</span>
-						</p>
+						<p>Custom star chart generation may take a couple of minutes. How long exactly depends mainly on the number of catalogs and artworks your star map definition contains.</p>
+						<div class="text-sep text-center"><i class="ccwf-brandicon"></i></div>
+						<p>Leave browser tab open until another dialog box comes up with your custom star chart.</p>
 					</div>
 					<div class="modal-footer">
-						<button id="ccDgInfoKey" class="btn btn-primary btn-lg btn-block" type="button">
-							<span class="dginfo-progress">OK</span>
-						</button>
+						<button class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">OK</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="ccDgInfoDone" class="modal fade" role="dialog" tabindex="-1">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Your custom star chart is ready.</h4>
+						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
+					</div>
+					<div class="modal-body info-txt lead">
+						<img class="img-thumbnail d-block mx-auto" src="" alt="Preview image of custom star map just rendered.">
+					</div>
+					<div class="modal-footer">
+						<a id="ccDgInfoDoneKey" class="btn btn-primary btn-lg btn-block" role="button" href="" target="_blank">View PDF</a>
 					</div>
 				</div>
 			</div>
@@ -406,7 +418,7 @@
 					<a href="#"><i class="fab fa-youtube"></i></a>
 					<a href="#"><i class="fab fa-pinterest"></i></a>
 					<a href="#"><i class="fab fa-twitter"></i></a>
-					<a href="https://github.com/otabuzzman/chartacaeli"><i class="fab fa-github"></i></a>
+					<a href="https://github.com/otabuzzman/chartacaeli-web"><i class="fab fa-github"></i></a>
 					</p>
 				</div>
 			</div>
