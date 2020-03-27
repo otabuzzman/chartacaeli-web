@@ -18,11 +18,16 @@ a:active { text-decoration: none ; color: #006adb!important ; }
 [id ^= ccBtn], [class ^= ccBtn] { font-size: 22px ; width: 60px ; }
 svg { width: 24px ; height: 24px ; fill: currentColor ; }
 
-/* home */
-#ccHome { background-image: url("../starrysky.png") ; background-size: cover ; background-repeat: no-repeat ; background-position: center ; min-height: 100vh ; display: flex ; }
+/* home, error 404 */
+#ccHome, #ccError404 { background-image: url("../starrysky.png") ; background-size: cover ; background-repeat: no-repeat ; background-position: center ; min-height: 100vh ; display: flex ; }
 .caption { color: #dadada ; }
 .caption-intro { padding-top: 6rem ; padding-left: 3.2rem ; }
 .caption-outro { margin-bottom: 2rem ; }
+#ccError404 .caption { margin-top: 2rem ; }
+.error-code { font-size: 10rem ; }
+.error-head { margin-top: -58px ; font-size: 2.45rem ; }
+.error-text { width: 22rem ; font-size: 1.65rem ; }
+.error-icon { width: 8rem ; margin-top: 2rem ; margin-left: -1.5rem ; }
 
 /* navigation */
 .navbar { background: rgba(0, 0, 0, .75) ; font-size: 1.4rem ; font-weight: 500 ; letter-spacing: .125rem ; }
