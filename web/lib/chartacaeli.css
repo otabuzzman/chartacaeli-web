@@ -4,8 +4,9 @@
 
 /* general */
 @font-face { font-family: 'chartacaeli-webfont' ; src: url('chartacaeli-webfont.ttf?wnmlrh') format('truetype') ; }
-.ccwf-brandicon { font-family: 'chartacaeli-webfont' ; font-style: normal ; line-height: 1 ; }
+[class ^= ccwf-] { font-family: 'chartacaeli-webfont' ; font-style: normal ; line-height: 1 ; }
 .ccwf-brandicon::before { content: "\f880" ; }
+.ccwf-chevron-double-down::before { content: "\f881" ; }
 body { font-family: 'M PLUS Rounded 1c', sans-serif ; color: #323232 ; }
 a:hover { text-decoration: none ; color: #0056b3!important ; }
 a:active { text-decoration: none ; color: #006adb!important ; }
@@ -28,6 +29,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 .error-head { margin-top: -58px ; font-size: 2.45rem ; }
 .error-text { width: 22rem ; font-size: 1.65rem ; }
 .error-icon { width: 8rem ; margin-top: 2rem ; margin-left: -1.5rem ; }
+.ccwf-chevron-double-down { font-size: 5.2rem ; }
 
 /* navigation */
 .navbar { background: rgba(0, 0, 0, .75) ; font-size: 1.4rem ; font-weight: 500 ; letter-spacing: .125rem ; }
@@ -99,6 +101,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 	.caption-intro h1 { font-size: 3.8rem ; }
 	.caption-outro h1 { font-size: 3.8rem ; }
 	.caption-outro .btn { border-width: 3px ; border-radius: 8px ; }
+	.ccwf-chevron-double-down { font-size: 7rem ; }
 
 	/* navigation */
 	.navbar { font-size: 2rem ; }
@@ -117,6 +120,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 	.caption-intro h1 { font-size: 5.4rem ; }
 	.caption-outro h1 { font-size: 5.4rem ; }
 	.caption-outro .btn { border-width: 4px ; border-radius: 12px ; }
+	.ccwf-chevron-double-down { font-size: 9.8rem ; }
 
 	/* navigation */
 	.navbar { font-size: 2.6rem ; }
@@ -137,6 +141,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 	.caption-intro h1 { font-size: 5.4rem ; }
 	.caption-outro h1 { font-size: 5.4rem ; }
 	.caption-outro .btn { border-width: 3px ; border-radius: 10px ; }
+	.ccwf-chevron-double-down { font-size: 7.6rem ; }
 
 	/* navigation */
 	.navbar { font-size: 1.6rem ; }

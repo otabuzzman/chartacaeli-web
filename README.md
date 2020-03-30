@@ -383,11 +383,11 @@ for p in `xml sel -t -v "//xs:pattern/@value" ../chartacaeli/chartacaeli.xsd | s
 	grep '0$'
 ```
 
-### Favicon creation
-- Icon sketched with Google Slides but defined with Microsoft Powerpoint because Slides lacks some GUI features (e.g. setting arbitrary linewidths, capstyles and numerical rotation angles).
-- Icon text in Justinian font made with Powerpoint. Set background transparent. Save text element as graphic via context menu.
-- Combine icon and text images with Slides.
-- Use the [IcoMoon](https://icomoon.io/) Chrome extension to generate custom fonts from SVG icons. Avoid using strokes. If not possible use [INKSCAPE](https://inkscape.org/) to [convert strokes to fills](https://inkscape.org/doc/tutorials/advanced/tutorial-advanced.html) ([tooltip](lab/inkscape-tooltip-stroke-to-fill.png)).
+### Webfont creation
+- Sketch glyphs in `chartacaeli-webfont.pptx` using PowerPoint (because Google Slides lacks some features like etting arbitrary linewidths, capstyles and numerical rotation angles.
+- Upload deck to Drive, open with Slides, set background transparent and export glyphs to SVG.
+- Create *Charta Caeli webfont* project in [IcoMoon](https://icomoon.io/) Chrome extension and import SVG files (glyphs). Use Inkscape in case of stroke to fill warnings (see [tooltip](lab/inkscape-tooltip-stroke-to-fill.png) and hints from IcoMoon).
+- Click Generate Font, set Unicode codes and Metadata, finally download font and find TTF in ZIP file.
 
 ### Style guide
 Basic color palette and usage. Click on hex value to get derived palettes.
