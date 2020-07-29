@@ -1014,6 +1014,20 @@
 							<entry key="linewidth" value=".01"/>
 						</map>
 					</node>
+					<node name="half">
+						<map>
+							<entry key="space" value=".4"/>
+							<entry key="linelength" value="3.6"/>
+							<entry key="linewidth" value=".01"/>
+						</map>
+					</node>
+					<node name="full">
+						<map>
+							<entry key="space" value=".4"/>
+							<entry key="linelength" value="4.2"/>
+							<entry key="linewidth" value=".01"/>
+						</map>
+					</node>
 				</node>
 				<node name="CatalogDS9Record">
 					<map>
