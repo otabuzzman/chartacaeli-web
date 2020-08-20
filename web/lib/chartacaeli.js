@@ -17,11 +17,11 @@ function initComposer() {
 	/* init definition state object */
 	compD8N = Object.create(chartS11N, compTmpl) ;
 	compThis = compD8N ;
-	compThis.open = compD8N.defdef ;
+	compThis.open = compD8N.XMLdec+compD8N.defdef ;
 	/* init preferences state object */
 	compP9S = Object.create(prefsS11N, compTmpl) ;
 	compExch = compP9S ;
-	compExch.open = compP9S.defdef ;
+	compExch.open = compP9S.XMLdec+compP9S.defdef ;
 	/* load Composer with current state object */
 	initXonomy() ;
 	loadXonomy('#ccXonomy') ;
@@ -38,14 +38,14 @@ function loadXonomy(id) {
 	Xonomy.render(compThis.open, xonDiv[0], compThis.Xonomy) ;
 }
 function grabXonomy(id) {
-	var head, data ;
+	var decl, data ;
 	var xonDiv = $(id) ;
 	if (xonDiv.css('display') === 'none') {
 		return null ;
 	}
-	head = compThis.XMLdec ;
+	decl = compThis.XMLdec ;
 	data = Xonomy.harvest() ;
-	return head+data ;
+	return decl+data ;
 }
 
 /* chart generation cancel timeout handler */
