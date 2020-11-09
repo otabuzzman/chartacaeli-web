@@ -454,7 +454,7 @@ function onclickBtnLoad() {
 	href = $('.carousel .active').attr('data-load-chart') ;
 	$.ajax({url: href,
 		dataType: 'text',
-		dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
+		dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, " ").replace(/> </g, "><")},
 		success: function (data) {
 			chart = data ;
 			compD8N.open = chart ;
@@ -463,7 +463,7 @@ function onclickBtnLoad() {
 			if (href) {
 				$.ajax({url: href,
 					dataType: 'text',
-					dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, "")},
+					dataFilter: function (data, type) {return data.replace(/(\r?\n|\r)\s*/g, " ").replace(/> </g, "><")},
 					success: function (data) {
 						prefs = data ;
 						compP9S.open = prefs ;
@@ -523,7 +523,7 @@ function onclickBtnD8N() {
 function onclickBtnOpen() {
 	var file = new FileReader() ;
 	file.onload = function () {
-		compThis.open = this.result.replace(/(\r?\n|\r)\s*/g, "") ;
+		compThis.open = this.result.replace(/(\r?\n|\r)\s*/g, " ").replace(/> </g, "><") ;
 		loadXonomy('#ccXonomy') ;
 		$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
 		compThis.stat = State.OPN ;
