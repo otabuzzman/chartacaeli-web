@@ -1,4 +1,4 @@
-# CHARTA CAELI Web Service
+# CHARTA CAELI web service
 A web service for the Charta Caeli star chart creation tool. The service is made up of a frontend that communicates with a backend. The frontend utilizes Bootstrap 4 for responsiveness and [Xonomy XML editor](https://github.com/michmech/xonomy) to edit star chart definitions on devices with appropriate display sizes. The backend connects the frontend with the Charta Caeli core application. It consists of a web application providing a RESTful API, a database and a Runner process for the actual star charts creation.
 
 ## Build
