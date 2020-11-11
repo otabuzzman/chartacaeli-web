@@ -20,7 +20,7 @@ NAME=ccws-cleaner
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
-JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+JAVA_HOME=${JAVA_HOME:-/usr/lib/jvm/java-1.8.0-openjdk}
 
 DAEMON_USR=${DAEMON_USR:-ccaeli}
 DAEMON_DIR=${DAEMON_DIR:-/opt/chartacaeli/web/WEB-INF}
@@ -122,6 +122,7 @@ case "$1" in
 		0) [ "$VERBOSE" != no ] && echo "$NAME : $DAEMON stopped" ; exit 0 ;;
 		1) [ "$VERBOSE" != no ] && echo "$NAME : $DAEMON already stopped" ; exit 0 ;;
 		2) [ "$VERBOSE" != no ] && echo "$NAME : failed to stop $DAEMON" ; exit 1 ;;
+	esac
 	;;
   status)
 	do_status && exit 0 || exit $?
