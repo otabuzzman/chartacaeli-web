@@ -93,6 +93,7 @@ else
 	install -m 0755 ccws-db $<
 	install -m 0755 ccws-runner $<
 	install -m 0755 ccws-cleaner $<
+	install -m 0644 setenv.sh $<
 endif
 	install -m 0644 ChartDB.sql $<
 
