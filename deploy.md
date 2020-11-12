@@ -6,14 +6,18 @@ Practices - maybe even *best* ones - to deploy Charta Caeli web service on cloud
 
 Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Provider is [contabo.de](https://contabo.de/). VPS access details received by mail. Domain registrar for [chartacaeli.org](https://www.whois.com/whois/chartacaeli.org) is [ionos.de](https://www.ionos.de/). Setup assumes a control node with SSH access to VPS.
 
-* [Basic setup](#Basic-setup) - Essentially SSL setup and firewall.<br>
-* [Web server setup](#Web-server-setup) - Apache web server with Let's Encrypt certificate.
-* [App server setup](#App-server-setup) - Tomcat Application server behind Apache web server.
-* [Charta Caeli setup](#Charta-Caeli-setup) - Setting up the Charta Caeli web service.
+* [A. Basic setup](#A-Basic-setup) - Essentially SSH setup and firewall.<br>
+* [B. Web server setup](#B-Web-server-setup) - Apache web server with Let's Encrypt certificate.
+* [C. App server setup](#C-App-server-setup) - Tomcat Application server behind Apache web server.
+* [D. Charta Caeli setup](#D-Charta-Caeli-setup) - The Charta Caeli web service.
 
-### Basic setup
+### A. Basic setup
 
-1. VPS login (from control node)
+1. Create new VPS (or rollback *virgin* snapshot)
+
+2. Consider *virgin* snapshot
+
+3. VPS login (from control node)
 
   IP address and root password in mail from contabo.
   ```
@@ -24,13 +28,13 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   khfile=known_hosts
   khpath=$khdir/$khfile
 
-  egrep -qs $ip $khpath && egrep -qsv $ip $khpath >$khfile
+  egrep -qs $ip $khpath && egrep -v $ip $khpath >$khfile
   test -s $khfile && cp $khfile $khdir ; rm -f $khfile
 
   ssh root@$ip
   ```
 
-2. Install updates
+4. Install updates
   ```
   apt update
 
@@ -38,7 +42,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   apt upgrade
   ```
 
-3. Replace root with leaf
+5. Replace root with leaf
   ```
   groupadd leaf
   useradd -s /bin/bash -m -g leaf leaf
@@ -53,10 +57,10 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   ```
   **/etc/sudoers** - Add line below.
   ```
-  leaf	ALL=(ALL:ALL) NOPASSWD:ALL
+  leaf ALL=(ALL:ALL) NOPASSWD:ALL
   ```
 
-4. Check sudo leaf (**must not continue on failure**)
+6. Check sudo leaf (**must not continue on failure**)
   ```
   su - leaf
 
@@ -69,7 +73,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   exit
   ```
 
-5. Install public key (from control node)
+7. Install public key (from control node)
   ```
   # generate keys
   ssh-keygen -b 4096 -f ~/.ssh/chartacaeli.org
@@ -77,7 +81,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   ssh-copy-id -i ~/.ssh/chartacaeli.org.pub leaf@161.97.115.13
   ```
 
-6. Restrict SSH access
+8. Restrict SSH access
   ```
   # restrict SSH access
   vi /etc/ssh/sshd_config
@@ -92,7 +96,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   PasswordAuthentication no
   ```
 
-7. Setup firewall
+9. Setup firewall
   ```
   ufw default deny incoming
   ufw default allow outgoing
@@ -103,7 +107,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
 
   systemctl enable ufw
 
-  apt install fail2ban
+  apt --yes install fail2ban
 
   systemctl enable fail2ban
 
@@ -119,7 +123,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   port = 3110
   ```
 
-8. Change domain
+10. Change domain
   ```
   hostnamectl set-hostname vmd62709.chartacaeli.org
 
@@ -131,10 +135,10 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   161.97.115.13 vmd62709.chartacaeli.org vmd62709 ccws
   ```
 
-9. Setup MTA
+11. Setup MTA
 ```
   # install sendmail
-  apt install sendmail
+  apt --yes install sendmail
 
   # configure sendmail (use defaults)
   sendmailconfig
@@ -171,27 +175,27 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   sudo bash -c "m4 /etc/mail/sendmail.mc >/etc/mail/sendmail.cf"
   ```
 
-10. VPS reboot
+12. VPS reboot
   ```
   reboot
   ```
 
-11. Set contabo nameservers for domain at ionos
+13. Set contabo nameservers for domain at ionos
 
-12. Create DNS zone for domain/ IP at contabo
+14. Create DNS zone for domain/ IP at contabo
 
-13. Consider snapshot.
+15. Consider snapshot
 
-### Web server setup
+### B. Web server setup
 
-1. VPS login
+1. VPS login (from control node)
   ```
   ssh -i ~/.ssh/chartacaeli.org leaf@chartacaeli.org -p 3110
   ```
 
 2. Install web server
   ```
-  sudo apt install apache2
+  sudo apt --yes install apache2
   ```
 
 3. Secure web server (basic)
@@ -212,23 +216,19 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   ```
   Require all denied
   ```
-  **/etc/apache2/apache2.conf** - Add lines below.
+  **/etc/apache2/apache2.conf** - Add or change relevant line below.
   ```
   TraceEnable Off
   ```
 
 3. Setup document root
   ```
+  # Charta Caeli account
   sudo groupadd ccaeli
-  sudo useradd -c "Charta Caeli" -m -s /usr/sbin/nologin -g ccaeli ccaeli
+  sudo useradd -c "Charta Caeli" -d /opt/chartacaeli -m -s /usr/sbin/nologin -g ccaeli ccaeli
   
-  droot=/opt/chartacaeli/www
-
   # Charta Caeli document root
-  sudo mkdir -p $droot
-
-  sudo chown ccaeli:ccaeli $droot
-  sudo chmod 775 $droot
+  sudo -u ccaeli mkdir /opt/chartacaeli/www
   ```
 
 4. Setup Virtual Hosts
@@ -239,20 +239,19 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   **/etc/apache2/sites-available/chartacaeli.org.conf** - Add lines below.
   ```
   <VirtualHost *:80>
-  	ServerAdmin leaf@chartacaeli.org
-  	ServerName chartacaeli.org
-  	ServerAlias www.chartacaeli.org
-  	DocumentRoot /opt/chartacaeli/www
-  	ErrorLog ${APACHE_LOG_DIR}/error.log
-  	CustomLog ${APACHE_LOG_DIR}/access.log combined
-  	<Directory /opt/chartacaeli/www/>
-  		Options -Indexes -FollowSymLinks
-  		AllowOverride None
-  		Require all granted
-  	</Directory>
+    ServerAdmin leaf@chartacaeli.org
+    ServerName chartacaeli.org
+    ServerAlias www.chartacaeli.org
+    DocumentRoot /opt/chartacaeli/www
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+    <Directory /opt/chartacaeli/www/>
+      Options -Indexes -FollowSymLinks
+      AllowOverride None
+      Require all granted
+    </Directory>
   </VirtualHost>
   ```
-
   ```
   # enable virtual host
   sudo a2ensite chartacaeli.org.conf
@@ -266,7 +265,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   sudo apache2ctl configtest
   ```
 
-5. Check [http://chartacaeli.org](http://chartacaeli.org) with browser
+5. Check [http://161.97.115.13](http://161.97.115.13) with browser
 
    On success reply will state something like access forbidden.
 
@@ -277,12 +276,12 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   Let's Encrypt maintains [rate limits](https://letsencrypt.org/docs/rate-limits/) on their production environment. Though the number of certificate issuings per time interval is rather huge they nevertheless recommend using their [staging environment](https://letsencrypt.org/docs/staging-environment) for development purposes like setting up CI/CD pipelines. 
   ```
   # install let's encrypt software
-  sudo apt install python-certbot-apache
+  sudo apt --yes install python-certbot-apache
   
   # obtain SSL certificate
   sudo certbot -n --apache --redirect \
-		-d chartacaeli.org -d www.chartacaeli.org \
-		--agree-tos --email iuergen.schuck@gmail.com # check mail address
+    -d chartacaeli.org -d www.chartacaeli.org \
+    --agree-tos --email iuergen.schuck@gmail.com # check mail address
   ```
 
 7. Check auto-renewal
@@ -297,23 +296,23 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
 
 9. Check secure [http**s**://chartacaeli.org](https://chartacaeli.org) with browser
 
-10. Consider snapshot.
+10. Consider snapshot
 
-### App server setup
+### C. App server setup
 
-1. VPS login
+1. VPS login (from control node)
   ```
   ssh -i ~/.ssh/chartacaeli.org leaf@chartacaeli.org -p 3110
   ```
 
 2. Install Tomcat
   ```
-  sudo apt install tomcat8
+  sudo apt --yes install tomcat8
   ```
 
 2. Install AJP
   ```
-  sudo apt install libapache2-mod-jk
+  sudo apt --yes install libapache2-mod-jk
   ```
 
 3. Configure AJP
@@ -338,7 +337,6 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
    # worker properties
    worker.ccws.type=ajp13
    ```
-
    ```
    # connect web with app server
    sudo vi /etc/apache2/mods-available/jk.conf
@@ -363,13 +361,199 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
 
 5. Check [https://chartacaeli.org/api](https://chartacaeli.org/api) with browser
 
-   On success reply will state a Tomcat error response.
+   First start after installation may take several minutes. On success reply will state a Tomcat error response.
 
 6. Consider snapshot
 
-### Charta Caeli setup
+### D. Charta Caeli setup
 
-1. VPS login
+1. VPS login (from control node)
   ```
+  # obtain Unicode font (e.g. search ARIALUNI.TTF on GitHub:
+  # https://www.google.de/search?q=arialuni.ttf+%2Bsite%3Agithub.com)
+
+  # provide Unicode font
+  scp -i .ssh/chartacaeli.org -P 3110 ./Downloads/ARIALUNI.TTF leaf@chartacaeli.org:~
+  ssh -i ~/.ssh/chartacaeli.org leaf@chartacaeli.org -p 3110 -- chmod o+r ARIALUNI.TTF
+
   ssh -i ~/.ssh/chartacaeli.org leaf@chartacaeli.org -p 3110
   ```
+
+2. Install prerequisites
+  ```
+  [ -d ~/lab ] || mkdir ~/lab
+
+  # package list
+  pkg=" \
+    bison \
+    flex \
+    gawk \
+    g++ \
+    gcc \
+    ghostscript \
+    git \
+    libpng-dev \
+    maven \
+    openjdk-8-jdk-headless \
+    patch \
+    pkg-config \
+    unzip \
+  "
+
+  # stop on error
+  for p in $pkg ; do
+    sudo apt --yes install $p || break
+  done
+
+  # ImageMagick
+  src=https://github.com/ImageMagick/ImageMagick.git
+  top=ImageMagick
+
+  ( cd ~/lab ; git clone $src ; cd $top ; ./configure ; make -j $(nproc) ; sudo make install )
+  sudo ldconfig /usr/local/lib
+
+  # CXXWRAP
+  tgz=cxxwrap-20061217.tar.gz
+  src=http://downloads.sourceforge.net/project/cxxwrap/cxxwrap/20061217/$tgz
+  top=cxxwrap-20061217
+
+  ( cd ~/lab ; wget -q $src ; tar zxf $tgz ; cd $top ; ./configure ; make )
+  ```
+
+3. Setup CC application repo
+  ```
+  # chartacaeli-app
+  src=https://github.com/otabuzzman/chartacaeli-app.git
+  top=chartacaeli-app
+
+  # build
+  export CXX=g++
+  export CXXWRAP=~/lab/cxxwrap-20061217/cxxwrap
+  export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+  export PATH=$JAVA_HOME/bin:$PATH
+  export LD_LIBRARY_PATH=.:lib:org/chartacaeli/caa:$LD_LIBRARY_PATH
+
+  cd ~/lab ; git clone $src ; cd $top
+
+  ( cd org/chartacaeli/caa ; make -j $(nproc) ; make -j $(nproc) all )
+  make
+  make classes
+
+  # install
+  mvn compile
+
+  sudo -u ccaeli -- make install
+  sudo -u ccaeli -- install ~/ARIALUNI.TTF -m 644 /opt/chartacaeli
+
+  # setup system prefs
+  sudo $JAVA_HOME/bin/java \
+    org.chartacaeli.PreferencesTool \
+    tree=system command=update chartacaeli.preferences
+  ```
+
+4. Check CC application (optional)
+  ```
+  # setup Unicode font
+  ln ~/ARIALUNI.TTF ARIALUNI.TTF
+
+  # reset user prefs
+  java org.chartacaeli.PreferencesTool tree=user command=delete
+
+  for sample in \
+    layout-and-text \
+    unicode-and-fonts \
+    field-of-view \
+    variables-and-expressions \
+    milkyway-with-catalogds9 \
+    azimuthal-projection ; do ( make ${sample}.pdf ) ; done
+  ```
+
+5. Setup CC web service repo
+  ```
+  # chartacaeli-web
+  src=https://github.com/otabuzzman/chartacaeli-web.git
+  top=chartacaeli-web
+
+  # build
+  cd ; cd ~/lab ; git clone $src ; cd $top
+
+  make all
+
+  # install
+  mvn compile
+
+  sudo -u ccaeli -- make install
+
+  # move HTML content to web server
+  sudo -u ccaeli bash -c "
+    cd /opt/chartacaeli/web
+	mv * ../www
+	mv ../www/META-INF .
+	mv ../www/WEB-INF ."
+
+  # setup start scripts
+  for script in ccws-db ccws-runner ccws-cleaner ; do
+    sudo install -m 755 /opt/chartacaeli/$script /etc/init.d
+    sudo update-rc.d $script defaults
+    sudo bash -c "echo JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 >>/etc/default/$script"
+  done
+
+  sudo install -m 644 /opt/chartacaeli/setenv.sh /usr/share/tomcat8/bin
+  ```
+
+6. Additional config steps
+  ```
+  # config web server
+  sudo vi /etc/apache2/sites-available/chartacaeli.org-le-ssl.conf
+  ```
+  **/etc/apache2/sites-available/chartacaeli.org-le-ssl.conf** - Add lines below.
+  ```
+  # add after DocumentRoot
+  DirectoryIndex custom-star-maps.html
+  ErrorDocument 404 /error-404.html
+  ```
+  ```
+  # config app server
+  sudo vi /opt/chartacaeli/web/META-INF/context.xml
+  ```
+ **/opt/chartacaeli/web/META-INF/context.xml** - Change relevant line as below.
+  ```
+  <Context docBase="/opt/chartacaeli/web" path="" reloadable="true">
+  ```
+  ```
+  sudo install -m 644 /opt/chartacaeli/web/META-INF/context.xml /etc/tomcat8/Catalina/localhost/ROOT.xml
+
+  sudo vi /opt/chartacaeli/web/WEB-INF/web.xml
+  ```
+ **/opt/chartacaeli/web/WEB-INF/web.xml** - Change relevant line as below.
+  ```
+  <param-value>/opt/chartacaeli/db</param-value>
+  ```
+  ```
+  # config CC and TC accounts
+  sudo usermod -a -G ccaeli tomcat8
+  sudo usermod -a -G tomcat8 ccaeli
+
+  # init DB
+  sudo -u ccaeli -- mkdir -m 0775 ${BASDIR:=/opt/chartacaeli/db}
+
+  sudo -u ccaeli -- bash -c "cd /opt/chartacaeli
+    java -cp web/WEB-INF/lib/h2-1.4.199.jar -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+    -url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
+    -sql \"RUNSCRIPT FROM 'ChartDB.sql'\""
+  ```
+
+7. VPS reboot
+  ```
+  sudo reboot
+  ```
+
+8. Check [https://chartacaeli.org](https://chartacaeli.org) with browser
+
+   On success the Charta Caeli web service will show up.
+
+9. Check [https://chartacaeli.org/api](https://chartacaeli.org/api) with browser
+
+   First after reboot may take several minutes. On success Charta Caeli RESTful API service will return some JSON.
+
+10. Consider snapshot
