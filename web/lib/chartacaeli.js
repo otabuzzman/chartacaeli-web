@@ -9,6 +9,14 @@ function initComposer() {
 				value: State.EMP,
 				writable: true, enumerable: true, configurable: false
 			},
+			Hstate: {
+				value: 0,
+				writable: true, enumerable: true, configurable: false
+			},
+			Hevent: {
+				value: 0,
+				writable: true, enumerable: true, configurable: false
+			},
 			open: {
 				value: null,
 				writable: true, enumerable: true, configurable: false
@@ -63,208 +71,212 @@ var compThis ;
 var compExch ;
 
 /* state enumeration names and values */
-const stateName = Object.freeze(["EMP", "OPN", "CHG", "WRN", "EXE", "ERR", "POL"]) ;
-const State = Object.freeze({EMP: 0, OPN: 1, CHG: 2, WRN: 3, EXE: 4, ERR: 5, POL: 6}) ;
+const stateName = Object.freeze(["CHG", "EMP", "EXE", "OPN", "POL", "USV"]) ;
+const State = Object.freeze({CHG: 0, EMP: 1, EXE: 2, OPN: 3, POL: 4, USV: 5}) ;
 /* event enumeration names and values */
-const eventName = Object.freeze(["NEW", "OPN", "LOD", "CHG", "PCD", "CNC", "EXE", "CER", "SER", "TMO", "TGD", "TGP"]) ;
-const Event = Object.freeze({NEW: 0, OPN: 1, LOD: 2, CHG: 3, PCD: 4, CNC: 5, EXE: 6, CER: 7, SER: 8, TMO: 9, TGD: 10, TGP: 11}) ;
+const eventName = Object.freeze(["CER", "CHG", "CNC", "EXE", "LOD", "NEW", "OPN", "PCD", "SER", "TGD", "TGP", "TMF", "TMP", "TMU"]) ;
+const Event = Object.freeze({CER: 0, CHG: 1, CNC: 2, EXE: 3, LOD: 4, NEW: 5, OPN: 6, PCD: 7, SER: 8, TGD: 9, TGP: 10, TMF: 11, TMP: 12, TMU: 13}) ;
 /* event/ activity table */
 const EATab = Object.freeze([
-	/* S/ E     New        Opn        Lod        Chg        Pcd        Cnc        Exe        Cer        Ser        Tmo        Tgd        Tgp      */
-	/* Emp */  [eaInvalid, eaEmpOpn,  eaEmpLod,  eaEmpChg,  eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaEmpTgd,  eaEmpTgp],
-	/* Opn */  [eaOpnNew,  eaOpnOpn,  eaOpnLod,  eaOpnChg,  eaInvalid, eaInvalid, eaOpnExe,  eaInvalid, eaInvalid, eaInvalid, eaOpnTgd,  eaOpnTgp],
-	/* Chg */  [eaChgNew,  eaChgOpn,  eaChgLod,  eaChgChg,  eaInvalid, eaInvalid, eaChgExe,  eaInvalid, eaInvalid, eaInvalid, eaChgTgd,  eaChgTgp],
-	/* Wrn */  [eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaWrnPcd,  eaWrnCnc,  eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid],
-	/* Exe */  [eaExeNew,  eaExeOpn,  eaExeLod,  eaInvalid, eaExePcd,  eaInvalid, eaInvalid, eaExeCer,  eaExeSer,  eaExeTmo,  eaExeTgd,  eaExeTgp],
-	/* Err */  [eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaErrPcd,  eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaInvalid],
-	/* Pol */  [eaInvalid, eaInvalid, eaInvalid, eaInvalid, eaPolPcd,  eaInvalid, eaInvalid, eaInvalid, eaPolSer,  eaPolTmo,  eaPolTgd,  eaPolTgp]
+	/* S/ E     Cer       Chg       Cnc       Exe       Lod       New       Opn       Pcd       Ser       Tgd       Tgp       Tmf       Tmp       Tmu     */
+	/* Chg */  [eaReject, eaChgChg, eaReject, eaChgExe, eaChgLod, eaChgNew, eaChgOpn, eaReject, eaReject, eaChgTgd, eaChgTgp, eaReject, eaReject, eaReject],
+	/* Emp */  [eaReject, eaEmpChg, eaReject, eaReject, eaEmpLod, eaReject, eaEmpOpn, eaReject, eaReject, eaEmpTgd, eaEmpTgp, eaReject, eaReject, eaReject],
+	/* Exe */  [eaExeCer, eaExeChg, eaReject, eaReject, eaExeLod, eaReject, eaReject, eaExePcd, eaExeSer, eaReject, eaReject, eaExeTmf, eaReject, eaExeTmu],
+	/* Opn */  [eaReject, eaOpnChg, eaReject, eaOpnExe, eaOpnLod, eaOpnNew, eaOpnOpn, eaReject, eaReject, eaOpnTgd, eaOpnTgp, eaReject, eaReject, eaReject],
+	/* Pol */  [eaReject, eaPolChg, eaReject, eaReject, eaPolLod, eaReject, eaReject, eaPolPcd, eaPolSer, eaReject, eaReject, eaPolTmf, eaPolTmp, eaPolTmu],
+	/* Usv */  [eaReject, eaReject, eaUsvCnc, eaReject, eaUsvLod, eaUsvNew, eaUsvOpn, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
 	]) ;
+
 /* event activities */
-function eaInvalid() {
-	console.log("Inv") ;
-}
-function eaEmpOpn() {
-	onclickBtnOpen() ;
-	console.log("Emp-Opn-Opn") ;
-}
-function eaEmpLod() {
-	onclickBtnLoad() ;
-	console.log("Emp-Lod-Opn") ;
-}
-function eaEmpChg() {
-	/* set next FSM and button states */
-	compThis.stat = State.CHG ;
-	SBTab[compThis.stat]() ;
-	console.log("Emp-Chg-Chg") ;
-}
-function eaEmpTgd() {
-	onclickBtnD8N() ;
-	/* set button states */
-	SBTab[compThis.stat]() ;
-	console.log("Emp-Tgd-D8N") ;
-}
-function eaEmpTgp() {
-	onclickBtnP9S() ;
-	/* set button states */
-	SBTab[compThis.stat]() ;
-	console.log("Emp-Tgp-P9S") ;
-}
-function eaOpnNew() {
-	onclickBtnNew() ;
-	/* set next FSM and button states */
-	compThis.stat = State.EMP ;
-	SBTab[compThis.stat]() ;
-	console.log("Opn-New-Emp") ;
-}
-function eaOpnOpn() {
-	onclickBtnOpen() ;
-	console.log("Opn-Opn-Opn") ;
-}
-function eaOpnLod() {
-	onclickBtnLoad() ;
-	console.log("Opn-Lod-Opn") ;
-}
-function eaOpnChg() {
-	/* set next FSM and button states */
-	compThis.stat = State.CHG ;
-	SBTab[compThis.stat]() ;
-	console.log("Opn-Chg-Chg") ;
-}
-function eaOpnExe() {
-	$('#ccBtnExec').data('stat-hist', compThis.stat) ;
-	onclickBtnExec() ;
-	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
-	/* set next FSM and button states */
-	compThis.stat = State.EXE ;
-	SBTab[compThis.stat]() ;
-	console.log("Opn-Exe-Exe") ;
-}
-function eaOpnTgd() {
-	onclickBtnD8N() ;
-	/* set button states */
-	SBTab[compThis.stat]() ;
-	console.log("Opn-Tgd-D8N") ;
-}
-function eaOpnTgp() {
-	onclickBtnP9S() ;
-	/* set button states */
-	SBTab[compThis.stat]() ;
-	console.log("Opn-Tgp-P9S") ;
-}
-function eaChgNew() {
-	$('#ccDgWarn2Key').data('event-hist', Event.NEW) ;
-	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
-	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
-	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
-	$('#ccDgWarn2Key').modal('toggle') ;
-	/* set next FSM and button states */
-	compThis.stat = State.WRN ;
-	SBTab[compThis.stat]() ;
-	console.log("Chg-New-Wrn") ;
-}
-function eaChgOpn() {
-	$('#ccDgWarn2Key').data('event-hist', Event.OPN) ;
-	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
-	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
-	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
-	$('#ccDgWarn2Key').modal('toggle') ;
-	/* set next FSM and button states */
-	compThis.stat = State.WRN ;
-	SBTab[compThis.stat]() ;
-	console.log("Chg-Opn-Wrn") ;
-}
-function eaChgLod() {
-	$('#ccDgWarn2Key').data('event-hist', Event.LOD) ;
-	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
-	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
-	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
-	$('#ccDgWarn2Key').modal('toggle') ;
-	/* set next FSM and button states */
-	compThis.stat = State.WRN ;
-	SBTab[compThis.stat]() ;
-	console.log("Chg-Lod-Wrn") ;
+function eaReject() {
+	console.log("FSM rejected") ;
 }
 function eaChgChg() {
-	console.log("Chg-Chg-Chg") ;
+	// save state and event
+	compThis.Hstate = State.CHG ;
+	compThis.Hevent = Event.CHG ;
+	// specific actions
+	// update FSM
+	compThis.stat = State.CHG ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("CHG-CHG-"+stateName[compThis.stat]) ;
 }
 function eaChgExe() {
-	$('#ccBtnExec').data('stat-hist', compThis.stat) ;
-	onclickBtnExec() ;
+	// save state and event
+	$('#ccBtnExec').data('Hstate', State.CHG) ;
+	$('#ccBtnExec').data('Hevent', Event.EXE) ;
+	// specific actions
+	oneventEXE() ;
 	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
-	/* set next FSM and button states */
+	// update FSM
 	compThis.stat = State.EXE ;
 	SBTab[compThis.stat]() ;
-	console.log("Chg-Exe-Exe") ;
+	// trace FSM
+	console.log("CHG-EXE-"+stateName[compThis.stat]) ;
+}
+function eaChgLod() {
+	// save state and event
+	$('#ccDgWarnUSV').data('Hstate', State.CHG) ;
+	$('#ccDgWarnUSV').data('Hevent', Event.LOD) ;
+	// specific actions
+	$('#ccDgWarnUSV').modal('toggle') ;
+	// update FSM
+	compThis.stat = State.USV ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("CHG-LOD-"+stateName[compThis.stat]) ;
+}
+function eaChgNew() {
+	// save state and event
+	$('#ccDgWarnUSV').data('Hstate', State.CHG) ;
+	$('#ccDgWarnUSV').data('Hevent', Event.NEW) ;
+	// specific actions
+	$('#ccDgWarnUSV').modal('toggle') ;
+	// update FSM
+	compThis.stat = State.USV ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("CHG-NEW-"+stateName[compThis.stat]) ;
+}
+function eaChgOpn() {
+	// save state and event
+	$('#ccDgWarnUSV').data('Hstate', State.CHG) ;
+	$('#ccDgWarnUSV').data('Hevent', Event.OPN) ;
+	// specific actions
+	$('#ccDgWarnUSV').modal('toggle') ;
+	// update FSM
+	compThis.stat = State.USV ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("CHG-OPN-"+stateName[compThis.stat]) ;
 }
 function eaChgTgd() {
-	onclickBtnD8N() ;
-	/* set button states */
+	// save state and event
+	compThis.Hstate = State.CHG ;
+	compThis.Hevent = Event.TGD ;
+	// specific actions
+	oneventD8N() ;
+	// update FSM
 	SBTab[compThis.stat]() ;
-	console.log("Chg-Tgd-D8N") ;
+	// trace FSM
+	console.log("CHG-TGD-"+stateName[compThis.stat]) ;
 }
 function eaChgTgp() {
-	onclickBtnP9S() ;
-	/* set button states */
+	// save state and event
+	compThis.Hstate = State.CHG ;
+	compThis.Hevent = Event.TGP ;
+	// specific actions
+	oneventP9S() ;
+	// update FSM
 	SBTab[compThis.stat]() ;
-	console.log("Chg-Tgp-P9S") ;
+	// trace FSM
+	console.log("CHG-TGP-"+stateName[compThis.stat]) ;
 }
-function eaWrnPcd() {
-	$('#ccDgWarn2Key').modal('toggle') ;
-	switch ($('#ccDgWarn2Key').data('event-hist')) {
-		case Event.NEW:
-			onclickBtnNew() ;
-			compThis.stat = State.EMP ;
-			/* set button states */
-			SBTab[compThis.stat]() ;
-		break ;
-		case Event.OPN:
-			onclickBtnOpen() ;
-		break ;
-		case Event.LOD:
-			onclickBtnLoad() ;
-		break ;
+function eaEmpChg() {
+	// save state and event
+	compThis.Hstate = State.EMP ;
+	compThis.Hevent = Event.CHG ;
+	// specific actions
+	// update FSM
+	compThis.stat = State.CHG ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("EMP-CHG-"+stateName[compThis.stat]) ;
+}
+function eaEmpLod() {
+	// save state and event
+	compThis.Hstate = State.EMP ;
+	compThis.Hevent = Event.LOD ;
+	// specific actions
+	oneventLOD() ;
+	// update FSM
+	// trace FSM
+	console.log("EMP-LOD-"+stateName[compThis.stat]) ;
+}
+function eaEmpOpn() {
+	// save state and event
+	compThis.Hstate = State.EMP ;
+	compThis.Hevent = Event.OPN ;
+	// specific actions
+	oneventOPN() ;
+	// update FSM
+	// trace FSM
+	console.log("EMP-OPN-"+stateName[compThis.stat]) ;
+}
+function eaEmpTgd() {
+	// save state and event
+	compThis.Hstate = State.EMP ;
+	compThis.Hevent = Event.TGD ;
+	// specific actions
+	oneventD8N() ;
+	// update FSM
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("EMP-TGD-"+stateName[compThis.stat]) ;
+}
+function eaEmpTgp() {
+	// save state and event
+	compThis.Hstate = State.EMP ;
+	compThis.Hevent = Event.TGP ;
+	// specific actions
+	oneventP9S() ;
+	// update FSM
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("EMP-TGP-"+stateName[compThis.stat]) ;
+}
+function eaExeCer(creq) {
+	// save state and event
+	compThis.Hstate = State.EXE ;
+	compThis.Hevent = Event.CER ;
+	// specific actions
+	clearTimeout(hdExecCanc) ;
+	if ($('#ccDgWarnDIS').hasClass('show')) {
+		$('#ccDgWarnDIS').modal('toggle') ;
 	}
-	console.log("Wrn-Pcd-EMP|OPN") ;
-}
-function eaWrnCnc() {
-	$('#ccDgWarn2Key').modal('toggle') ;
-	compThis.stat = $('#ccDgWarn2Key').data('state-hist') ;
-	console.log("Wrn-Cnc-"+stateName[compThis.stat]) ;
-}
-function eaExeNew() {
-	$('#ccDgWarn2Key').data('event-hist', Event.NEW) ;
-	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
-	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
-	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
-	$('#ccDgWarn2Key').modal('toggle') ;
-	/* set next FSM and button states */
-	compThis.stat = State.WRN ;
+	if ($('#ccDgInfoFDB').hasClass('show')) {
+		$('#ccDgInfoFDB').modal('toggle') ;
+	}
+	$('#ccDgFailERR .dgfail-CER .creq-info').text(creq.info) ;
+	$('#ccDgFailERR').find('[class ^= dgfail-]').addClass('d-none') ;
+	$('#ccDgFailERR').find('.dgfail-CER').removeClass('d-none') ;
+	$('#ccDgFailERR').modal('toggle') ;
+	// update FSM
+	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
-	console.log("Exe-New-Wrn") ;
+	// trace FSM
+	console.log("EXE-CER-"+stateName[compThis.stat]) ;
 }
-function eaExeOpn() {
-	$('#ccDgWarn2Key').data('event-hist', Event.OPN) ;
-	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
-	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
-	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
-	$('#ccDgWarn2Key').modal('toggle') ;
-	/* set next FSM and button states */
-	compThis.stat = State.WRN ;
+function eaExeChg() {
+	// save state and event
+	compThis.Hstate = State.EXE ;
+	compThis.Hevent = Event.CHG ;
+	// specific actions
+	$('#ccDgWarnDIS').modal('toggle') ;
+	// update FSM
+	compThis.stat = State.EXE ;
 	SBTab[compThis.stat]() ;
-	console.log("Exe-Opn-Wrn") ;
+	// trace FSM
+	console.log("EXE-CHG-"+stateName[compThis.stat]) ;
 }
 function eaExeLod() {
-	$('#ccDgWarn2Key').data('event-hist', Event.LOD) ;
-	$('#ccDgWarn2Key').data('state-hist', compThis.stat) ;
-	$('#ccDgWarn2Key').find('[class ^= dgwarn-]').addClass('d-none') ;
-	$('#ccDgWarn2Key').find('.dgwarn-unsaved').removeClass('d-none') ;
-	$('#ccDgWarn2Key').modal('toggle') ;
-	/* set next FSM and button states */
-	compThis.stat = State.WRN ;
+	// save state and event
+	compThis.Hstate = State.EXE ;
+	compThis.Hevent = Event.LOD ;
+	// specific actions
+	$('#ccDgWarnDIS').modal('toggle') ;
+	// update FSM
+	compThis.stat = State.EXE ;
 	SBTab[compThis.stat]() ;
-	console.log("Exe-Lod-Wrn") ;
+	// trace FSM
+	console.log("EXE-LOD-"+stateName[compThis.stat]) ;
 }
 function eaExePcd(creq) {
+	// save state and event
+	compThis.Hstate = State.EXE ;
+	compThis.Hevent = Event.PCD ;
+	// specific actions
 	var next = restGetHref(creq.hateoas, 'next') ;
 	hdExecPoll = setInterval(function () {
 		$.ajax({
@@ -275,7 +287,7 @@ function eaExePcd(creq) {
 				switch (creq.stat) {
 				case 'accepted':
 				case 'started':
-					EATab[compThis.stat][Event.TMO]() ;
+					EATab[compThis.stat][Event.TMP]() ;
 					break ;
 				case 'finished':
 					EATab[compThis.stat][Event.PCD](creq) ;
@@ -292,163 +304,359 @@ function eaExePcd(creq) {
 		}) ;
 	}, 5*1000) ; /* 5 sec */
 	hdExecPrgs = setTimeout(function () {
-		$('#ccDgInfoWork').modal('toggle') ;
+		EATab[compThis.stat][Event.TMF]() ;
 	}, 15*1000) ; /* 15 sec */
-	/* set next FSM and button states */
+	// update FSM
 	compThis.stat = State.POL ;
 	SBTab[compThis.stat]() ;
-	console.log("Exe-Pcd-Pol") ;
-}
-function eaExeCer(creq) {
-	clearTimeout(hdExecCanc) ;
-	$('#ccDgFail .dgfail-exec400 .creq-info').text(creq.info) ;
-	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
-	$('#ccDgFail').find('.dgfail-exec400').removeClass('d-none') ;
-	$('#ccDgFail').modal('toggle') ;
-	/* set next FSM and button states */
-	compThis.stat = State.ERR ;
-	SBTab[compThis.stat]() ;
-	console.log("Exe-Cer-Err") ;
+	// trace FSM
+	console.log("EXE-PCD-"+stateName[compThis.stat]) ;
 }
 function eaExeSer(creq) {
+	// save state and event
+	compThis.Hstate = State.EXE ;
+	compThis.Hevent = Event.SER ;
+	// specific actions
 	clearTimeout(hdExecCanc) ;
-	$('#ccDgFail .dgfail-exec500 .creq-info').text(creq.info) ;
-	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
-	$('#ccDgFail').find('.dgfail-exec500').removeClass('d-none') ;
-	$('#ccDgFail').modal('toggle') ;
-	/* set next FSM and button states */
-	compThis.stat = State.ERR ;
+	if ($('#ccDgWarnDIS').hasClass('show')) {
+		$('#ccDgWarnDIS').modal('toggle') ;
+	}
+	if ($('#ccDgInfoFDB').hasClass('show')) {
+		$('#ccDgInfoFDB').modal('toggle') ;
+	}
+	$('#ccDgFailERR .dgfail-EXE-SER .creq-info').text(creq.info) ;
+	$('#ccDgFailERR').find('[class ^= dgfail-]').addClass('d-none') ;
+	$('#ccDgFailERR').find('.dgfail-EXE-SER').removeClass('d-none') ;
+	$('#ccDgFailERR').modal('toggle') ;
+	// update FSM
+	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
-	console.log("Exe-Ser-Err") ;
+	// trace FSM
+	console.log("EXE-SER-"+stateName[compThis.stat]) ;
 }
-function eaExeTmo() {
+function eaExeTmf() {
+	// save state and event
+	compThis.Hstate = State.EXE ;
+	compThis.Hevent = Event.TMF ;
+	// specific actions
+	if ($('#ccDgWarnDIS').hasClass('show')) {
+		$('#ccDgWarnDIS').modal('toggle') ;
+	}
+	$('#ccDgInfoFDB').modal('toggle') ;
+	// update FSM
+	// trace FSM
+	console.log("EXE-TMF-"+stateName[compThis.stat]) ;
+}
+function eaExeTmu() {
+	// save state and event
+	compThis.Hstate = State.EXE ;
+	compThis.Hevent = Event.TMU ;
+	// specific actions
 	clearInterval(hdExecPoll) ;
+	if ($('#ccDgWarnDIS').hasClass('show')) {
+		$('#ccDgWarnDIS').modal('toggle') ;
+	}
+	if ($('#ccDgInfoFDB').hasClass('show')) {
+		$('#ccDgInfoFDB').modal('toggle') ;
+	}
+	// update FSM
+	compThis.stat = $('#ccBtnExec').data('Hstate') ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("EXE-TMU-"+stateName[compThis.stat]) ;
+}
+function eaOpnChg() {
+	// save state and event
+	compThis.Hstate = State.OPN ;
+	compThis.Hevent = Event.CHG ;
+	// specific actions
+	// update FSM
+	compThis.stat = State.CHG ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("OPN-CHG-"+stateName[compThis.stat]) ;
+}
+function eaOpnExe() {
+	// save state and event
+	$('#ccBtnExec').data('Hstate', State.OPN) ;
+	$('#ccBtnExec').data('Hevent', Event.EXE) ;
+	// specific actions
+	oneventEXE() ;
 	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
-	/* set next FSM and button states */
-	compThis.stat = $('#ccBtnExec').data('stat-hist') ;
+	// update FSM
+	compThis.stat = State.EXE ;
 	SBTab[compThis.stat]() ;
-	console.log("Exe-Tmo-"+stateName[compThis.stat]) ;
+	// trace FSM
+	console.log("OPN-EXE-"+stateName[compThis.stat]) ;
 }
-function eaExeTgd() {
-	onclickBtnD8N() ;
-	/* set button states */
+function eaOpnLod() {
+	// save state and event
+	compThis.Hstate = State.OPN ;
+	compThis.Hevent = Event.LOD ;
+	// specific actions
+	oneventLOD() ;
+	// update FSM
+	// trace FSM
+	console.log("OPN-LOD-"+stateName[compThis.stat]) ;
+}
+function eaOpnNew() {
+	// save state and event
+	compThis.Hstate = State.OPN ;
+	compThis.Hevent = Event.NEW ;
+	// specific actions
+	oneventNEW() ;
+	// update FSM
+	compThis.stat = State.EMP ;
 	SBTab[compThis.stat]() ;
-	console.log("Exe-Tgd-D8N") ;
+	// trace FSM
+	console.log("OPN-NEW-"+stateName[compThis.stat]) ;
 }
-function eaExeTgp() {
-	onclickBtnP9S() ;
-	/* set button states */
+function eaOpnOpn() {
+	// save state and event
+	compThis.Hstate = State.OPN ;
+	compThis.Hevent = Event.OPN ;
+	// specific actions
+	oneventOPN() ;
+	// update FSM
+	// trace FSM
+	console.log("OPN-OPN-"+stateName[compThis.stat]) ;
+}
+function eaOpnTgd() {
+	// save state and event
+	compThis.Hstate = State.OPN ;
+	compThis.Hevent = Event.TGD ;
+	// specific actions
+	oneventD8N() ;
+	// update FSM
 	SBTab[compThis.stat]() ;
-	console.log("Exe-Tgp-P9S") ;
+	// trace FSM
+	console.log("OPN-TGD-"+stateName[compThis.stat]) ;
 }
-function eaErrPcd() {
-	$('#ccDgFail').modal('toggle') ;
-	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
-	/* set next FSM and button states */
-	compThis.stat = $('#ccBtnExec').data('stat-hist') ;
+function eaOpnTgp() {
+	// save state and event
+	compThis.Hstate = State.OPN ;
+	compThis.Hevent = Event.TGP ;
+	// specific actions
+	oneventP9S() ;
+	// update FSM
 	SBTab[compThis.stat]() ;
-	console.log("Err-Pcd-"+stateName[compThis.stat]) ;
+	// trace FSM
+	console.log("OPN-TGP-"+stateName[compThis.stat]) ;
 }
-function eaPolSer(creq) {
-	var applog, pdferr ;
-	clearInterval(hdExecPoll) ;
-	clearTimeout(hdExecPrgs) ;
-	clearTimeout(hdExecCanc) ;
-	if ($('#ccDgInfoWork').hasClass('show'))
-		$('#ccDgInfoWork').modal('toggle') ;
-	applog = restGetHref(creq.hateoas, 'related', 'Charta Caeli') ;
-	if (typeof applog !== 'undefined') {
-		$('#ccDgFail .dgfail-poll500').find('.applog a').attr('href', applog) ;
-		$('#ccDgFail .dgfail-poll500').find('.applog').removeClass('d-none') ;
-	} else
-		$('#ccDgFail .dgfail-poll500').find('.applog').addClass('d-none') ;
-	pdferr = restGetHref(creq.hateoas, 'related', 'Ghostscript') ;
-	if (typeof pdferr !== 'undefined') {
-		$('#ccDgFail .dgfail-poll500').find('.pdferr a').attr('href', pdferr) ;
-		$('#ccDgFail .dgfail-poll500').find('.pdferr').removeClass('d-none') ;
-	} else
-		$('#ccDgFail .dgfail-poll500').find('.pdferr').addClass('d-none') ;
-	$('#ccDgFail').find('[class ^= dgfail-]').addClass('d-none') ;
-	$('#ccDgFail').find('.dgfail-poll500').removeClass('d-none') ;
-	$('#ccDgFail').modal('toggle') ;
-	/* set next FSM and button states */
-	compThis.stat = State.ERR ;
+function eaPolChg() {
+	// save state and event
+	compThis.Hstate = State.POL ;
+	compThis.Hevent = Event.CHG ;
+	// specific actions
+	$('#ccDgWarnDIS').modal('toggle') ;
+	// update FSM
+	compThis.stat = State.POL ;
 	SBTab[compThis.stat]() ;
-	console.log("Pol-Ser-Err") ;
+	// trace FSM
+	console.log("POL-CHG-"+stateName[compThis.stat]) ;
 }
-function eaPolTmo() {
-	console.log("Pol-Tmo-Pol") ;
+function eaPolLod() {
+	// save state and event
+	compThis.Hstate = State.POL ;
+	compThis.Hevent = Event.LOD ;
+	// specific actions
+	$('#ccDgWarnDIS').modal('toggle') ;
+	// update FSM
+	compThis.stat = State.POL ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("POL-LOD-"+stateName[compThis.stat]) ;
 }
 function eaPolPcd(creq) {
+	// save state and event
+	compThis.Hstate = State.POL ;
+	compThis.Hevent = Event.PCD ;
+	// specific actions
 	var pdf, ico ;
+	pdf = restGetHref(creq.hateoas, 'next') ;
+	ico = restGetHref(creq.hateoas, 'related', 'preview') ;
 	clearInterval(hdExecPoll) ;
 	clearTimeout(hdExecPrgs) ;
 	clearTimeout(hdExecCanc) ;
-	if ($('#ccDgInfoWork').hasClass('show'))
-		$('#ccDgInfoWork').modal('toggle') ;
-	pdf = restGetHref(creq.hateoas, 'next') ;
-	ico = restGetHref(creq.hateoas, 'related', 'preview') ;
-	$('#ccDgInfoDone a').attr('href', pdf) ;
-	$('#ccDgInfoDone img').attr('src', ico) ;
-	$('#ccDgInfoDone').modal('toggle') ;
+	if ($('#ccDgWarnDIS').hasClass('show')) {
+		$('#ccDgWarnDIS').modal('toggle') ;
+	}
+	if ($('#ccDgInfoFDB').hasClass('show')) {
+		$('#ccDgInfoFDB').modal('toggle') ;
+	}
+	$('#ccDgInfoRDY a').attr('href', pdf) ;
+	$('#ccDgInfoRDY img').attr('src', ico) ;
+	$('#ccDgInfoRDY').modal('toggle') ;
 	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
-	/* set next FSM and button states */
-	compThis.stat = $('#ccBtnExec').data('stat-hist') ;
+	// update FSM
+	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
-	console.log("Pol-Pcd-"+stateName[compThis.stat]) ;
+	// trace FSM
+	console.log("POL-PCD-"+stateName[compThis.stat]) ;
 }
-function eaPolTgd() {
-	onclickBtnD8N() ;
-	/* set button states */
+function eaPolSer(creq) {
+	// save state and event
+	compThis.Hstate = State.POL ;
+	compThis.Hevent = Event.SER ;
+	// specific actions
+	var applog, pdferr ;
+	applog = restGetHref(creq.hateoas, 'related', 'Charta Caeli') ;
+	pdferr = restGetHref(creq.hateoas, 'related', 'Ghostscript') ;
+	clearInterval(hdExecPoll) ;
+	clearTimeout(hdExecPrgs) ;
+	clearTimeout(hdExecCanc) ;
+	if ($('#ccDgWarnDIS').hasClass('show')) {
+		$('#ccDgWarnDIS').modal('toggle') ;
+	}
+	if ($('#ccDgInfoFDB').hasClass('show')) {
+		$('#ccDgInfoFDB').modal('toggle') ;
+	}
+	if (typeof applog !== 'undefined') {
+		$('#ccDgFailERR .dgfail-POL-SER').find('.applog a').attr('href', applog) ;
+		$('#ccDgFailERR .dgfail-POL-SER').find('.applog').removeClass('d-none') ;
+	} else
+		$('#ccDgFailERR .dgfail-POL-SER').find('.applog').addClass('d-none') ;
+	if (typeof pdferr !== 'undefined') {
+		$('#ccDgFailERR .dgfail-POL-SER').find('.pdferr a').attr('href', pdferr) ;
+		$('#ccDgFailERR .dgfail-POL-SER').find('.pdferr').removeClass('d-none') ;
+	} else
+		$('#ccDgFailERR .dgfail-POL-SER').find('.pdferr').addClass('d-none') ;
+	$('#ccDgFailERR').find('[class ^= dgfail-]').addClass('d-none') ;
+	$('#ccDgFailERR').find('.dgfail-POL-SER').removeClass('d-none') ;
+	$('#ccDgFailERR').modal('toggle') ;
+	// update FSM
+	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
-	console.log("Pol-Tgd-D8N") ;
+	// trace FSM
+	console.log("POL-SER-"+stateName[compThis.stat]) ;
 }
-function eaPolTgp() {
-	onclickBtnP9S() ;
-	/* set button states */
+function eaPolTmf() {
+	// save state and event
+	compThis.Hstate = State.POL ;
+	compThis.Hevent = Event.TMF ;
+	// specific actions
+	if ($('#ccDgWarnDIS').hasClass('show')) {
+		$('#ccDgWarnDIS').modal('toggle') ;
+	}
+	$('#ccDgInfoFDB').modal('toggle') ;
+	// update FSM
+	// trace FSM
+	console.log("POL-TMF-"+stateName[compThis.stat]) ;
+}
+function eaPolTmp() {
+	// save state and event
+	compThis.Hstate = State.POL ;
+	compThis.Hevent = Event.TMP ;
+	// specific actions
+	// update FSM
+	compThis.stat = State.POL ;
 	SBTab[compThis.stat]() ;
-	console.log("Pol-Tgp-P9S") ;
+	// trace FSM
+	console.log("POL-TMP-"+stateName[compThis.stat]) ;
+}
+function eaPolTmu() {
+	// save state and event
+	compThis.Hstate = State.POL ;
+	compThis.Hevent = Event.TMU ;
+	// specific actions
+	clearInterval(hdExecPoll) ;
+	if ($('#ccDgWarnDIS').hasClass('show')) {
+		$('#ccDgWarnDIS').modal('toggle') ;
+	}
+	if ($('#ccDgInfoFDB').hasClass('show')) {
+		$('#ccDgInfoFDB').modal('toggle') ;
+	}
+	// update FSM
+	compThis.stat = $('#ccBtnExec').data('Hstate') ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("POL-TMU-"+stateName[compThis.stat]) ;
+}
+function eaUsvCnc() {
+	// save state and event
+	compThis.Hstate = State.USV ;
+	compThis.Hevent = Event.CNC ;
+	// specific actions
+	// update FSM
+	compThis.stat = State.CHG ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("USV-CNC-"+stateName[compThis.stat]) ;
+}
+function eaUsvLod() {
+	// save state and event
+	compThis.Hstate = State.USV ;
+	compThis.Hevent = Event.LOD ;
+	// specific actions
+	oneventLOD() ;
+	// update FSM
+	// trace FSM
+	console.log("USV-LOD-"+stateName[compThis.stat]) ;
+}
+function eaUsvNew() {
+	// save state and event
+	compThis.Hstate = State.USV ;
+	compThis.Hevent = Event.NEW ;
+	// specific actions
+	oneventNEW() ;
+	// update FSM
+	compThis.stat = State.EMP ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("USV-NEW-"+stateName[compThis.stat]) ;
+}
+function eaUsvOpn() {
+	// save state and event
+	compThis.Hstate = State.USV ;
+	compThis.Hevent = Event.OPN ;
+	// specific actions
+	oneventOPN() ;
+	// update FSM
+	// trace FSM
+	console.log("USV-OPN-"+stateName[compThis.stat]) ;
 }
 
 /* state/ button states table */
 var SBTab = Object.freeze([
+	function () { // State.CHG
+		$('#ccBtnNew').prop('disabled', false) ;
+		$('#ccBtnOpen').prop('disabled', false) ;
+		$('#ccBtnExec').prop('disabled', false) ;
+		$(compThis.id).prop('disabled', false) ;
+	},
 	function () { // State.EMP
 		$('#ccBtnNew').prop('disabled', true) ;
 		$('#ccBtnOpen').prop('disabled', false) ;
 		$('#ccBtnExec').prop('disabled', true) ;
+		$(compThis.id).prop('disabled', false) ;
+	},
+	function () { // State.EXE
+		$('#ccBtnNew').prop('disabled', true) ;
+		$('#ccBtnOpen').prop('disabled', true) ;
+		$('#ccBtnExec').prop('disabled', true) ;
+		$(compThis.id).prop('disabled', true) ;
 	},
 	function () { // State.OPN
 		$('#ccBtnNew').prop('disabled', false) ;
 		$('#ccBtnOpen').prop('disabled', false) ;
 		$('#ccBtnExec').prop('disabled', false) ;
-	},
-	function () { // State.CHG
-		$('#ccBtnNew').prop('disabled', false) ;
-		$('#ccBtnOpen').prop('disabled', false) ;
-		$('#ccBtnExec').prop('disabled', false) ;
-	},
-	function () { // State.WRN
-	},
-	function () { // State.EXE
-		$('#ccBtnNew').prop('disabled', false) ;
-		$('#ccBtnOpen').prop('disabled', false) ;
-		$('#ccBtnExec').prop('disabled', true) ;
-	},
-	function () { // State.ERR
+		$(compThis.id).prop('disabled', false) ;
 	},
 	function () { // State.POL
+	},
+	function () { // State.USV
 	}
 ]) ;
 
 /* clear Composer */
-function onclickBtnNew() {
+function oneventNEW() {
 	compThis.open = compThis.defdef ;
 	loadXonomy('#ccXonomy') ;
 	$('html, body').animate({scrollTop: $('#ccComposer').offset().top}, 800) ;
 }
 
 /* load Composer from gallery */
-function onclickBtnLoad() {
+function oneventLOD() {
 	var href, chart, prefs ;
 	/* fetch definition */
 	href = $('.carousel .active').attr('data-load-chart') ;
@@ -468,16 +676,16 @@ function onclickBtnLoad() {
 						prefs = data ;
 						compP9S.open = prefs ;
 						loadXonomy('#ccXonomy') ;
+						// update FSM
 						compP9S.stat = State.OPN ;
 						compD8N.stat = State.OPN ;
-						/* set button states */
 						SBTab[compThis.stat]() ;
 					}}) ;
 			} else {
 				loadXonomy('#ccXonomy') ;
+				// update FSM
 				compD8N.stat = State.OPN ;
 				compP9S.stat = State.EMP ;
-				/* set button states */
 				SBTab[compThis.stat]() ;
 			}
 		}
@@ -485,7 +693,7 @@ function onclickBtnLoad() {
 }
 
 /* toggle to preferences button */
-function onclickBtnP9S() {
+function oneventP9S() {
 	$('#ccBtnTglP')
 	.toggleClass('d-md-block')
 	.prop('disabled', true) ;
@@ -503,7 +711,7 @@ function onclickBtnP9S() {
 }
 
 /* toggle to definition button */
-function onclickBtnD8N() {
+function oneventD8N() {
 	$('#ccBtnTglD')
 	.toggleClass('d-md-block')
 	.prop('disabled', true) ;
@@ -520,25 +728,23 @@ function onclickBtnD8N() {
 	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
 }
 
-function onclickBtnOpen() {
+function oneventOPN() {
 	var file = new FileReader() ;
 	file.onload = function () {
 		compThis.open = this.result.replace(/(\r?\n|\r)\s*/g, " ").replace(/> </g, "><") ;
 		loadXonomy('#ccXonomy') ;
 		$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
+		// update FSM
 		compThis.stat = State.OPN ;
-		/* set button states */
 		SBTab[compThis.stat]() ;
 	} ;
 	file.readAsText($('#ccInpOpen')[0].files[0]) ;
-	/* allow to select same file several times in a row (SO #12030686) */ 
-	document.getElementById('ccInpOpen').value = null ;
 }
 
-function onclickBtnExec() {
+function oneventEXE() {
 	var exec, chart, prefs ;
 	hdExecCanc = setTimeout(function () {
-		EATab[compThis.stat][Event.TMO]() ;
+		EATab[compThis.stat][Event.TMP]() ;
 	}, 30*60*1000) ; /* 30 min */
 	/* issue POST */
 	compThis.open = grabXonomy() ;
@@ -562,13 +768,15 @@ function onclickBtnExec() {
 function restGetHref(hateoas, rel, title) {
 	var elem ;
 
-	if (typeof title === 'undefined')
+	if (typeof title === 'undefined') {
 		elem = hateoas.find(function (link) {return link.rel == rel}) ;
-	else
+	} else {
 		elem = hateoas.find(function (link) {return link.rel == rel && link.title.includes(title)}) ;
+	}
 
-	if (typeof elem !== 'undefined')
+	if (typeof elem !== 'undefined') {
 		return elem.href ;
+	}
 	return elem ;
 }
 
@@ -591,12 +799,14 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	document.querySelector('#ccBtnTglD').addEventListener('click', function () {EATab[compThis.stat][Event.TGD]()}) ;
 	document.querySelector('#ccBtnNew').addEventListener('click', function () {EATab[compThis.stat][Event.NEW]()}) ;
 	document.querySelector('#ccBtnOpen').addEventListener('click', function () {$('#ccInpOpen').focus().trigger('click')}) ;
+	/* make input element fire on change event even if same file picked (SO #12030686) */
+	document.querySelector('#ccInpOpen').addEventListener('click', function () {this.value = null}) ;
 	document.querySelector('#ccInpOpen').addEventListener('change', function () {EATab[compThis.stat][Event.OPN]()}) ;
+	document.querySelector('#ccXonomy').addEventListener('click', function () {EATab[compThis.stat][Event.CHG]()}) ;
 	document.querySelector('#ccBtnExec').addEventListener('click', function () {EATab[compThis.stat][Event.EXE]()}) ;
-	document.querySelector('#ccDgWarnKey1st').addEventListener('click', function () {EATab[compThis.stat][Event.CNC]()}) ;
-	document.querySelector('#ccDgWarnKey2nd').addEventListener('click', function () {EATab[compThis.stat][Event.PCD]()}) ;
-	document.querySelector('#ccDgFailKey').addEventListener('click', function () {EATab[compThis.stat][Event.PCD]()}) ;
-	document.querySelector('#ccDgInfoDoneKey').addEventListener('click', function () {$('#ccDgInfoDone').modal('toggle')}) ;
+	document.querySelector('#ccDgInfoRDY .ccDg1WayKey').addEventListener('click', function () {$('#ccDgInfoRDY').modal('toggle')}) ;
+	document.querySelector('#ccDgWarnUSV .ccDg2Way1st').addEventListener('click', function () {EATab[compThis.stat][$('#ccDgWarnUSV').data('Hevent')]()}) ;
+	document.querySelector('#ccDgWarnUSV .ccDg2Way2nd').addEventListener('click', function () {EATab[compThis.stat][Event.CNC]()}) ;
 }) ;
 
 /* toggle burger and cross icons */

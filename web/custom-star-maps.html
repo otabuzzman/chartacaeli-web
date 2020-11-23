@@ -271,7 +271,8 @@
 				</div>
 			</div>
 		</div>
-		<div id="ccDgInfoWork" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
+	</div>
+	<div id="ccDgInfoFDB" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -284,12 +285,12 @@
 						<p>Leave browser tab open until another dialog box comes up with your custom star chart.</p>
 					</div>
 					<div class="modal-footer">
-						<button class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">OK</button>
+						<button class="ccDg1WayKey btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">Got it</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div id="ccDgInfoDone" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
+	<div id="ccDgInfoRDY" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -300,65 +301,72 @@
 						<img class="img-thumbnail d-block mx-auto" src="" alt="Preview image of custom star map just rendered.">
 					</div>
 					<div class="modal-footer">
-						<a id="ccDgInfoDoneKey" class="btn btn-primary btn-lg btn-block" role="button" href="" target="_blank">View PDF</a>
+						<a class="ccDg1WayKey btn btn-primary btn-lg btn-block" role="button" href="" target="_blank">View PDF</a>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div id="ccDgWarn2Key" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
+	<div id="ccDgWarnDIS" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">State frozen during chart generation</h4>
+						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
+					</div>
+					<div class="modal-body info-txt lead">
+						<p>If you insist on giving up generating your current star map, reload the page in the browser. Your request will continue in the background, but unfortunately there is no way to access the results.</p>
+					</div>
+					<div class="modal-footer">
+						<button class="ccDg1WayKey btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">Wait to complete chart generation</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	<div id="ccDgWarnUSV" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Unsaved changes pending</h4>
+						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
+					</div>
+					<div class="modal-body info-txt lead">
+						<p>Are you sure to proceed and discard your unsaved changes?</p>
+					</div>
+					<div class="modal-footer">
+						<button class="ccDg2Way1st btn btn-secondary btn-lg btn-block" type="button" data-dismiss="modal">Proceed and discard unsaved changes</button>
+						<button class="ccDg2Way2nd btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">Return and preserve unsaved changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	<div id="ccDgFailERR" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h4 class="modal-title">
-							<span class="dgwarn-unsaved">Unsaved changes pending</span>
+							<span class="dgfail-CER">Bad request (400) error occurred</span>
+							<span class="dgfail-EXE-SER">Internal server error (500) occurred</span>
+							<span class="dgfail-POL-SER">Internal server error (500) occurred</span>
 						</h4>
 						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
 					</div>
 					<div class="modal-body info-txt lead">
 						<p>
-							<span class="dgwarn-unsaved">Do you really want to proceed and discard your unsaved changes?</span>
+							<span class="dgfail-CER">Server sent <i class="creq-info"></i>. Check if chart definition and preferences (if given) are valid.</span>
+							<span class="dgfail-EXE-SER">Server sent <i class="creq-info"></i>. There is not much you can do except try again later.</span>
+							<span class="dgfail-POL-SER">Custom star chart generation or PDF conversion failed for some reason.<span class="applog"> See <a target="_blank">Charta Caeli log file</a> for details.</span><span class="pdferr"> <a target="_blank">Ghostscript PDF converter error log</a> might provide additional hints.</span></span>
 						</p>
 					</div>
 					<div class="modal-footer">
-						<button id="ccDgWarnKey2nd" class="btn btn-secondary btn-lg btn-block" type="button">
-							<span class="dgwarn-unsaved">Proceed and discard unsaved changes</span>
-						</button>
-						<button id="ccDgWarnKey1st" class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">
-							<span class="dgwarn-unsaved">Return and preserve unsaved changes</span>
+						<button class="ccDg1WayKey btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">
+							<span class="dgfail-CER">Got it</span>
+							<span class="dgfail-EXE-SER">Got it</span>
+							<span class="dgfail-POL-SER">Got it</span>
 						</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div id="ccDgFail" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
-			<div class="modal-dialog" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h4 class="modal-title">
-							<span class="dgfail-exec400">Bad request (400) error occurred</span>
-							<span class="dgfail-exec500">Internal server error (500) occurred</span>
-							<span class="dgfail-poll500">Internal server error (500) occurred</span>
-						</h4>
-						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
-					</div>
-					<div class="modal-body info-txt lead">
-						<p>
-							<span class="dgfail-exec400">Server sent <i class="creq-info"></i>. Check if chart definition and preferences (if given) are valid.</span>
-							<span class="dgfail-exec500">Server sent <i class="creq-info"></i>. There is not much you can do except try again later.</span>
-							<span class="dgfail-poll500">Custom star chart generation or PDF conversion failed for some reason.<span class="applog"> See <a target="_blank">Charta Caeli log file</a> for details.</span><span class="pdferr"> <a target="_blank">Ghostscript PDF converter error log</a> might provide additional hints.</span></span>
-						</p>
-					</div>
-					<div class="modal-footer">
-						<button id="ccDgFailKey" class="btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">
-							<span class="dgfail-exec400">OK</span>
-							<span class="dgfail-exec500">OK</span>
-							<span class="dgfail-poll500">OK</span>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 	<!-- end composer -->
 	<!-- begin concepts -->
 	<div id="ccConcepts" class="navbar-offset">

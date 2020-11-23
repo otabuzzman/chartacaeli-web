@@ -1,5 +1,8 @@
 // preferences specification object (prototype of statP9S)
 var prefsS11N = Object.freeze({
+	// mind the D(8N) where P(9S) would seem to make more sense (but actually doesn't)
+	id: "#ccBtnTglD",
+
 	// default preferences definition
 	defdef: "<preferences EXTERNAL_XML_VERSION='1.0'><root type='user'><map/></root></preferences>",
 
@@ -152,7 +155,6 @@ var prefsS11N = Object.freeze({
 			}
 		},
 		onchange: function() {
-			EATab[compThis.stat][Event.CHG]();
 		},
 		validate: function() {
 		}

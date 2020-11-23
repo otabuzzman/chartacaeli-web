@@ -76,7 +76,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 .modal-footer { display: block ; }
 .modal-footer > :not(:first-child) { margin-left: 0 ; }
 #ccComposer .btn-box {  }
-#ccDgInfoWork .text-center { margin-top: 0 ; }
+#ccDgInfoFDB .text-center { margin-top: 0 ; }
 
 /* concepts */
 .pragma-bg-headimg { background-image: url("../starchart.png") ; background-size: contain ; background-repeat: no-repeat ; background-position: left top ; transform: scale(-1, -1) ; min-height: 100vh ; display: flex ; }

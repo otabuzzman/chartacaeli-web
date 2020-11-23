@@ -13,6 +13,9 @@ minimum occurrences (minOcc) are reached.
 
 // chart specification object (prototype of statD8N)
 var chartS11N = Object.freeze({
+	// mind the P(9S) where D(8N) would seem to make more sense (but actually doesn't)
+	id: "#ccBtnTglP",
+
 	// default chart definition
 	defdef: "<ChartaCaeli name='default' xmlns='http://www.chartacaeli.org/model' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.chartacaeli.org/model https://raw.githubusercontent.com/otabuzzman/chartacaeli/master/chartacaeli.xsd'/>",
 
@@ -4416,7 +4419,6 @@ var chartS11N = Object.freeze({
 			}
 		},
 		onchange: function() {
-			EATab[compThis.stat][Event.CHG]();
 		},
 		validate: function() {
 		}
