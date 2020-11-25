@@ -152,6 +152,8 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   vmd62709.chartacaeli.org
   mail.chartacaeli.org
   chartacaeli.org
+  # forwarding domains matching /etc/mail/aliases
+  gmail.com
   ```
   ```
   # configure sendmail
@@ -289,14 +291,34 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   sudo certbot renew --dry-run
   ```
 
-8. VPS reboot
+8. Setup redirection
+  ```
+  # redirect HTTP www.chartacaeli.org
+  sudo vi /etc/apache2/sites-available/chartacaeli.org.conf
+  ```
+  **/etc/apache2/sites-available/chartacaeli.org.conf** - Change line as below.
+  ```
+  RewriteRule ^ https://chartacaeli.org/%{REQUEST_URI} [END,NE,R=permanent]
+  ```
+  ```
+  # redirect HTTPS www.chartacaeli.org
+  sudo vi /etc/apache2/sites-available/chartacaeli.org-le-ssl.conf
+  ```
+  **/etc/apache2/sites-available/chartacaeli.org-le-ssl.conf** - Add lines below.
+  ```
+  RewriteEngine on
+  RewriteCond %{SERVER_NAME} =www.chartacaeli.org
+  RewriteRule ^ https://chartacaeli.org/%{REQUEST_URI} [END,NE,R=permanent]
+  ```
+
+9. VPS reboot
   ```
   sudo reboot
   ```
 
-9. Check secure [http**s**://chartacaeli.org](https://chartacaeli.org) with browser
+10. Check secure [http**s**://chartacaeli.org](https://chartacaeli.org) with browser
 
-10. Consider snapshot
+11. Consider snapshot
 
 ### C. App server setup
 
