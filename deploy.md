@@ -298,7 +298,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   ```
   **/etc/apache2/sites-available/chartacaeli.org.conf** - Change line as below.
   ```
-  RewriteRule ^ https://chartacaeli.org/%{REQUEST_URI} [END,NE,R=permanent]
+  RewriteRule ^ https://chartacaeli.org%{REQUEST_URI} [END,NE,R=permanent]
   ```
   ```
   # redirect HTTPS www.chartacaeli.org
@@ -308,7 +308,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   ```
   RewriteEngine on
   RewriteCond %{SERVER_NAME} =www.chartacaeli.org
-  RewriteRule ^ https://chartacaeli.org/%{REQUEST_URI} [END,NE,R=permanent]
+  RewriteRule ^ https://chartacaeli.org%{REQUEST_URI} [END,NE,R=permanent]
   ```
 
 9. VPS reboot
