@@ -155,6 +155,7 @@ var prefsS11N = Object.freeze({
 			}
 		},
 		onchange: function() {
+			EATab[compThis.stat][Event.CHG]() ;
 		},
 		validate: function() {
 		}

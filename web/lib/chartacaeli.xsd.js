@@ -4419,6 +4419,7 @@ var chartS11N = Object.freeze({
 			}
 		},
 		onchange: function() {
+			EATab[compThis.stat][Event.CHG]() ;
 		},
 		validate: function() {
 		}
