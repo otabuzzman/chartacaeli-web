@@ -97,8 +97,17 @@ else
 endif
 	install -m 0644 ChartDB.sql $<
 
+# deploy
+ifdef linos
+instdep: instwww instweb
+instwww: $(instdir)/www
+	( cd web ; tar cf - --owner=ccaeli --group=ccaeli --exclude=META-INF --exclude=WEB-INF .) | ( cd $< ; tar xf - )
+instweb: $(instdir)/web
+	( cd web ; tar cf - --owner=ccaeli --group=ccaeli META-INF WEB-INF) | ( cd $< ; tar xf - )
+
 clean:
 	rm -f $(PDF) $(PNG) $(GNG)
+endif
 
 # local clean
 lclean: clean

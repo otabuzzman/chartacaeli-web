@@ -230,7 +230,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   sudo useradd -c "Charta Caeli" -d /opt/chartacaeli -m -s /usr/sbin/nologin -g ccaeli ccaeli
   
   # Charta Caeli document root
-  sudo -u ccaeli mkdir /opt/chartacaeli/www
+  sudo -u ccaeli -- mkdir /opt/chartacaeli/www
   ```
 
 4. Setup Virtual Hosts
@@ -504,14 +504,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   # install
   mvn compile
 
-  sudo -u ccaeli -- make install
-
-  # move HTML content to web server
-  sudo -u ccaeli bash -c "
-    cd /opt/chartacaeli/web
-	mv * ../www
-	mv ../www/META-INF .
-	mv ../www/WEB-INF ."
+  sudo -u ccaeli -- make instdep
 
   # setup start scripts
   for script in ccws-db ccws-runner ccws-cleaner ; do
