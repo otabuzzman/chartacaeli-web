@@ -921,7 +921,7 @@
 						<Frame number="310" anchor="middle"/>
 					</AnnotationStraight>
 					<AnnotationStraight reverse="false" radiant="false" anchor="middleleft">
-						<Script purpose="4.0" value="Bright nebluae"/>
+						<Script purpose="4.0" value="Bright nebulae"/>
 						<Frame number="310" anchor="middle"/>
 					</AnnotationStraight>
 					<AnnotationStraight reverse="false" radiant="false" anchor="middleright">
@@ -929,7 +929,7 @@
 						<Frame number="316" anchor="middle"/>
 					</AnnotationStraight>
 					<AnnotationStraight reverse="false" radiant="false" anchor="middleleft">
-						<Script purpose="4.0" value="Dark nebluae"/>
+						<Script purpose="4.0" value="Dark nebulae"/>
 						<Frame number="316" anchor="middle"/>
 					</AnnotationStraight>
 					<AnnotationStraight reverse="false" radiant="false" anchor="middleright">
@@ -937,7 +937,7 @@
 						<Frame number="322" anchor="middle"/>
 					</AnnotationStraight>
 					<AnnotationStraight reverse="false" radiant="false" anchor="middleleft">
-						<Script purpose="4.0" value="Planetary nebluae"/>
+						<Script purpose="4.0" value="Planetary nebulae"/>
 						<Frame number="322" anchor="middle"/>
 					</AnnotationStraight>
 					<AnnotationStraight reverse="false" radiant="false" anchor="middleright">
