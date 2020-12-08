@@ -17,7 +17,7 @@ trap termclnr 1 2 3 6 15
 
 doit() {
 	# lookup chart requests to be deleted
-	creq=$($JAVA -cp $CLASSPATH -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	creq=$($JAVA -cp ${CLASSPATH:-lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "SELECT id, modified, stat FROM charts
 			WHERE stat IN ('finished', 'failed')

@@ -34,7 +34,7 @@ GNG = ccGallery_general-features-selection.png \
 
 .SUFFIXES: .xml .pdf .png
 
-.PHONY: all clean instimg install lclean rclean tidy pdf png gng
+.PHONY: all pdf png gng clean instimg install instdep instwww instweb lclean rclean tidy pdf png gng
 
 vpath %.xml $(docdir)
 vpath %.preferences $(docdir)
@@ -104,10 +104,10 @@ instwww: $(instdir)/www
 	( cd web ; tar cf - --owner=ccaeli --group=ccaeli --exclude=META-INF --exclude=WEB-INF .) | ( cd $< ; tar xf - )
 instweb: $(instdir)/web
 	( cd web ; tar cf - --owner=ccaeli --group=ccaeli META-INF WEB-INF) | ( cd $< ; tar xf - )
+endif
 
 clean:
 	rm -f $(PDF) $(PNG) $(GNG)
-endif
 
 # local clean
 lclean: clean

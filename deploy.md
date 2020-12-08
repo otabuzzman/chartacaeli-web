@@ -464,7 +464,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   # install
   mvn compile
 
-  sudo -u ccaeli -- make install
+  sudo -u ccaeli -- make instdep
   sudo -u ccaeli -- install ~/ARIALUNI.TTF -m 644 /opt/chartacaeli
 
   # setup system prefs
