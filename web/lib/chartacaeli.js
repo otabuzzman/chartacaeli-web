@@ -267,6 +267,7 @@ function eaExeCer(creq) {
 	$('#ccDgFailERR').find('[class ^= dgfail-]').addClass('d-none') ;
 	$('#ccDgFailERR').find('.dgfail-CER').removeClass('d-none') ;
 	$('#ccDgFailERR').modal('toggle') ;
+	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
 	// update FSM
 	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
@@ -353,6 +354,7 @@ function eaExeSer(creq) {
 	$('#ccDgFailERR').find('[class ^= dgfail-]').addClass('d-none') ;
 	$('#ccDgFailERR').find('.dgfail-EXE-SER').removeClass('d-none') ;
 	$('#ccDgFailERR').modal('toggle') ;
+	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
 	// update FSM
 	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
@@ -588,6 +590,7 @@ function eaPolSer(creq) {
 	$('#ccDgFailERR').find('[class ^= dgfail-]').addClass('d-none') ;
 	$('#ccDgFailERR').find('.dgfail-POL-SER').removeClass('d-none') ;
 	$('#ccDgFailERR').modal('toggle') ;
+	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
 	// update FSM
 	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
