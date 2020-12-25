@@ -3107,7 +3107,11 @@ var chartS11N = Object.freeze({
 				}],
 				attributes: {
 					"neg": {
-						asker: Xonomy.askString
+						asker: Xonomy.askPicklist,
+						askerParameter: [
+							{value: "true"},
+							{value: "false"}
+						]
 					},
 					"deg": {
 						asker: Xonomy.askString
@@ -3558,7 +3562,11 @@ var chartS11N = Object.freeze({
 				}],
 				attributes: {
 					"neg": {
-						asker: Xonomy.askString
+						asker: Xonomy.askPicklist,
+						askerParameter: [
+							{value: "true"},
+							{value: "false"}
+						]
 					},
 					"hrs": {
 						asker: Xonomy.askString
