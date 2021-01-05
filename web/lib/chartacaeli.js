@@ -49,10 +49,11 @@ function grabXonomy(id) {
 	var decl, data ;
 	var xonDiv = $(id) ;
 	if (xonDiv.css('display') === 'none') {
-		return null ;
+		data = compThis.open ;
+	} else {
+		data = Xonomy.harvest() ;
 	}
 	decl = compThis.XMLdec ;
-	data = Xonomy.harvest() ;
 	return decl+data ;
 }
 
@@ -766,13 +767,13 @@ function oneventLOD() {
 /* toggle to preferences button */
 function oneventP9S() {
 	$('#ccBtnTglP')
-	.toggleClass('d-md-block')
+	.toggleClass('d-none')
 	.prop('disabled', true) ;
 	$('#ccBtnTglD')
-	.toggleClass('d-md-block')
+	.toggleClass('d-none')
 	.prop('disabled', false) ;
 	/* save current Composer */
-	compThis.open = grabXonomy() ;
+	compThis.open = grabXonomy('#ccXonomy') ;
 	/* toggle runtime state objects */
 	compThis = compP9S ;
 	compExch = compD8N ;
@@ -784,13 +785,13 @@ function oneventP9S() {
 /* toggle to definition button */
 function oneventD8N() {
 	$('#ccBtnTglD')
-	.toggleClass('d-md-block')
+	.toggleClass('d-none')
 	.prop('disabled', true) ;
 	$('#ccBtnTglP')
-	.toggleClass('d-md-block')
+	.toggleClass('d-none')
 	.prop('disabled', false) ;
 	/* save current Composer */
-	compThis.open = grabXonomy() ;
+	compThis.open = grabXonomy('#ccXonomy') ;
 	/* toggle runtime state objects */
 	compThis = compD8N ;
 	compExch = compP9S ;
@@ -805,7 +806,7 @@ function oneventEXE() {
 		EATab[compThis.stat][Event.TMP]() ;
 	}, 30*60*1000) ; /* 30 min */
 	/* issue POST */
-	compThis.open = grabXonomy() ;
+	compThis.open = grabXonomy('#ccXonomy') ;
 	chart = compD8N.open ;
 	prefs = compP9S.open ;
 	exec = $('#ccBtnExec').attr('data-rest-api') ;
