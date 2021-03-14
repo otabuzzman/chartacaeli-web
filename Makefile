@@ -88,12 +88,14 @@ instimg: $(PDF) $(PNG) $(GNG)
 install: $(instdir)
 ifdef winos
 	tar cf - web | ( cd $< ; tar xf - )
+	ln $</web/META-INF/context.xml.winos $</web/META-INF/context.xml
 else
 	tar cf - --owner=ccaeli --group=ccaeli web | ( cd $< ; tar xf - )
 	install -m 0755 ccws-db $<
 	install -m 0755 ccws-runner $<
 	install -m 0755 ccws-cleaner $<
 	install -m 0644 setenv.sh $<
+	ln $</web/META-INF/context.xml.linos $</web/META-INF/context.xml
 endif
 	install -m 0644 ChartDB.sql $<
 
@@ -104,6 +106,7 @@ instwww: $(instdir)/www
 	( cd web ; tar cf - --owner=ccaeli --group=ccaeli --exclude=META-INF --exclude=WEB-INF .) | ( cd $< ; tar xf - )
 instweb: $(instdir)/web
 	( cd web ; tar cf - --owner=ccaeli --group=ccaeli META-INF WEB-INF) | ( cd $< ; tar xf - )
+	ln $</META-INF/context.xml.linos $</META-INF/context.xml
 endif
 
 clean:

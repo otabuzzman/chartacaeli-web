@@ -140,9 +140,7 @@ java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Server \
 
 There are plenty of ways to get Tomcat up and running on Linux and Windows. They differ in TC version, using a tarball or an installer and of course the OS and in case of Linux the derivate in question. Gopher it and ask Google. The [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore) provides a comprehensive description of [Tomcat installation and configuration](https://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) which furthermore provides useful newbie information on setup including a first *Hello World* servlet.
 
-The setup foresees to make the Charta Caeli web service the ROOT application of Tomcat. To achieve this copy `web/META-INF/context.xml` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`.
-
-Update Context element to `<Context docBase="" path="" reloadable="true">` with the value of `docbase` set appropriately, that is `/opt/chartacaeli/web` on Linux and on Windows/ Cygwin dependung of the Windows (!) path you chose for the Cygwin (!) directory `/opt` (`c:\users\<user>\opt\chartacaeli\web` if `c:\users\<user>\opt` mounted at `/opt`).
+The setup foresees to make the Charta Caeli web service the ROOT application of Tomcat. To achieve this copy `web/META-INF/context.xml.linos` or `web/META-INF/context.xml.winos` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`. Update docBase attribute of Context element appropriately (e.g. `/opt/chartacaeli/web` on Linux or `c:\users\<user>\opt\chartacaeli\web` on Windows/ Cygwin if `c:\users\<user>\opt` mounted at `/opt`).
 
 **Notes on Amazon Linux AMI**
 
@@ -172,7 +170,6 @@ chkconfig --list tomcat8
 ```
 
 - Update JAVA_HOME (e.g. `/usr/lib/jvm/java-1.8.0-openjdk`) in `/usr/share/tomcat8/tomcat8.conf`.
-- Remove `~` (tilde) from `~/opt/chartacaeli/web` in `/opt/chartacaeli/web/WEB-INF/web.xml`.
 
 ```bash
 # start Tomcat service

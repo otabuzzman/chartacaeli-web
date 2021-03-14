@@ -7,7 +7,7 @@
 	</context-param>
 	<context-param>
 		<param-name>org.chartacaeli.api.ChartsResource.outputDirectory</param-name>
-		<param-value>~/opt/chartacaeli/db</param-value>
+		<param-value>/opt/chartacaeli/db</param-value>
 	</context-param>
 	<resource-ref>
 		<res-ref-name>jdbc/ChartDB</res-ref-name>

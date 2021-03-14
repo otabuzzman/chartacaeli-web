@@ -454,17 +454,13 @@ public class ChartsResource {
 	}
 
 	private String getOutputDirectroy() {
-		String key, val, dir ;
+		String key, val ;
 
 		key = this.getClass().getName()+CF_OUTDIR ;
 		val = context.getInitParameter( key ) ;
 
-		if ( val.charAt( 0 ) == '~' )
-			dir = System.getProperty( "user.home" )
-			+val.substring( 1 ) ;
-		else
-			dir = val ;
-
-		return dir ;
+		if ( new File( val ).exists() )
+			return val ;
+		return System.getProperty( "user.home" )+val ;
 	}
 }
