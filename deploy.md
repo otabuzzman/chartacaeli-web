@@ -457,7 +457,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
 
   cd ~/lab ; git clone $src ; cd $top
 
-  ( cd org/chartacaeli/caa ; make -j $(nproc) ; make -j $(nproc) all )
+  ( cd org/chartacaeli/caa ; make ; make all )
   make
   make classes
 
@@ -513,7 +513,11 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
     sudo bash -c "echo JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 >>/etc/default/$script"
   done
 
+  # setup app server start configuration
   sudo install -m 644 /opt/chartacaeli/setenv.sh /usr/share/tomcat8/bin
+
+  # setup app server default app
+  sudo install -m 644 /opt/chartacaeli/web/META-INF/context.xml /etc/tomcat8/Catalina/localhost/ROOT.xml
   ```
 
 6. Additional config steps
@@ -528,23 +532,6 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   ErrorDocument 404 /error-404.html
   ```
   ```
-  # config app server
-  sudo vi /opt/chartacaeli/web/META-INF/context.xml
-  ```
- **/opt/chartacaeli/web/META-INF/context.xml** - Change relevant line as below.
-  ```
-  <Context docBase="/opt/chartacaeli/web" path="" reloadable="true">
-  ```
-  ```
-  sudo install -m 644 /opt/chartacaeli/web/META-INF/context.xml /etc/tomcat8/Catalina/localhost/ROOT.xml
-
-  sudo vi /opt/chartacaeli/web/WEB-INF/web.xml
-  ```
- **/opt/chartacaeli/web/WEB-INF/web.xml** - Change relevant line as below.
-  ```
-  <param-value>/opt/chartacaeli/db</param-value>
-  ```
-  ```
   # config CC and TC accounts
   sudo usermod -a -G ccaeli tomcat8
   sudo usermod -a -G tomcat8 ccaeli
@@ -552,7 +539,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   # init DB
   sudo -u ccaeli -- mkdir -m 0775 ${BASDIR:=/opt/chartacaeli/db}
 
-  sudo -u ccaeli -- bash -c "cd /opt/chartacaeli
+  sudo -u ccaeli -- bash -c "
     java -cp web/WEB-INF/lib/h2-1.4.199.jar -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
     -url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
     -sql \"RUNSCRIPT FROM 'ChartDB.sql'\""
