@@ -332,6 +332,12 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   sudo apt --yes install tomcat8
   ```
 
+3. Setup application root
+  ```
+  # Charta Caeli application root
+  sudo -u ccaeli -- mkdir /opt/chartacaeli/web
+  ```
+
 2. Install AJP
   ```
   sudo apt --yes install libapache2-mod-jk
