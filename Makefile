@@ -86,11 +86,10 @@ instimg: $(PDF) $(PNG) $(GNG)
 	( for img in $^ ; do install $$img $(docdir) ; done )
 
 install: $(instdir)
-ifdef winos
 	tar cf - web | ( cd $< ; tar xf - )
+ifdef winos
 	ln $</web/META-INF/context.xml.winos $</web/META-INF/context.xml
 else
-	tar cf - --owner=ccaeli --group=ccaeli web | ( cd $< ; tar xf - )
 	install -m 0755 ccws-db $<
 	install -m 0755 ccws-runner $<
 	install -m 0755 ccws-cleaner $<
