@@ -1,3 +1,6 @@
+# eclipse
+.settings/
+# artefacts
 /generated-sources
 /maven-status
 /artistic-star-chart.pdf

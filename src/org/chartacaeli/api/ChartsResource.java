@@ -400,7 +400,6 @@ public class ChartsResource {
 	}
 
 	private CompositeResult validateP9S( final String prefs ) {
-
 		if ( prefs == null )
 			return new FailureResult( MessageCatalog.getMessage( this, MK_EP9SINV, null ) ) ;
 
