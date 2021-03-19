@@ -46,15 +46,12 @@ function loadXonomy(id) {
 	Xonomy.render(compThis.open, xonDiv[0], compThis.Xonomy) ;
 }
 function grabXonomy(id) {
-	var decl, data ;
 	var xonDiv = $(id) ;
 	if (xonDiv.css('display') === 'none') {
-		data = compThis.open ;
+		return compThis.open ;
 	} else {
-		data = Xonomy.harvest() ;
+		return compThis.XMLdec+Xonomy.harvest() ;
 	}
-	decl = compThis.XMLdec ;
-	return decl+data ;
 }
 
 /* chart generation cancel timeout handler */
