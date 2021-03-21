@@ -80,7 +80,7 @@ const EATab = Object.freeze([
 	/* Chg */  [eaReject, eaChgChi, eaChgChg, eaReject, eaChgExe, eaChgLod, eaChgNew, eaChgOpn, eaReject, eaReject, eaChgTgd, eaChgTgp, eaReject, eaReject, eaReject],
 	/* Emp */  [eaReject, eaEmpChi, eaEmpChg, eaReject, eaReject, eaEmpLod, eaReject, eaEmpOpn, eaReject, eaReject, eaEmpTgd, eaEmpTgp, eaReject, eaReject, eaReject],
 	/* Exe */  [eaExeCer, eaExeChi, eaReject, eaReject, eaReject, eaExeLod, eaReject, eaReject, eaExePcd, eaExeSer, eaReject, eaReject, eaExeTmf, eaReject, eaExeTmu],
-	/* Fin */  [eaReject, eaReject, eaFinChg, eaReject, eaReject, eaFinLod, eaFinNew, eaFinOpn, eaFinPcd, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
+	/* Fin */  [eaReject, eaReject, eaFinChg, eaReject, eaReject, eaFinLod, eaFinNew, eaFinOpn, eaFinPcd, eaReject, eaFinTgd, eaFinTgp, eaReject, eaReject, eaReject],
 	/* Opn */  [eaReject, eaOpnChi, eaOpnChg, eaReject, eaOpnExe, eaOpnLod, eaOpnNew, eaOpnOpn, eaReject, eaReject, eaOpnTgd, eaOpnTgp, eaReject, eaReject, eaReject],
 	/* Pol */  [eaReject, eaPolChi, eaReject, eaReject, eaReject, eaPolLod, eaReject, eaReject, eaPolPcd, eaPolSer, eaReject, eaReject, eaPolTmf, eaPolTmp, eaPolTmu],
 	/* Usv */  [eaReject, eaReject, eaReject, eaUsvCnc, eaReject, eaUsvLod, eaUsvNew, eaUsvOpn, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
@@ -220,7 +220,7 @@ function eaEmpOpn() {
 	$('#ccInpOpen').data('Hstate', State.EMP) ;
 	$('#ccInpOpen').data('Hevent', Event.OPN) ;
 	// specific actions
-	$('#ccInpOpen').focus().trigger('click')
+	$('#ccInpOpen').trigger('click')
 	// update FSM
 	compThis.stat = State.FIN ;
 	SBTab[compThis.stat]() ;
@@ -390,17 +390,23 @@ function eaExeTmu() {
 	// trace FSM
 	console.log("EXE-TMU-"+stateName[compThis.stat]) ;
 }
-function eaFinChg() { // hack to unstuck from State.FIN after click on button cancel of file picker dialog
+function eaFinChg() { // hack to get away from State.FIN after cancel in file picker dialog
 	EATab[$('#ccInpOpen').data('Hstate')][Event.CHG]()
 }
-function eaFinLod() { // hack to unstuck from State.FIN after click on button cancel of file picker dialog
+function eaFinLod() { // hack to get away from State.FIN after cancel in file picker dialog
 	EATab[$('#ccInpOpen').data('Hstate')][Event.LOD]()
 }
-function eaFinNew() { // hack to unstuck from State.FIN after click on button cancel of file picker dialog
+function eaFinNew() { // hack to get away from State.FIN after cancel in file picker dialog
 	EATab[$('#ccInpOpen').data('Hstate')][Event.NEW]()
 }
-function eaFinOpn() { // hack to unstuck from State.FIN after click on button cancel of file picker dialog
+function eaFinOpn() { // hack to get away from State.FIN after cancel in file picker dialog
 	EATab[$('#ccInpOpen').data('Hstate')][Event.OPN]()
+}
+function eaFinTgd() { // hack to get away from State.FIN after cancel in file picker dialog
+	EATab[$('#ccInpOpen').data('Hstate')][Event.TGD]()
+}
+function eaFinTgp() { // hack to get away from State.FIN after cancel in file picker dialog
+	EATab[$('#ccInpOpen').data('Hstate')][Event.TGP]()
 }
 function eaFinPcd(e) {
 	// save state and event
@@ -478,7 +484,7 @@ function eaOpnOpn() {
 	$('#ccInpOpen').data('Hstate', State.OPN) ;
 	$('#ccInpOpen').data('Hevent', Event.OPN) ;
 	// specific actions
-	$('#ccInpOpen').focus().trigger('click')
+	$('#ccInpOpen').trigger('click')
 	// update FSM
 	compThis.stat = State.FIN ;
 	SBTab[compThis.stat]() ;
@@ -675,7 +681,7 @@ function eaUsvOpn() {
 	$('#ccInpOpen').data('Hstate', $('#ccDgWarnUSV').data('Hstate')) ;
 	$('#ccInpOpen').data('Hevent', $('#ccDgWarnUSV').data('Hevent')) ;
 	// specific actions
-	$('#ccInpOpen').focus().trigger('click')
+	$('#ccInpOpen').trigger('click')
 	// update FSM
 	compThis.stat = State.FIN ;
 	SBTab[compThis.stat]() ;
