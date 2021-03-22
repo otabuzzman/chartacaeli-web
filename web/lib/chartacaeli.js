@@ -80,7 +80,7 @@ const EATab = Object.freeze([
 	/* Chg */  [eaReject, eaChgChi, eaChgChg, eaReject, eaChgExe, eaChgLod, eaChgNew, eaChgOpn, eaReject, eaReject, eaChgTgd, eaChgTgp, eaReject, eaReject, eaReject],
 	/* Emp */  [eaReject, eaEmpChi, eaEmpChg, eaReject, eaReject, eaEmpLod, eaReject, eaEmpOpn, eaReject, eaReject, eaEmpTgd, eaEmpTgp, eaReject, eaReject, eaReject],
 	/* Exe */  [eaExeCer, eaExeChi, eaReject, eaReject, eaReject, eaExeLod, eaReject, eaReject, eaExePcd, eaExeSer, eaReject, eaReject, eaExeTmf, eaReject, eaExeTmu],
-	/* Fin */  [eaReject, eaReject, eaFinChg, eaReject, eaReject, eaFinLod, eaFinNew, eaFinOpn, eaFinPcd, eaReject, eaFinTgd, eaFinTgp, eaReject, eaReject, eaReject],
+	/* Fin */  [eaReject, eaReject, eaFinChg, eaReject, eaFinExe, eaFinLod, eaFinNew, eaFinOpn, eaFinPcd, eaReject, eaFinTgd, eaFinTgp, eaReject, eaReject, eaReject],
 	/* Opn */  [eaReject, eaOpnChi, eaOpnChg, eaReject, eaOpnExe, eaOpnLod, eaOpnNew, eaOpnOpn, eaReject, eaReject, eaOpnTgd, eaOpnTgp, eaReject, eaReject, eaReject],
 	/* Pol */  [eaReject, eaPolChi, eaReject, eaReject, eaReject, eaPolLod, eaReject, eaReject, eaPolPcd, eaPolSer, eaReject, eaReject, eaPolTmf, eaPolTmp, eaPolTmu],
 	/* Usv */  [eaReject, eaReject, eaReject, eaUsvCnc, eaReject, eaUsvLod, eaUsvNew, eaUsvOpn, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
@@ -392,6 +392,9 @@ function eaExeTmu() {
 }
 function eaFinChg() { // hack to get away from State.FIN after cancel in file picker dialog
 	EATab[$('#ccInpOpen').data('Hstate')][Event.CHG]()
+}
+function eaFinExe() { // hack to get away from State.FIN after cancel in file picker dialog
+	EATab[$('#ccInpOpen').data('Hstate')][Event.EXE]()
 }
 function eaFinLod() { // hack to get away from State.FIN after cancel in file picker dialog
 	EATab[$('#ccInpOpen').data('Hstate')][Event.LOD]()
@@ -862,7 +865,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	document.querySelector('#ccBtnNew').addEventListener('click', function () {EATab[compThis.stat][Event.NEW]()}) ;
 	document.querySelector('#ccBtnOpen').addEventListener('click', function () {EATab[compThis.stat][Event.OPN]()}) ;
 	/* make input element fire on change event even if same file picked (SO #12030686) */
-	document.querySelector('#ccInpOpen').addEventListener('click', function () {this.value = null}) ;
+	document.querySelector('#ccInpOpen').addEventListener('click', function (e) {e.stopPropagation() ; this.value = null}) ;
 	document.querySelector('#ccInpOpen').addEventListener('change', function () {var file = new FileReader() ; file.onload = function (e) {EATab[compThis.stat][Event.PCD](e)} ; file.readAsText(this.files[0])}) ;
 	document.querySelector('#ccXonomy').addEventListener('click', function () {EATab[compThis.stat][Event.CHI]()}) ;
 	document.querySelector('#ccBtnExec').addEventListener('click', function () {EATab[compThis.stat][Event.EXE]()}) ;
