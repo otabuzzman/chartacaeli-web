@@ -73,33 +73,22 @@ const stateName = Object.freeze(["CHG", "EMP", "EXE", "FIN", "OPN", "POL", "USV"
 const State = Object.freeze({CHG: 0, EMP: 1, EXE: 2, FIN: 3, OPN: 4, POL: 5, USV: 6}) ;
 /* event enumeration names and values */
 const eventName = Object.freeze(["CER", "CHG", "CNC", "EXE", "LOD", "NEW", "OPN", "PCD", "SER", "TGD", "TGP", "TMF", "TMP", "TMU"]) ;
-const Event = Object.freeze({CER: 0, CHI: 1, CHG: 2, CNC: 3, EXE: 4, LOD: 5, NEW: 6, OPN: 7, PCD: 8, SER: 9, TGD: 10, TGP: 11, TMF: 12, TMP: 13, TMU: 14}) ;
+const Event = Object.freeze({CER: 0, CHG: 1, CNC: 2, EXE: 3, LOD: 4, NEW: 5, OPN: 6, PCD: 7, SER: 8, TGD: 9, TGP: 10, TMF: 11, TMP: 12, TMU: 13}) ;
 /* event/ activity table */
 const EATab = Object.freeze([
-	/* S/ E     Cer       Chi       Chg       Cnc       Exe       Lod       New       Opn       Pcd       Ser       Tgd       Tgp       Tmf       Tmp       Tmu     */
-	/* Chg */  [eaReject, eaChgChi, eaChgChg, eaReject, eaChgExe, eaChgLod, eaChgNew, eaChgOpn, eaReject, eaReject, eaChgTgd, eaChgTgp, eaReject, eaReject, eaReject],
-	/* Emp */  [eaReject, eaEmpChi, eaEmpChg, eaReject, eaReject, eaEmpLod, eaReject, eaEmpOpn, eaReject, eaReject, eaEmpTgd, eaEmpTgp, eaReject, eaReject, eaReject],
-	/* Exe */  [eaExeCer, eaExeChi, eaReject, eaReject, eaReject, eaExeLod, eaReject, eaReject, eaExePcd, eaExeSer, eaReject, eaReject, eaExeTmf, eaReject, eaExeTmu],
-	/* Fin */  [eaReject, eaReject, eaFinChg, eaReject, eaFinExe, eaFinLod, eaFinNew, eaFinOpn, eaFinPcd, eaReject, eaFinTgd, eaFinTgp, eaReject, eaReject, eaReject],
-	/* Opn */  [eaReject, eaOpnChi, eaOpnChg, eaReject, eaOpnExe, eaOpnLod, eaOpnNew, eaOpnOpn, eaReject, eaReject, eaOpnTgd, eaOpnTgp, eaReject, eaReject, eaReject],
-	/* Pol */  [eaReject, eaPolChi, eaReject, eaReject, eaReject, eaPolLod, eaReject, eaReject, eaPolPcd, eaPolSer, eaReject, eaReject, eaPolTmf, eaPolTmp, eaPolTmu],
-	/* Usv */  [eaReject, eaReject, eaReject, eaUsvCnc, eaReject, eaUsvLod, eaUsvNew, eaUsvOpn, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
+	/* S/ E     Cer       Chg       Cnc       Exe       Lod       New       Opn       Pcd       Ser       Tgd       Tgp       Tmf       Tmp       Tmu     */
+	/* Chg */  [eaReject, eaChgChg, eaReject, eaChgExe, eaChgLod, eaChgNew, eaChgOpn, eaReject, eaReject, eaChgTgd, eaChgTgp, eaReject, eaReject, eaReject],
+	/* Emp */  [eaReject, eaEmpChg, eaReject, eaReject, eaEmpLod, eaReject, eaEmpOpn, eaReject, eaReject, eaEmpTgd, eaEmpTgp, eaReject, eaReject, eaReject],
+	/* Exe */  [eaExeCer, eaExeChg, eaReject, eaReject, eaExeLod, eaReject, eaReject, eaExePcd, eaExeSer, eaReject, eaReject, eaExeTmf, eaReject, eaExeTmu],
+	/* Fin */  [eaReject, eaFinChg, eaReject, eaFinExe, eaFinLod, eaFinNew, eaFinOpn, eaFinPcd, eaReject, eaFinTgd, eaFinTgp, eaReject, eaReject, eaReject],
+	/* Opn */  [eaReject, eaOpnChg, eaReject, eaOpnExe, eaOpnLod, eaOpnNew, eaOpnOpn, eaReject, eaReject, eaOpnTgd, eaOpnTgp, eaReject, eaReject, eaReject],
+	/* Pol */  [eaReject, eaPolChg, eaReject, eaReject, eaPolLod, eaReject, eaReject, eaPolPcd, eaPolSer, eaReject, eaReject, eaPolTmf, eaPolTmp, eaPolTmu],
+	/* Usv */  [eaReject, eaReject, eaUsvCnc, eaReject, eaUsvLod, eaUsvNew, eaUsvOpn, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
 	]) ;
 
 /* event activities */
 function eaReject() {
 	console.log("FSM rejected") ;
-}
-function eaChgChi() {
-	// save state and event
-	compThis.Hstate = State.CHG ;
-	compThis.Hevent = Event.CHI ;
-	// specific actions
-	// update FSM
-	compThis.stat = State.CHG ;
-	SBTab[compThis.stat]() ;
-	// trace FSM
-	console.log("CHG-CHI-"+stateName[compThis.stat]) ;
 }
 function eaChgChg() {
 	// save state and event
@@ -183,17 +172,6 @@ function eaChgTgp() {
 	// trace FSM
 	console.log("CHG-TGP-"+stateName[compThis.stat]) ;
 }
-function eaEmpChi() {
-	// save state and event
-	compThis.Hstate = State.EMP ;
-	compThis.Hevent = Event.CHI ;
-	// specific actions
-	// update FSM
-	compThis.stat = State.EMP ;
-	SBTab[compThis.stat]() ;
-	// trace FSM
-	console.log("EMP-CHI-"+stateName[compThis.stat]) ;
-}
 function eaEmpChg() {
 	// save state and event
 	compThis.Hstate = State.EMP ;
@@ -272,17 +250,17 @@ function eaExeCer(creq) {
 	// trace FSM
 	console.log("EXE-CER-"+stateName[compThis.stat]) ;
 }
-function eaExeChi() {
+function eaExeChg() {
 	// save state and event
 	compThis.Hstate = State.EXE ;
-	compThis.Hevent = Event.CHI ;
+	compThis.Hevent = Event.CHG ;
 	// specific actions
 	$('#ccDgWarnDIS').modal('toggle') ;
 	// update FSM
 	compThis.stat = State.EXE ;
 	SBTab[compThis.stat]() ;
 	// trace FSM
-	console.log("EXE-CHI-"+stateName[compThis.stat]) ;
+	console.log("EXE-CHG-"+stateName[compThis.stat]) ;
 }
 function eaExeLod() {
 	// save state and event
@@ -425,17 +403,6 @@ function eaFinPcd(e) {
 	// trace FSM
 	console.log("FIN-PCD-"+stateName[compThis.stat]) ;
 }
-function eaOpnChi() {
-	// save state and event
-	compThis.Hstate = State.OPN ;
-	compThis.Hevent = Event.CHI ;
-	// specific actions
-	// update FSM
-	compThis.stat = State.OPN ;
-	SBTab[compThis.stat]() ;
-	// trace FSM
-	console.log("OPN-CHI-"+stateName[compThis.stat]) ;
-}
 function eaOpnChg() {
 	// save state and event
 	compThis.Hstate = State.OPN ;
@@ -516,17 +483,17 @@ function eaOpnTgp() {
 	// trace FSM
 	console.log("OPN-TGP-"+stateName[compThis.stat]) ;
 }
-function eaPolChi() {
+function eaPolChg() {
 	// save state and event
 	compThis.Hstate = State.POL ;
-	compThis.Hevent = Event.CHI ;
+	compThis.Hevent = Event.CHG ;
 	// specific actions
 	$('#ccDgWarnDIS').modal('toggle') ;
 	// update FSM
 	compThis.stat = State.POL ;
 	SBTab[compThis.stat]() ;
 	// trace FSM
-	console.log("POL-CHI-"+stateName[compThis.stat]) ;
+	console.log("POL-CHG-"+stateName[compThis.stat]) ;
 }
 function eaPolLod() {
 	// save state and event
@@ -809,7 +776,7 @@ function oneventD8N() {
 function oneventEXE() {
 	var exec, chart, prefs ;
 	hdExecCanc = setTimeout(function () {
-		EATab[compThis.stat][Event.TMP]() ;
+		EATab[compThis.stat][Event.TMU]() ;
 	}, 30*60*1000) ; /* 30 min */
 	/* issue POST */
 	compThis.open = grabXonomy('#ccXonomy') ;
@@ -867,7 +834,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	/* make input element fire on change event even if same file picked (SO #12030686) */
 	document.querySelector('#ccInpOpen').addEventListener('click', function (e) {e.stopPropagation() ; this.value = null}) ;
 	document.querySelector('#ccInpOpen').addEventListener('change', function () {var file = new FileReader() ; file.onload = function (e) {EATab[compThis.stat][Event.PCD](e)} ; file.readAsText(this.files[0])}) ;
-	document.querySelector('#ccXonomy').addEventListener('click', function () {EATab[compThis.stat][Event.CHI]()}) ;
+	document.querySelector('#ccXonomy').addEventListener('click', function () {EATab[compThis.stat][Event.CHG]()}) ;
 	document.querySelector('#ccBtnExec').addEventListener('click', function () {EATab[compThis.stat][Event.EXE]()}) ;
 	document.querySelector('#ccDgInfoRDY .ccDg1WayKey').addEventListener('click', function () {$('#ccDgInfoRDY').modal('toggle')}) ;
 	document.querySelector('#ccDgWarnUSV .ccDg2Way1st').addEventListener('click', function () {EATab[compThis.stat][$('#ccDgWarnUSV').data('Hevent')]()}) ;
