@@ -76,14 +76,14 @@ const eventName = Object.freeze(["CER", "CHG", "CNC", "EXE", "LOD", "NEW", "OPN"
 const Event = Object.freeze({CER: 0, CHG: 1, CNC: 2, EXE: 3, LOD: 4, NEW: 5, OPN: 6, PCD: 7, SER: 8, TGD: 9, TGP: 10, TMF: 11, TMP: 12, TMU: 13}) ;
 /* event/ activity table */
 const EATab = Object.freeze([
-	/* S/ E     Cer       Chg       Cnc       Exe       Lod       New       Opn       Pcd       Ser       Tgd       Tgp       Tmf       Tmp       Tmu     */
-	/* Chg */  [eaReject, eaChgChg, eaReject, eaChgExe, eaChgLod, eaChgNew, eaChgOpn, eaReject, eaReject, eaChgTgd, eaChgTgp, eaReject, eaReject, eaReject],
-	/* Emp */  [eaReject, eaEmpChg, eaReject, eaReject, eaEmpLod, eaReject, eaEmpOpn, eaReject, eaReject, eaEmpTgd, eaEmpTgp, eaReject, eaReject, eaReject],
-	/* Exe */  [eaExeCer, eaExeChg, eaReject, eaReject, eaExeLod, eaReject, eaReject, eaExePcd, eaExeSer, eaReject, eaReject, eaExeTmf, eaReject, eaExeTmu],
-	/* Fin */  [eaReject, eaFinChg, eaReject, eaFinExe, eaFinLod, eaFinNew, eaFinOpn, eaFinPcd, eaReject, eaFinTgd, eaFinTgp, eaReject, eaReject, eaReject],
-	/* Opn */  [eaReject, eaOpnChg, eaReject, eaOpnExe, eaOpnLod, eaOpnNew, eaOpnOpn, eaReject, eaReject, eaOpnTgd, eaOpnTgp, eaReject, eaReject, eaReject],
-	/* Pol */  [eaReject, eaPolChg, eaReject, eaReject, eaPolLod, eaReject, eaReject, eaPolPcd, eaPolSer, eaReject, eaReject, eaPolTmf, eaPolTmp, eaPolTmu],
-	/* Usv */  [eaReject, eaReject, eaUsvCnc, eaReject, eaUsvLod, eaUsvNew, eaUsvOpn, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
+	/* S/ E    Cer       Chg       Cnc       Exe       Lod       New       Opn       Pcd       Ser       Tgd       Tgp       Tmf       Tmp       Tmu     */
+	/* Chg */ [eaReject, eaChgChg, eaReject, eaChgExe, eaChgLod, eaChgNew, eaChgOpn, eaReject, eaReject, eaChgTgd, eaChgTgp, eaReject, eaReject, eaReject],
+	/* Emp */ [eaReject, eaEmpChg, eaReject, eaReject, eaEmpLod, eaReject, eaEmpOpn, eaReject, eaReject, eaEmpTgd, eaEmpTgp, eaReject, eaReject, eaReject],
+	/* Exe */ [eaExeCer, eaExeChg, eaReject, eaReject, eaExeLod, eaReject, eaReject, eaExePcd, eaExeSer, eaReject, eaReject, eaExeTmf, eaReject, eaExeTmu],
+	/* Fin */ [eaReject, eaFinChg, eaReject, eaFinExe, eaFinLod, eaFinNew, eaFinOpn, eaFinPcd, eaReject, eaFinTgd, eaFinTgp, eaReject, eaReject, eaReject],
+	/* Opn */ [eaReject, eaOpnChg, eaReject, eaOpnExe, eaOpnLod, eaOpnNew, eaOpnOpn, eaReject, eaReject, eaOpnTgd, eaOpnTgp, eaReject, eaReject, eaReject],
+	/* Pol */ [eaReject, eaPolChg, eaReject, eaReject, eaPolLod, eaReject, eaReject, eaPolPcd, eaPolSer, eaReject, eaReject, eaPolTmf, eaPolTmp, eaPolTmu],
+	/* Usv */ [eaReject, eaReject, eaUsvCnc, eaReject, eaUsvLod, eaUsvNew, eaUsvOpn, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
 	]) ;
 
 /* event activities */
@@ -116,8 +116,8 @@ function eaChgExe() {
 }
 function eaChgLod() {
 	// save state and event
-	$('#ccDgWarnUSV').data('Hstate', State.CHG) ;
-	$('#ccDgWarnUSV').data('Hevent', Event.LOD) ;
+	compThis.Hstate = State.CHG ;
+	compThis.Hevent = Event.LOD ;
 	// specific actions
 	$('#ccDgWarnUSV').modal('toggle') ;
 	// update FSM
@@ -128,8 +128,8 @@ function eaChgLod() {
 }
 function eaChgNew() {
 	// save state and event
-	$('#ccDgWarnUSV').data('Hstate', State.CHG) ;
-	$('#ccDgWarnUSV').data('Hevent', Event.NEW) ;
+	compThis.Hstate = State.CHG ;
+	compThis.Hevent = Event.NEW ;
 	// specific actions
 	$('#ccDgWarnUSV').modal('toggle') ;
 	// update FSM
@@ -140,8 +140,8 @@ function eaChgNew() {
 }
 function eaChgOpn() {
 	// save state and event
-	$('#ccDgWarnUSV').data('Hstate', State.CHG) ;
-	$('#ccDgWarnUSV').data('Hevent', Event.OPN) ;
+	compThis.Hstate = State.CHG ;
+	compThis.Hevent = Event.OPN ;
 	// specific actions
 	$('#ccDgWarnUSV').modal('toggle') ;
 	// update FSM
@@ -195,8 +195,8 @@ function eaEmpLod() {
 }
 function eaEmpOpn() {
 	// save state and event
-	$('#ccInpOpen').data('Hstate', State.EMP) ;
-	$('#ccInpOpen').data('Hevent', Event.OPN) ;
+	compThis.Hstate = State.EMP ;
+	compThis.Hevent = Event.OPN ;
 	// specific actions
 	$('#ccInpOpen').trigger('click')
 	// update FSM
@@ -368,26 +368,33 @@ function eaExeTmu() {
 	// trace FSM
 	console.log("EXE-TMU-"+stateName[compThis.stat]) ;
 }
-function eaFinChg() { // hack to get away from State.FIN after cancel in file picker dialog
-	EATab[$('#ccInpOpen').data('Hstate')][Event.CHG]()
+function eaFinChg() {
+	// history state considered actual after blind cancel event
+	EATab[compThis.Hstate][Event.CHG]()
 }
-function eaFinExe() { // hack to get away from State.FIN after cancel in file picker dialog
-	EATab[$('#ccInpOpen').data('Hstate')][Event.EXE]()
+function eaFinExe() {
+	// history state considered actual after blind cancel event
+	EATab[compThis.Hstate][Event.EXE]()
 }
-function eaFinLod() { // hack to get away from State.FIN after cancel in file picker dialog
-	EATab[$('#ccInpOpen').data('Hstate')][Event.LOD]()
+function eaFinLod() {
+	// history state considered actual after blind cancel event
+	EATab[compThis.Hstate][Event.LOD]()
 }
-function eaFinNew() { // hack to get away from State.FIN after cancel in file picker dialog
-	EATab[$('#ccInpOpen').data('Hstate')][Event.NEW]()
+function eaFinNew() {
+	// history state considered actual after blind cancel event
+	EATab[compThis.Hstate][Event.NEW]()
 }
-function eaFinOpn() { // hack to get away from State.FIN after cancel in file picker dialog
-	EATab[$('#ccInpOpen').data('Hstate')][Event.OPN]()
+function eaFinOpn() {
+	// history state considered actual after blind cancel event
+	EATab[compThis.Hstate][Event.OPN]()
 }
-function eaFinTgd() { // hack to get away from State.FIN after cancel in file picker dialog
-	EATab[$('#ccInpOpen').data('Hstate')][Event.TGD]()
+function eaFinTgd() {
+	// history state considered actual after blind cancel event
+	EATab[compThis.Hstate][Event.TGD]()
 }
-function eaFinTgp() { // hack to get away from State.FIN after cancel in file picker dialog
-	EATab[$('#ccInpOpen').data('Hstate')][Event.TGP]()
+function eaFinTgp() {
+	// history state considered actual after blind cancel event
+	EATab[compThis.Hstate][Event.TGP]()
 }
 function eaFinPcd(e) {
 	// save state and event
@@ -451,8 +458,8 @@ function eaOpnNew() {
 }
 function eaOpnOpn() {
 	// save state and event
-	$('#ccInpOpen').data('Hstate', State.OPN) ;
-	$('#ccInpOpen').data('Hevent', Event.OPN) ;
+	compThis.Hstate = State.OPN ;
+	compThis.Hevent = Event.OPN ;
 	// specific actions
 	$('#ccInpOpen').trigger('click')
 	// update FSM
@@ -648,8 +655,8 @@ function eaUsvNew() {
 }
 function eaUsvOpn() {
 	// save state and event
-	$('#ccInpOpen').data('Hstate', $('#ccDgWarnUSV').data('Hstate')) ;
-	$('#ccInpOpen').data('Hevent', $('#ccDgWarnUSV').data('Hevent')) ;
+	compThis.Hstate = State.USV ;
+	compThis.Hevent = Event.OPN ;
 	// specific actions
 	$('#ccInpOpen').trigger('click')
 	// update FSM
@@ -837,7 +844,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	document.querySelector('#ccXonomy').addEventListener('click', function () {EATab[compThis.stat][Event.CHG]()}) ;
 	document.querySelector('#ccBtnExec').addEventListener('click', function () {EATab[compThis.stat][Event.EXE]()}) ;
 	document.querySelector('#ccDgInfoRDY .ccDg1WayKey').addEventListener('click', function () {$('#ccDgInfoRDY').modal('toggle')}) ;
-	document.querySelector('#ccDgWarnUSV .ccDg2Way1st').addEventListener('click', function () {EATab[compThis.stat][$('#ccDgWarnUSV').data('Hevent')]()}) ;
+	document.querySelector('#ccDgWarnUSV .ccDg2Way1st').addEventListener('click', function () {EATab[compThis.stat][compThis.Hevent]()}) ;
 	document.querySelector('#ccDgWarnUSV .ccDg2Way2nd').addEventListener('click', function () {EATab[compThis.stat][Event.CNC]()}) ;
 }) ;
 
