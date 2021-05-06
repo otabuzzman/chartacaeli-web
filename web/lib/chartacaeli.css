@@ -62,6 +62,8 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 #ccComposer .ruler-sep { margin-top: 2.25rem ; }
 #ccComposer .text-center { margin-top: 1.5rem ; }
 #ccBtnExec { max-height: 49px ; }
+#ccBtnExec [class ^= spinner-] { visibility: hidden ; }
+#ccBtnExec [class ^= spinner-] [class ^= ccwf-] { visibility: visible ; }
 #ccBtnExec .ccwf-brandicon::before { font-size: 34px ; }
 #ccBtnExec:hover .ccwf-brandicon::before { color: #ffffff ; }
 #ccBtnExec:disabled .ccwf-brandicon::before { color: #007bff ; }
@@ -77,6 +79,8 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 .modal-footer > :not(:first-child) { margin-left: 0 ; }
 #ccComposer .btn-box {  }
 #ccDgInfoFDB .text-center { margin-top: 0 ; }
+#ccDgWaitOPN [class ^= spinner-] { visibility: hidden ; }
+#ccDgWaitOPN [class ^= spinner-] [class ^= ccwf-] { visibility: visible ; font-size: 2rem ; }
 
 /* concepts */
 .pragma-bg-headimg { background-image: url("../starchart.png") ; background-size: contain ; background-repeat: no-repeat ; background-position: left top ; transform: scale(-1, -1) ; min-height: 100vh ; display: flex ; }

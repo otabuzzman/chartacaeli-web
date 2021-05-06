@@ -108,7 +108,7 @@ function eaChgExe() {
 	$('#ccBtnExec').data('Hevent', Event.EXE) ;
 	// specific actions
 	oneventEXE() ;
-	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	$('#ccBtnExec').find('span').toggleClass('d-none') ;
 	// update FSM
 	compThis.stat = State.EXE ;
 	SBTab[compThis.stat]() ;
@@ -197,6 +197,8 @@ function eaEmpLod() {
 			$('#ccDgWaitOPN').off('shown.bs.modal') ;
 			oneventLOD() ;
 		}) ;
+		$('#ccDgWaitOPN').find('[class ^= dgwait-]').addClass('d-none') ;
+		$('#ccDgWaitOPN').find('.dgwait-LOD').removeClass('d-none') ;
 		$('#ccDgWaitOPN').modal('toggle') ;
 		compThis.stat = State.LOD ;
 	}
@@ -255,7 +257,7 @@ function eaExeCer(creq) {
 	$('#ccDgFailERR').find('[class ^= dgfail-]').addClass('d-none') ;
 	$('#ccDgFailERR').find('.dgfail-CER').removeClass('d-none') ;
 	$('#ccDgFailERR').modal('toggle') ;
-	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	$('#ccBtnExec').find('span').toggleClass('d-none') ;
 	// update FSM
 	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
@@ -342,7 +344,7 @@ function eaExeSer(creq) {
 	$('#ccDgFailERR').find('[class ^= dgfail-]').addClass('d-none') ;
 	$('#ccDgFailERR').find('.dgfail-EXE-SER').removeClass('d-none') ;
 	$('#ccDgFailERR').modal('toggle') ;
-	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	$('#ccBtnExec').find('span').toggleClass('d-none') ;
 	// update FSM
 	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
@@ -414,6 +416,8 @@ function eaFinPcd(name) {
 		} ; 
 		file.readAsText(name) ;
 	}) ;
+	$('#ccDgWaitOPN').find('[class ^= dgwait-]').addClass('d-none') ;
+	$('#ccDgWaitOPN').find('.dgwait-OPN').removeClass('d-none') ;
 	$('#ccDgWaitOPN').modal('toggle') ;
 	// update FSM
 	compThis.stat = State.LOD ;
@@ -460,7 +464,7 @@ function eaOpnExe() {
 	$('#ccBtnExec').data('Hevent', Event.EXE) ;
 	// specific actions
 	oneventEXE() ;
-	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	$('#ccBtnExec').find('span').toggleClass('d-none') ;
 	// update FSM
 	compThis.stat = State.EXE ;
 	SBTab[compThis.stat]() ;
@@ -480,6 +484,8 @@ function eaOpnLod() {
 			$('#ccDgWaitOPN').off('shown.bs.modal') ;
 			oneventLOD() ;
 		}) ;
+		$('#ccDgWaitOPN').find('[class ^= dgwait-]').addClass('d-none') ;
+		$('#ccDgWaitOPN').find('.dgwait-LOD').removeClass('d-none') ;
 		$('#ccDgWaitOPN').modal('toggle') ;
 		compThis.stat = State.LOD ;
 	}
@@ -578,7 +584,7 @@ function eaPolPcd(creq) {
 	$('#ccDgInfoRDY a').attr('href', pdf) ;
 	$('#ccDgInfoRDY img').attr('src', ico) ;
 	$('#ccDgInfoRDY').modal('toggle') ;
-	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	$('#ccBtnExec').find('span').toggleClass('d-none') ;
 	// update FSM
 	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
@@ -615,7 +621,7 @@ function eaPolSer(creq) {
 	$('#ccDgFailERR').find('[class ^= dgfail-]').addClass('d-none') ;
 	$('#ccDgFailERR').find('.dgfail-POL-SER').removeClass('d-none') ;
 	$('#ccDgFailERR').modal('toggle') ;
-	$('#ccBtnExec').find('i, span').toggleClass('d-none') ;
+	$('#ccBtnExec').find('span').toggleClass('d-none') ;
 	// update FSM
 	compThis.stat = $('#ccBtnExec').data('Hstate') ;
 	SBTab[compThis.stat]() ;
@@ -684,6 +690,8 @@ function eaUsvLod() {
 		$('#ccDgWaitOPN').off('shown.bs.modal') ;
 		oneventLOD() ;
 	}) ;
+	$('#ccDgWaitOPN').find('[class ^= dgwait-]').addClass('d-none') ;
+	$('#ccDgWaitOPN').find('.dgwait-LOD').removeClass('d-none') ;
 	$('#ccDgWaitOPN').modal('toggle') ;
 	// update FSM
 	compThis.stat = State.LOD ;
