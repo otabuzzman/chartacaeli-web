@@ -115,7 +115,7 @@
 				<div class="d-inline-block">
 					<a id="ccBtnView" class="btn btn-lg btn-outline-primary" role="button" href="scientific-star-chart.pdf" target="_blank" title="Open PDF"><i class="far fa-file-pdf"></i></a>
 					<a id="ccBtnInfo" class="btn btn-lg btn-outline-primary" role="button" href="#ccInfoSci" title="Show details"><i class="fas fa-info"></i></a>
-					<a id="ccBtnLoad" class="btn btn-lg btn-outline-primary" role="button" href="#ccComposer" title="Load Composer"><i class="fas fa-pen"></i></a>
+					<a id="ccBtnLoad" class="btn btn-lg btn-outline-primary" role="button" title="Load Composer"><i class="fas fa-pen"></i></a>
 				</div>
 			</div>
 		</div>
@@ -340,33 +340,37 @@
 		</div>
 	</div>
 	<div id="ccDgFailERR" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
-			<div class="modal-dialog" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h4 class="modal-title">
-							<span class="dgfail-CER">Bad request (400) error occurred</span>
-							<span class="dgfail-EXE-SER">Internal server error (500) occurred</span>
-							<span class="dgfail-POL-SER">Internal server error (500) occurred</span>
-						</h4>
-						<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
-					</div>
-					<div class="modal-body info-txt lead">
-						<p>
-							<span class="dgfail-CER">Server sent <i class="creq-info"></i>. Check if chart definition and preferences (if given) are valid.</span>
-							<span class="dgfail-EXE-SER">Server sent <i class="creq-info"></i>. There is not much you can do except try again later.</span>
-							<span class="dgfail-POL-SER">Custom star chart generation or PDF conversion failed for some reason.<span class="applog"> See <a target="_blank">Charta Caeli log file</a> for details.</span><span class="pdferr"> <a target="_blank">Ghostscript PDF converter error log</a> might provide additional hints.</span></span>
-						</p>
-					</div>
-					<div class="modal-footer">
-						<button class="ccDg1WayKey btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">
-							<span class="dgfail-CER">Got it</span>
-							<span class="dgfail-EXE-SER">Got it</span>
-							<span class="dgfail-POL-SER">Got it</span>
-						</button>
-					</div>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">
+						<span class="dgfail-CER">Bad request (400) error occurred</span>
+						<span class="dgfail-EXE-SER">Internal server error (500) occurred</span>
+						<span class="dgfail-POL-SER">Internal server error (500) occurred</span>
+					</h4>
+					<button type="button" class="close" data-dismiss="modal"><i class="fas fa-times"></i></button>
+				</div>
+				<div class="modal-body info-txt lead">
+					<p>
+						<span class="dgfail-CER">Server sent <i class="creq-info"></i>. Check if chart definition and preferences (if given) are valid.</span>
+						<span class="dgfail-EXE-SER">Server sent <i class="creq-info"></i>. There is not much you can do except try again later.</span>
+						<span class="dgfail-POL-SER">Custom star chart generation or PDF conversion failed for some reason.<span class="applog"> See <a target="_blank">Charta Caeli log file</a> for details.</span><span class="pdferr"> <a target="_blank">Ghostscript PDF converter error log</a> might provide additional hints.</span></span>
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button class="ccDg1WayKey btn btn-primary btn-lg btn-block" type="button" data-dismiss="modal">
+						<span class="dgfail-CER">Got it</span>
+						<span class="dgfail-EXE-SER">Got it</span>
+						<span class="dgfail-POL-SER">Got it</span>
+					</button>
 				</div>
 			</div>
 		</div>
+	</div>
+	<div id="ccDgWaitOPN" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1">
+		<div class="modal-dialog">
+		</div>
+	</div>
 	<!-- end composer -->
 	<!-- begin concepts -->
 	<div id="ccConcepts" class="navbar-offset">

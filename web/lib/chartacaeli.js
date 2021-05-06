@@ -69,8 +69,8 @@ var compThis ;
 var compExch ;
 
 /* state enumeration names and values */
-const stateName = Object.freeze(["CHG", "EMP", "EXE", "FIN", "OPN", "POL", "USV"]) ;
-const State = Object.freeze({CHG: 0, EMP: 1, EXE: 2, FIN: 3, OPN: 4, POL: 5, USV: 6}) ;
+const stateName = Object.freeze(["CHG", "EMP", "EXE", "FIN", "LOD", "OPN", "POL", "USV"]) ;
+const State = Object.freeze({CHG: 0, EMP: 1, EXE: 2, FIN: 3, LOD: 4, OPN: 5, POL: 6, USV: 7}) ;
 /* event enumeration names and values */
 const eventName = Object.freeze(["CER", "CHG", "CNC", "EXE", "LOD", "NEW", "OPN", "PCD", "SER", "TGD", "TGP", "TMF", "TMP", "TMU"]) ;
 const Event = Object.freeze({CER: 0, CHG: 1, CNC: 2, EXE: 3, LOD: 4, NEW: 5, OPN: 6, PCD: 7, SER: 8, TGD: 9, TGP: 10, TMF: 11, TMP: 12, TMU: 13}) ;
@@ -81,6 +81,7 @@ const EATab = Object.freeze([
 	/* Emp */ [eaReject, eaEmpChg, eaReject, eaReject, eaEmpLod, eaReject, eaEmpOpn, eaReject, eaReject, eaEmpTgd, eaEmpTgp, eaReject, eaReject, eaReject],
 	/* Exe */ [eaExeCer, eaExeChg, eaReject, eaReject, eaExeLod, eaReject, eaReject, eaExePcd, eaExeSer, eaReject, eaReject, eaExeTmf, eaReject, eaExeTmu],
 	/* Fin */ [eaReject, eaFinChg, eaReject, eaFinExe, eaFinLod, eaFinNew, eaFinOpn, eaFinPcd, eaReject, eaFinTgd, eaFinTgp, eaReject, eaReject, eaReject],
+	/* Lod */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaLodPcd, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
 	/* Opn */ [eaReject, eaOpnChg, eaReject, eaOpnExe, eaOpnLod, eaOpnNew, eaOpnOpn, eaReject, eaReject, eaOpnTgd, eaOpnTgp, eaReject, eaReject, eaReject],
 	/* Pol */ [eaReject, eaPolChg, eaReject, eaReject, eaPolLod, eaReject, eaReject, eaPolPcd, eaPolSer, eaReject, eaReject, eaPolTmf, eaPolTmp, eaPolTmu],
 	/* Usv */ [eaReject, eaReject, eaUsvCnc, eaReject, eaUsvLod, eaUsvNew, eaUsvOpn, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
@@ -188,10 +189,21 @@ function eaEmpLod() {
 	compThis.Hstate = State.EMP ;
 	compThis.Hevent = Event.LOD ;
 	// specific actions
-	oneventLOD() ;
+	if (compExch.stat == State.CHG) {
+		$('#ccDgWarnUSV').modal('toggle') ;
+		compThis.stat = State.USV ;
+	} else {
+		$('#ccDgWaitOPN').on('shown.bs.modal', function () {
+			$('#ccDgWaitOPN').off('shown.bs.modal') ;
+			oneventLOD() ;
+		}) ;
+		$('#ccDgWaitOPN').modal('toggle') ;
+		compThis.stat = State.LOD ;
+	}
 	// update FSM
+	SBTab[compThis.stat]() ;
 	// trace FSM
-	console.log("EMP-LOD-"+stateName[compThis.stat]+" (update pending)") ;
+	console.log("EMP-LOD-"+stateName[compThis.stat]) ;
 }
 function eaEmpOpn() {
 	// save state and event
@@ -388,6 +400,27 @@ function eaFinOpn() {
 	// history state considered actual after blind cancel event
 	EATab[compThis.Hstate][Event.OPN]()
 }
+function eaFinPcd(name) {
+	// save state and event
+	compThis.Hstate = State.FIN ;
+	compThis.Hevent = Event.PCD ;
+	// specific actions
+	$('#ccDgWaitOPN').on('shown.bs.modal', function () {
+		$('#ccDgWaitOPN').off('shown.bs.modal') ;
+		var file = new FileReader() ;
+		file.onload = function (e) {
+			compThis.open = e.target.result.replace(/(\r?\n|\r)\s*/g, " ").replace(/> </g, "><") ;
+			EATab[compThis.stat][Event.PCD]() ;
+		} ; 
+		file.readAsText(name) ;
+	}) ;
+	$('#ccDgWaitOPN').modal('toggle') ;
+	// update FSM
+	compThis.stat = State.LOD ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("FIN-PCD-"+stateName[compThis.stat]) ;
+}
 function eaFinTgd() {
 	// history state considered actual after blind cancel event
 	EATab[compThis.Hstate][Event.TGD]()
@@ -396,19 +429,19 @@ function eaFinTgp() {
 	// history state considered actual after blind cancel event
 	EATab[compThis.Hstate][Event.TGP]()
 }
-function eaFinPcd(e) {
+function eaLodPcd() {
 	// save state and event
-	compThis.Hstate = State.FIN ;
+	compThis.Hstate = State.LOD ;
 	compThis.Hevent = Event.PCD ;
 	// specific actions
-	compThis.open = e.target.result.replace(/(\r?\n|\r)\s*/g, " ").replace(/> </g, "><") ;
 	loadXonomy('#ccXonomy') ;
 	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
+	$('#ccDgWaitOPN').modal('toggle') ;
 	// update FSM
 	compThis.stat = State.OPN ;
 	SBTab[compThis.stat]() ;
 	// trace FSM
-	console.log("FIN-PCD-"+stateName[compThis.stat]) ;
+	console.log("LOD-PCD-"+stateName[compThis.stat]) ;
 }
 function eaOpnChg() {
 	// save state and event
@@ -439,10 +472,21 @@ function eaOpnLod() {
 	compThis.Hstate = State.OPN ;
 	compThis.Hevent = Event.LOD ;
 	// specific actions
-	oneventLOD() ;
+	if (compExch.stat == State.CHG) {
+		$('#ccDgWarnUSV').modal('toggle') ;
+		compThis.stat = State.USV ;
+	} else {
+		$('#ccDgWaitOPN').on('shown.bs.modal', function () {
+			$('#ccDgWaitOPN').off('shown.bs.modal') ;
+			oneventLOD() ;
+		}) ;
+		$('#ccDgWaitOPN').modal('toggle') ;
+		compThis.stat = State.LOD ;
+	}
 	// update FSM
+	SBTab[compThis.stat]() ;
 	// trace FSM
-	console.log("OPN-LOD-"+stateName[compThis.stat]+" (update pending)") ;
+	console.log("OPN-LOD-"+stateName[compThis.stat]) ;
 }
 function eaOpnNew() {
 	// save state and event
@@ -636,10 +680,16 @@ function eaUsvLod() {
 	compThis.Hstate = State.USV ;
 	compThis.Hevent = Event.LOD ;
 	// specific actions
-	oneventLOD() ;
+	$('#ccDgWaitOPN').on('shown.bs.modal', function () {
+		$('#ccDgWaitOPN').off('shown.bs.modal') ;
+		oneventLOD() ;
+	}) ;
+	$('#ccDgWaitOPN').modal('toggle') ;
 	// update FSM
+	compThis.stat = State.LOD ;
+	SBTab[compThis.stat]() ;
 	// trace FSM
-	console.log("USV-LOD-"+stateName[compThis.stat]+" (update pending)") ;
+	console.log("USV-LOD-"+stateName[compThis.stat]) ;
 }
 function eaUsvNew() {
 	// save state and event
@@ -688,6 +738,8 @@ var SBTab = Object.freeze([
 	},
 	function () { // State.FIN
 	},
+	function () { // State.LOD
+	},
 	function () { // State.OPN
 		$('#ccBtnNew').prop('disabled', false) ;
 		$('#ccBtnOpen').prop('disabled', false) ;
@@ -727,18 +779,12 @@ function oneventLOD() {
 					success: function (data) {
 						prefs = data ;
 						compP9S.open = prefs ;
-						loadXonomy('#ccXonomy') ;
-						// update FSM
 						compP9S.stat = State.OPN ;
-						compD8N.stat = State.OPN ;
-						SBTab[compThis.stat]() ;
+						EATab[compThis.stat][Event.PCD]() ;
 					}}) ;
 			} else {
-				loadXonomy('#ccXonomy') ;
-				// update FSM
-				compD8N.stat = State.OPN ;
 				compP9S.stat = State.EMP ;
-				SBTab[compThis.stat]() ;
+				EATab[compThis.stat][Event.PCD]() ;
 			}
 		}
 	}) ;
@@ -840,7 +886,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	document.querySelector('#ccBtnOpen').addEventListener('click', function () {EATab[compThis.stat][Event.OPN]()}) ;
 	/* make input element fire on change event even if same file picked (SO #12030686) */
 	document.querySelector('#ccInpOpen').addEventListener('click', function (e) {e.stopPropagation() ; this.value = null}) ;
-	document.querySelector('#ccInpOpen').addEventListener('change', function () {var file = new FileReader() ; file.onload = function (e) {EATab[compThis.stat][Event.PCD](e)} ; file.readAsText(this.files[0])}) ;
+	document.querySelector('#ccInpOpen').addEventListener('change', function () {EATab[compThis.stat][Event.PCD](this.files[0])}) ;
 	document.querySelector('#ccXonomy').addEventListener('click', function () {EATab[compThis.stat][Event.CHG]()}) ;
 	document.querySelector('#ccBtnExec').addEventListener('click', function () {EATab[compThis.stat][Event.EXE]()}) ;
 	document.querySelector('#ccDgInfoRDY .ccDg1WayKey').addEventListener('click', function () {$('#ccDgInfoRDY').modal('toggle')}) ;
