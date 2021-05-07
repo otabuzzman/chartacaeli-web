@@ -439,7 +439,7 @@ function eaLodPcd() {
 	compThis.Hevent = Event.PCD ;
 	// specific actions
 	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
+	window.scrollTo({top: $('#ccComposer .btn-box').offset().top-400, behavior: "smooth"}) ;
 	$('#ccDgWaitOPN').modal('toggle') ;
 	// update FSM
 	compThis.stat = State.OPN ;
@@ -764,7 +764,7 @@ var SBTab = Object.freeze([
 function oneventNEW() {
 	compThis.open = compThis.defdef ;
 	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer').offset().top}, 800) ;
+	window.scrollTo({top: $('#ccComposer').offset().top, behavior: "smooth"}) ;
 }
 
 /* load Composer from gallery */
@@ -813,7 +813,7 @@ function oneventP9S() {
 	compExch = compD8N ;
 	/* load Composer from toggled state object */
 	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
+	window.scrollTo({top: $('#ccComposer .btn-box').offset().top-400, behavior: "smooth"}) ;
 }
 
 /* toggle to definition button */
@@ -831,7 +831,7 @@ function oneventD8N() {
 	compExch = compP9S ;
 	/* load Composer from toggled state object */
 	loadXonomy('#ccXonomy') ;
-	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 800) ;
+	window.scrollTo({top: $('#ccComposer .btn-box').offset().top-400, behavior: "smooth"}) ;
 }
 
 function oneventEXE() {
@@ -882,10 +882,21 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	document.addEventListener('scroll', fadeCaptionOutro ) ;
 
 	document.addEventListener('click', closeBurgerMenu ) ;
-	var a = document.querySelectorAll('a') ;
-	for (var i=0 ; a.length>i ; i++ ) {
-		a[i].addEventListener('click', smoothScrollToAnchor) ;
-	}
+
+	document.querySelectorAll("a").forEach(function(aref) {
+		if (aref.hash == "") {
+			return ;
+		}
+		var a = document.querySelector(aref.hash) ;
+		if (a == null) {
+			return ;
+		}
+		aref.addEventListener("click", function(e) {
+			a.scrollIntoView({behavior: "smooth"}) ;
+			e.preventDefault() ;
+		}) ;
+	}) ;
+
 	document.querySelector('#ccBtnLoad').addEventListener('click', function () {EATab[compThis.stat][Event.LOD]()}) ;
 	document.querySelector('.navbar-toggler').addEventListener('click', btnToggleMenu) ;
 	document.querySelector('#ccBtnTglP').addEventListener('click', function () {EATab[compThis.stat][Event.TGP]()}) ;
@@ -905,14 +916,6 @@ document.addEventListener('DOMContentLoaded', function (event) {
 /* toggle burger and cross icons */
 function btnToggleMenu(event) {
 	$(this).find('i').toggleClass('fa-bars fa-times') ;
-}
-
-function smoothScrollToAnchor(event) {
-	if (this.hash !== "") {
-		var hash = this.hash ;
-		event.preventDefault() ;
-		$('html, body').animate({scrollTop: $(hash).offset().top}, 800, function () {window.location.hash = hash}) ;
-	}
 }
 
 /* close open burger menu on any click */
