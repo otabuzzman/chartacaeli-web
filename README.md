@@ -384,7 +384,8 @@ for p in `xml sel -t -v "//xs:pattern/@value" ../chartacaeli/chartacaeli.xsd | s
 - Sketch glyphs in `chartacaeli-webfont.pptx` using PowerPoint (because Google Slides lacks some features like etting arbitrary linewidths, capstyles and numerical rotation angles.
 - Upload deck to Drive, open with Slides, set background transparent and export glyphs to SVG.
 - Create *Charta Caeli webfont* project in [IcoMoon](https://icomoon.io/) Chrome extension and import SVG files (glyphs). Use Inkscape in case of stroke to fill warnings (see [tooltip](lab/inkscape-tooltip-stroke-to-fill.png) and hints from IcoMoon).
-- Click Generate Font, set Unicode codes and Metadata, finally download font and find TTF in ZIP file.
+- Click Generate Font, set Unicode codes and Metadata, finally download font and find TTF file in ZIP archive.
+- Import *Charta Caeli webfont* project file `selection.json` from ZIP archive into IcoMoon.
 
 ### Style guide
 Basic color palette and usage. Click on hex value to get derived palettes.

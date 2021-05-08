@@ -433,6 +433,18 @@ function eaFinTgp() {
 	// history state considered actual after blind cancel event
 	EATab[compThis.Hstate][Event.TGP]()
 }
+function eaLodCnc() {
+	// save state and event
+	compThis.Hstate = State.LOD ;
+	compThis.Hevent = Event.CNC ;
+	// specific actions
+	location.reload() ;
+	// update FSM
+	compThis.stat = State.EMP ;
+	SBTab[compThis.stat]() ;
+	// trace FSM
+	console.log("LOD-CNC-"+stateName[compThis.stat]) ;
+}
 function eaLodPcd() {
 	// save state and event
 	compThis.Hstate = State.LOD ;
