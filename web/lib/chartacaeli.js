@@ -451,7 +451,7 @@ function eaLodPcd() {
 	compThis.Hevent = Event.PCD ;
 	// specific actions
 	loadXonomy('#ccXonomy') ;
-	window.scrollTo({top: $('#ccComposer .btn-box').offset().top-400, behavior: "smooth"}) ;
+	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 1000) ;
 	$('#ccDgWaitOPN').modal('toggle') ;
 	// update FSM
 	compThis.stat = State.OPN ;
@@ -776,7 +776,7 @@ var SBTab = Object.freeze([
 function oneventNEW() {
 	compThis.open = compThis.defdef ;
 	loadXonomy('#ccXonomy') ;
-	window.scrollTo({top: $('#ccComposer').offset().top, behavior: "smooth"}) ;
+	$('html, body').animate({scrollTop: $('#ccComposer').offset().top}, 1000) ;
 }
 
 /* load Composer from gallery */
@@ -825,7 +825,8 @@ function oneventP9S() {
 	compExch = compD8N ;
 	/* load Composer from toggled state object */
 	loadXonomy('#ccXonomy') ;
-	window.scrollTo({top: $('#ccComposer .btn-box').offset().top-400, behavior: "smooth"}) ;
+	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 1000) ;
+
 }
 
 /* toggle to definition button */
@@ -843,7 +844,7 @@ function oneventD8N() {
 	compExch = compP9S ;
 	/* load Composer from toggled state object */
 	loadXonomy('#ccXonomy') ;
-	window.scrollTo({top: $('#ccComposer .btn-box').offset().top-400, behavior: "smooth"}) ;
+	$('html, body').animate({scrollTop: $('#ccComposer .btn-box').offset().top-400}, 1000) ;
 }
 
 function oneventEXE() {
@@ -895,18 +896,10 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
 	document.addEventListener('click', closeBurgerMenu ) ;
 
-	document.querySelectorAll("a").forEach(function(aref) {
-		if (aref.hash == "") {
-			return ;
-		}
-		var a = document.querySelector(aref.hash) ;
-		if (a == null) {
-			return ;
-		}
-		aref.addEventListener("click", function(e) {
-			a.scrollIntoView({behavior: "smooth"}) ;
-			e.preventDefault() ;
-		}) ;
+	/* smooth scroll to A elements */
+	$('a[href *= "#"]').not('[href = "#"]').click(function(e) {
+		e.preventDefault() ;
+		$('html, body').animate({scrollTop: $(this.hash).offset().top}, 1000) ;
 	}) ;
 
 	document.querySelector('#ccBtnLoad').addEventListener('click', function () {EATab[compThis.stat][Event.LOD]()}) ;
