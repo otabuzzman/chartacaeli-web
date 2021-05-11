@@ -21,7 +21,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 
 /* home, error 404 */
 #ccHome, #ccError404 { background-image: url("../starrysky.png") ; background-size: cover ; background-repeat: no-repeat ; background-position: center ; min-height: 100vh ; display: flex ; }
-.caption { color: #dadada ; }
+.caption { font-size: 2.5rem ; font-weight: 500 ; color: #dadada ; }
 .caption-intro { padding-top: 6rem ; padding-left: 3.2rem ; }
 .caption-outro { margin-bottom: 2rem ; }
 #ccError404 .caption { margin-top: 2rem ; }
@@ -93,8 +93,8 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 
 @media (min-width: 576px) and (orientation: portrait) {
 	/* general */
-	h2 { font-size: 2.8rem ; }
-	h3 { font-size: 2.2rem ; }
+	h2, .h2 { font-size: 2.8rem ; }
+	h3, .h3 { font-size: 2.2rem ; }
 	[id ^= ccBtn] { width: 80px ; }
 
 	/* home */
