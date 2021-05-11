@@ -1,4 +1,4 @@
-window.addEventListener('load', function (event) {
+window.addEventListener('load', function () {
 	initComposer() ;
 }) ;
 
@@ -212,7 +212,7 @@ function eaEmpOpn() {
 	compThis.Hstate = State.EMP ;
 	compThis.Hevent = Event.OPN ;
 	// specific actions
-	$('#ccInpOpen').trigger('click')
+	$('#ccInpOpen').trigger('click') ;
 	// update FSM
 	compThis.stat = State.FIN ;
 	SBTab[compThis.stat]() ;
@@ -309,9 +309,10 @@ function eaExePcd(creq) {
 					EATab[compThis.stat][Event.PCD](creq) ;
 					break ;
 				case 'failed':
-				default:
 					EATab[compThis.stat][Event.SER](creq) ;
 					break ;
+				default:
+					console.log("GET returned unknown state "+creq.stat) ;
 				}
 			},
 			error: function (xhr) {
@@ -384,23 +385,23 @@ function eaExeTmu() {
 }
 function eaFinChg() {
 	// history state considered actual after blind cancel event
-	EATab[compThis.Hstate][Event.CHG]()
+	EATab[compThis.Hstate][Event.CHG]() ;
 }
 function eaFinExe() {
 	// history state considered actual after blind cancel event
-	EATab[compThis.Hstate][Event.EXE]()
+	EATab[compThis.Hstate][Event.EXE]() ;
 }
 function eaFinLod() {
 	// history state considered actual after blind cancel event
-	EATab[compThis.Hstate][Event.LOD]()
+	EATab[compThis.Hstate][Event.LOD]() ;
 }
 function eaFinNew() {
 	// history state considered actual after blind cancel event
-	EATab[compThis.Hstate][Event.NEW]()
+	EATab[compThis.Hstate][Event.NEW]() ;
 }
 function eaFinOpn() {
 	// history state considered actual after blind cancel event
-	EATab[compThis.Hstate][Event.OPN]()
+	EATab[compThis.Hstate][Event.OPN]() ;
 }
 function eaFinPcd(name) {
 	// save state and event
@@ -427,23 +428,11 @@ function eaFinPcd(name) {
 }
 function eaFinTgd() {
 	// history state considered actual after blind cancel event
-	EATab[compThis.Hstate][Event.TGD]()
+	EATab[compThis.Hstate][Event.TGD]() ;
 }
 function eaFinTgp() {
 	// history state considered actual after blind cancel event
-	EATab[compThis.Hstate][Event.TGP]()
-}
-function eaLodCnc() {
-	// save state and event
-	compThis.Hstate = State.LOD ;
-	compThis.Hevent = Event.CNC ;
-	// specific actions
-	location.reload() ;
-	// update FSM
-	compThis.stat = State.EMP ;
-	SBTab[compThis.stat]() ;
-	// trace FSM
-	console.log("LOD-CNC-"+stateName[compThis.stat]) ;
+	EATab[compThis.Hstate][Event.TGP]() ;
 }
 function eaLodPcd() {
 	// save state and event
@@ -523,7 +512,7 @@ function eaOpnOpn() {
 	compThis.Hstate = State.OPN ;
 	compThis.Hevent = Event.OPN ;
 	// specific actions
-	$('#ccInpOpen').trigger('click')
+	$('#ccInpOpen').trigger('click') ;
 	// update FSM
 	compThis.stat = State.FIN ;
 	SBTab[compThis.stat]() ;
@@ -728,7 +717,7 @@ function eaUsvOpn() {
 	compThis.Hstate = State.USV ;
 	compThis.Hevent = Event.OPN ;
 	// specific actions
-	$('#ccInpOpen').trigger('click')
+	$('#ccInpOpen').trigger('click') ;
 	// update FSM
 	compThis.stat = State.FIN ;
 	SBTab[compThis.stat]() ;
@@ -887,7 +876,7 @@ function restGetHref(hateoas, rel, title) {
 }
 
 /* register events */
-document.addEventListener('DOMContentLoaded', function (event) {
+document.addEventListener('DOMContentLoaded', function () {
 
 	/* addEventListener doesn't work with Bootstrap (SO #24211185) */
 	$('#ccGalleryCarousel').on('slid.bs.carousel', updateBtnConf) ;
@@ -919,13 +908,13 @@ document.addEventListener('DOMContentLoaded', function (event) {
 }) ;
 
 /* toggle burger and cross icons */
-function btnToggleMenu(event) {
+function btnToggleMenu() {
 	$(this).find('i').toggleClass('fa-bars fa-times') ;
 }
 
 /* close open burger menu on any click */
-function closeBurgerMenu(event) {
-	var clickedOn = $(event.target) ;
+function closeBurgerMenu(e) {
+	var clickedOn = $(e.target) ;
 	var navOpened = $('.navbar-collapse').hasClass('show') ;
 	if (navOpened === true && !clickedOn.hasClass('navbar-toggler')) {
 		$('.navbar-toggler').click() ;
@@ -933,12 +922,12 @@ function closeBurgerMenu(event) {
 }
 
 /* fade button at bottom of home on scroll */
-function fadeCaptionOutro(event) {
+function fadeCaptionOutro() {
 	$('.caption-outro').css('opacity', 1-$(window).scrollTop()/480) ;
 }
 
 /* update button configurations according to carousel state */
-function updateBtnConf(event) {
+function updateBtnConf() {
 	var view = $('.carousel .active').attr('data-view') ;
 	document.getElementById('ccBtnView').href = view ;
 	var info = $('.carousel .active').attr('data-info') ;

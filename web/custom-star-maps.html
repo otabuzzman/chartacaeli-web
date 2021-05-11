@@ -55,11 +55,11 @@
 		<div class="caption container">
 			<div class="row h-100">
 				<div class="caption-intro col-12 h-50">
-					<h1>it's all about stars...</h1>
+					it's all about stars...
 				</div>
 				<div class="caption-outro col-12 align-self-end text-center">
-					<p><h1>...map 'em!</h1></p>
-					<a href="#ccGallery"><h1><i class="ccwf-chevron-double-down"></i></h1></a>
+					<p>...map 'em!</p>
+					<a href="#ccGallery"><i class="ccwf-chevron-double-down"></i></a>
 				</div>
 			</div>
 		</div>
@@ -80,32 +80,32 @@
 					<div class="carousel-item" data-view="general-features-selection.pdf" data-info="#ccInfoGen" data-load-chart="general-features-selection.xml" data-load-prefs="general-features-selection.preferences">
 						<img class="d-block w-100" src="ccGallery_general-features-selection.png" alt="Gallery item showing a custom star chart with a selection of Charta Caeli's general features like star map layout, having a margin around the actual chart by defining a field of view and using Chinese, Hebraic and Greek character sets.">
 						<div class="carousel-caption">
-							<h3 class="d-none d-md-block">General features selection</h3>
+							<span class="d-none d-md-block h3">General features selection</span>
 						</div>
 					</div>
 					<!-- first item -->
 					<div class="carousel-item active" data-view="scientific-star-chart.pdf" data-info="#ccInfoSci" data-load-chart="scientific-star-chart.xml" data-load-prefs="scientific-star-chart.preferences">
 						<img class="d-block w-100" src="ccGallery_scientific-star-chart.png" alt="Gallery item of a scientific custom star chart with various grids, stars up to a certain magnitude and depicting each with a star type specific symbol taken from Charta Caeli's font.">
 						<div class="carousel-caption">
-							<h3 class="d-none d-md-block">Scientific star chart</h3>
+							<span class="d-none d-md-block h3">Scientific star chart</span>
 						</div>
 					</div>
 					<div class="carousel-item" data-view="artistic-star-chart.pdf" data-info="#ccInfoArt">
 						<img class="d-block w-100" src="ccGallery_artistic-star-chart.png" alt="Gallery item of an artistic custom star chart showing artist's impressions as well as stick figures of ancient constellations both inside the boundaries defined by the corresponding astronomical catalog. Grids and scales drawn beyond the bounding edge of the star map.">
 						<div class="carousel-caption">
-							<h3 class="d-none d-md-block">Artistic star chart</h3>
+							<span class="d-none d-md-block h3">Artistic star chart</span>
 						</div>
 					</div>
 					<div class="carousel-item" data-view="artistic-star-chart--toppage.pdf" data-info="#ccInfoArt" data-load-chart="artistic-star-chart--toppage.xml" data-load-prefs="">
 						<img class="d-block w-100" src="ccGallery_artistic-star-chart--toppage.png" alt="Gallery item of an artistic custom star chart showing stick figures and boundaries of ancient constellations. Grids and scales drawn in a somewhat manneristic way beyond the bounding edge of the star map.">
 						<div class="carousel-caption">
-							<h3 class="d-none d-md-block">Artistic star chart overlay</h3>
+							<span class="d-none d-md-block h3">Artistic star chart overlay</span>
 						</div>
 					</div>
 					<div class="carousel-item" data-view="artistic-star-chart--artwork.pdf" data-info="#ccInfoArt" data-load-chart="artistic-star-chart--artwork.xml" data-load-prefs="artistic-star-chart--artwork.preferences">
 						<img class="d-block w-100" src="ccGallery_artistic-star-chart--artwork.png" alt="Gallery item just showing artist's impressions of ancient constellations to be used as an optional background for a scientific or artistic custom star map.">
 						<div class="carousel-caption">
-							<h3 class="d-none d-md-block">Artistic star chart artwork</h3>
+							<span class="d-none d-md-block h3">Artistic star chart artwork</span>
 						</div>
 					</div>
 				</div>
@@ -134,17 +134,17 @@
 						<p>The focus of this custom chart is on the subject matter of giving precise information about the position of sky objects and their orientations with respect to different reference systems. A somewhat inaccurate element is the suggestion of the Milky Way, which nevertheless helps to orientate oneself in the night sky and not least is worth a mapping because of its mere extent.</p>
 						<p>The example applies the major elements that make up a custom chart definition, namely charts, horizons, circles, dials, annotations and catalogs. Grid and comments are faint and small but not too much to make sure they're useful and readable.</p>
 						<hr class="ruler-sep">
-						<h4>The Chart element</h4>
+						<span class="h4">The Chart element</span>
 						<p>This outermost piece of XML data starts a chart definition. Actually, there is one more element above Chart but that’s essentially to group multiple chart definitions in a single file. Chart is of XSD type choice and serves to define the projection type, which in turn is a child of Chart. Furthermore, Chart defines the page dimensions of a custom star map and a viewport, which is a kind of passe-partout.</p>
-						<h4>The Horizon element</h4>
+						<span class="h4">The Horizon element</span>
 						<p>Similar to Chart this element serves to define a horizon type, which is sort of a synonym for coordinate system. Interpretation of object coordinates depends on their horizon type. For humans, three of these appear to be fix coordinate systems as they change only slowly due to sky mechanics: the equatorial, the ecliptical and the galactical one. Compared to these, the local horizon appears to be variable because local time is part of  its definition.</p>
-						<h4>The Circle element</h4>
+						<span class="h4">The Circle element</span>
 						<p>These serve to define grids to support orientation on a given custom star map. Circle as well is a choice to pick a particular type. Meridian and parallel circles draw lines of length and height, respectively. They are horizon dependent and correspond with longitudes and latitudes if for instance defined for a local horizon. There are four special Circle elements of type parallel to define the northern and southern tropic and polar circles.</p>
-						<h4>The Dial* elements</h4>
+						<span class="h4">The Dial* elements</span>
 						<p>Attached to a circle a dial provides a means of scale. The two types of dials are day and degree with the day type being a special one. The other one is fairly universal and suitable for appending a scale to any circle in a chart definition.</p>
-						<h4>The Annotation element</h4>
+						<span class="h4">The Annotation element</span>
 						<p>The specification foresees straight and curved annotations. The latter are useful to add comments that follow the paths of circles. Straight annotations happen to appear at the point where drawing stops. They refer to the page coordinate system. Many elements support annotations and thus a way to provide further explanations on them. A special case is the Frame element defined by the Layout element, which allows a more flexible positioning of straight annotations.</p>
-						<h4>The Catalog element</h4>
+						<span class="h4">The Catalog element</span>
 						<p>Charta Caeli supports some of the more popular star catalogs for instance The Bright Star Catalogue. The Catalog element supplies a choice to pick a catalog type, which applied with an URL fetches the catalog data from Internet or local file. An expression supplied to the attribute value interpreter might restrict the output of catalog content.</p>
 					</div>
 				</div>
@@ -191,14 +191,14 @@
 						<hr class="ruler-top">
 						<p>Although not really a star chart and not even good-looking the definition gives practical insights on how to use some of Charta Caeli's concepts in practice. Having the chart definition from the repository at hands will further help understanding what’s going on.</p>
 						<hr class="ruler-sep">
-						<h4>Layout and text</h4>
+						<span class="h4">Layout and text</span>
 						<p>The layout feature shown here uses a debug entry in the custom star chart specific preferences file to make the layout grid visible to the frames in use. One wouldn’t use this in a real star chart, but it is useful during development.</p>
 						<p>Position of text happens by combination of two anchor points from the text element and the frame in question. They sum up to nine for each: four for the corners, four for the middles of the edges and one for the center. The text anchor points actually refer to the bounding box of the text. Combining the anchor point values <span class="text-monospace">topleft</span> and <span class="text-monospace">center</span> of a text and a frame element yields a text starting in the top-left corner of the bottom-right frame quarter. The frame rectangles along the axes each show the frame number and the number of logical units these frames span.</p>
-						<h4>Unicode and fonts</h4>
+						<span class="h4">Unicode and fonts</span>
 						<p>The example uses the Arial Unicode MS font, which contains a large subset of glyphs defined by Unicode 2.1. The font is licensed and therefore not available in the Charta Caeli web service. Despite of this the example gives a good impression of what’s possible in terms of I18N if a respective font is available. Note multiple text elements for each language section in the chart definition, which is due to a lack of newline.</p>
-						<h4>Field of view</h4>
+						<span class="h4">Field of view</span>
 						<p>The inner circle in the middle shows an azimuthal projection of the stars in The Bright Star Catalogue. The circle is tagged as Field of View (FOV) thus restricting catalog output to the circle area. This is the so-called effective FOV, which affects catalog output as well as outputs from Artwork, Sign and Body elements. The outer circle has slightly flattened sections at the left and right side. These result from a combination with the passe-partout that restricts output of every element. This one is called global FOV.</p>
-						<h4>Attribute value interpreter</h4>
+						<span class="h4">Attribute value interpreter</span>
 						<p>This one enables to define values for some attributes at runtime during chart generation. The sample utilizes the feature to restrict stars output by the Catalog element on those with mag values of 3 and below. The interpreter provides access to certain runtime variables, simple arithmetic and string matching as well as conditions cribbed from C’s ternary conditional operator. Complex expressions tend to be difficult to read because of escapes for reserved characters and use of XML character entity references. Luckily, there are online services for XML encoding/ decoding available to ease the task.</p>
 					</div>
 				</div>
@@ -276,7 +276,7 @@
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h4 class="modal-title">Still rendering your custom star map</h4>
+					<span class="modal-title h4">Still rendering your custom star map</span>
 					<button class="close" type="button" data-dismiss="modal"><i class="fas fa-times"></i></button>
 				</div>
 				<div class="modal-body info-txt lead">
@@ -294,11 +294,11 @@
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h4 class="modal-title">Your custom star chart is ready.</h4>
+					<span class="modal-title h4">Your custom star chart is ready.</span>
 					<button class="close" type="button" data-dismiss="modal"><i class="fas fa-times"></i></button>
 				</div>
 				<div class="modal-body info-txt lead">
-					<img class="img-thumbnail d-block mx-auto" src="" alt="Preview image of custom star map just rendered.">
+					<img class="img-thumbnail d-block mx-auto" src="#" alt="Preview image of custom star map just rendered.">
 				</div>
 				<div class="modal-footer">
 					<a class="ccDg1WayKey btn btn-primary btn-lg btn-block" role="button" href="" target="_blank">View PDF</a>
@@ -310,7 +310,7 @@
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h4 class="modal-title">State frozen during chart generation</h4>
+					<span class="modal-title h4">State frozen during chart generation</span>
 					<button class="close" type="button" data-dismiss="modal"><i class="fas fa-times"></i></button>
 				</div>
 				<div class="modal-body info-txt lead">
@@ -326,7 +326,7 @@
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h4 class="modal-title">Unsaved changes pending</h4>
+					<span class="modal-title h4">Unsaved changes pending</span>
 					<button class="close" type="button" data-dismiss="modal"><i class="fas fa-times"></i></button>
 				</div>
 				<div class="modal-body info-txt lead">
@@ -343,18 +343,18 @@
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h4 class="modal-title">
+					<span class="modal-title h4">
 						<span class="dgfail-CER">Bad request (400) error occurred</span>
 						<span class="dgfail-EXE-SER">Internal server error (500) occurred</span>
 						<span class="dgfail-POL-SER">Internal server error (500) occurred</span>
-					</h4>
+					</span>
 					<button class="close" type="button" data-dismiss="modal"><i class="fas fa-times"></i></button>
 				</div>
 				<div class="modal-body info-txt lead">
 					<p>
 						<span class="dgfail-CER">Server sent <i class="creq-info"></i>. Check if chart definition and preferences (if given) are valid.</span>
 						<span class="dgfail-EXE-SER">Server sent <i class="creq-info"></i>. There is not much you can do except try again later.</span>
-						<span class="dgfail-POL-SER">Custom star chart generation or PDF conversion failed for some reason.<span class="applog"> See <a target="_blank">Charta Caeli log file</a> for details.</span><span class="pdferr"> <a target="_blank">Ghostscript PDF converter error log</a> might provide additional hints.</span></span>
+						<span class="dgfail-POL-SER">Custom star chart generation or PDF conversion failed for some reason.<span class="applog"> See <a href="#" target="_blank">Charta Caeli log file</a> for details.</span><span class="pdferr"> <a href="#" target="_blank">Ghostscript PDF converter error log</a> might provide additional hints.</span></span>
 					</p>
 				</div>
 				<div class="modal-footer">
@@ -371,10 +371,10 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h4 class="modal-title">
+					<span class="modal-title h4">
 						<span class="dgwait-LOD">Loading Composer from Gallery...</span>
 						<span class="dgwait-OPN">Opening file in Composer...</span>
-					</h4>
+					</span>
 				</div>
 				<div class="modal-body info-txt lead">
 					<p>Loading Composer may strain your patience. How much depends on the size of the chart definition. Some star maps from Gallery for instance take about 15 seconds to load.</p>
@@ -460,9 +460,9 @@
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
 
-	<script type="text/javascript" src="lib/xonomy/xonomy.js"></script>
-	<script type="text/javascript" src="lib/chartacaeli.xsd.js"></script>
-	<script type="text/javascript" src="lib/preferences.dtd.js"></script>
-	<script type="text/javascript" src="lib/chartacaeli.js"></script>
+	<script src="lib/xonomy/xonomy.js"></script>
+	<script src="lib/chartacaeli.xsd.js"></script>
+	<script src="lib/preferences.dtd.js"></script>
+	<script src="lib/chartacaeli.js"></script>
 </body>
 </html>

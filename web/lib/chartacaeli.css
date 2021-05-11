@@ -45,8 +45,7 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 .navbar-offset::before { height: 4.4rem ; margin-top: -4.4rem ; content: "" ; display: block ; }
 
 /* gallery */
-.carousel-caption { padding-bottom: 0 ; position: relative ; left: auto ; right: auto ; }
-.carousel-caption h3 { margin-top: .5rem ; color: #007bff ; font-weight: 400 ; }
+.carousel-caption { padding-bottom: 0 ; position: relative ; left: auto ; right: auto ; margin-top: .5rem ; color: #007bff ; font-weight: 400 ; }
 .info-txt {  }
 .info-img { width: 360px ; }
 #ccGallery .btn-box {  }
@@ -99,9 +98,8 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 	[id ^= ccBtn] { width: 80px ; }
 
 	/* home */
+	.caption { font-size: 3.8rem ; font-weight: 500 ; }
 	.caption-intro { padding-top: 9rem ; }
-	.caption-intro h1 { font-size: 3.8rem ; }
-	.caption-outro h1 { font-size: 3.8rem ; }
 	.caption-outro .btn { border-width: 3px ; border-radius: 8px ; }
 	.ccwf-chevron-double-down { font-size: 7rem ; }
 
@@ -118,9 +116,8 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 	h2 { font-size: 3.8rem ; }
 
 	/* home */
+	.caption { font-size: 5.4rem ; font-weight: 500 ; }
 	.caption-intro { padding-left: 4rem ; }
-	.caption-intro h1 { font-size: 5.4rem ; }
-	.caption-outro h1 { font-size: 5.4rem ; }
 	.caption-outro .btn { border-width: 4px ; border-radius: 12px ; }
 	.ccwf-chevron-double-down { font-size: 9.8rem ; }
 
@@ -139,9 +136,8 @@ svg { width: 24px ; height: 24px ; fill: currentColor ; }
 
 @media (min-width: 1200px) {
 	/* home */
+	.caption { font-size: 5.4rem ; font-weight: 500 ; }
 	.caption-intro { padding-left: 2rem ; }
-	.caption-intro h1 { font-size: 5.4rem ; }
-	.caption-outro h1 { font-size: 5.4rem ; }
 	.caption-outro .btn { border-width: 3px ; border-radius: 10px ; }
 	.ccwf-chevron-double-down { font-size: 7.6rem ; }
 
