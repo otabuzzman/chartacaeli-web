@@ -136,7 +136,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   ```
 
 11. Setup MTA
-```
+  ```
   # install sendmail
   apt --yes install sendmail
 
@@ -152,8 +152,6 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   vmd62709.chartacaeli.org
   mail.chartacaeli.org
   chartacaeli.org
-  # forwarding domains matching /etc/mail/aliases
-  gmail.com
   ```
   ```
   # configure sendmail
@@ -174,19 +172,45 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   ```
   ```
   # compile configuration
-  sudo bash -c "m4 /etc/mail/sendmail.mc >/etc/mail/sendmail.cf"
+  m4 /etc/mail/sendmail.mc >/etc/mail/sendmail.cf
   ```
 
-12. VPS reboot
+12. Forward *ccaeli* to Gmail
+  ```
+  # configure sendmail/ Gmail authentication
+  mkdir -p 0700 /etc/mail/authinfo
+  cat >/etc/mail/authinfo/gmail-auth <<-EOF
+  AuthInfo: "U:root" "I:iuergen.schuck@gmail.com" "P:GMAIL APP PASSWORD"
+  EOF
+
+  # configure Gmail
+  vi /etc/mail/sendmail.mc
+  ```
+  **/etc/mail/sendmail.mc** - Add or change relevant lines as below.
+  ```
+  define(`SMART_HOST',`[smtp.gmail.com]')dnl
+  define(`RELAY_MAILER_ARGS', `TCP $h 587')dnl
+  define(`ESMTP_MAILER_ARGS', `TCP $h 587')dnl
+  define(`confAUTH_OPTIONS', `A p')dnl
+  TRUST_AUTH_MECH(`EXTERNAL DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
+  define(`confAUTH_MECHANISMS', `EXTERNAL GSSAPI DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
+  FEATURE(`authinfo',`hash -o /etc/mail/authinfo/gmail-auth.db')dnl
+  ```
+  ```
+  # configure sendmail (use defaults)
+  sendmailconfig
+  ```
+
+13. VPS reboot
   ```
   reboot
   ```
 
-13. Set contabo nameservers for domain at ionos
+14. Set contabo nameservers for domain at ionos
 
-14. Create DNS zone for domain/ IP at contabo
+15. Create DNS zone for domain/ IP at contabo
 
-15. Consider snapshot
+16. Consider snapshot
 
 ### B. Web server setup
 
