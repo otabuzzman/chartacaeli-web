@@ -101,6 +101,10 @@ endif
 # deploy
 ifdef linos
 instdep: instwww instweb
+	install -m 0755 ccws-db $(instdir)
+	install -m 0755 ccws-runner $(instdir)
+	install -m 0755 ccws-cleaner $(instdir)
+	install -m 0644 setenv.sh $(instdir)
 instwww: $(instdir)/www
 	( cd web ; tar cf - --owner=ccaeli --group=ccaeli --exclude=META-INF --exclude=WEB-INF .) | ( cd $< ; tar xf - )
 instweb: $(instdir)/web

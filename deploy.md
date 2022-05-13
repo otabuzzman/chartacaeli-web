@@ -571,7 +571,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
 
   sudo -u ccaeli -- bash -c "
     java -cp web/WEB-INF/lib/h2-2.1.210.jar org.h2.tools.Shell \
-    -url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
+    -url jdbc:h2:${BASDIR}/ChartDB -user chartacaeli -password chartaca3li \
     -sql \"RUNSCRIPT FROM 'ChartDB.sql'\""
   ```
 
