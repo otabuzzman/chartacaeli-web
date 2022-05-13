@@ -299,7 +299,7 @@ function eaExePcd(creq) {
 			url: next,
 			method: 'GET',
 			headers: { Accept: "application/json" },
-			success: function(creq) {
+			success: function (creq) {
 				switch (creq.stat) {
 				case 'accepted':
 				case 'started':

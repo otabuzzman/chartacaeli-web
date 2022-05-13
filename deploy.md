@@ -570,7 +570,7 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
   sudo -u ccaeli -- mkdir -m 0775 ${BASDIR:=/opt/chartacaeli/db}
 
   sudo -u ccaeli -- bash -c "
-    java -cp web/WEB-INF/lib/h2-1.4.199.jar -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+    java -cp web/WEB-INF/lib/h2-2.1.210.jar org.h2.tools.Shell \
     -url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
     -sql \"RUNSCRIPT FROM 'ChartDB.sql'\""
   ```

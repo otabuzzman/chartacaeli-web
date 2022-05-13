@@ -25,7 +25,7 @@ JAVA_HOME=${JAVA_HOME:-/usr/lib/jvm/java-1.8.0-openjdk}
 DAEMON_USR=${DAEMON_USR:-ccaeli}
 DAEMON_DIR=${DAEMON_DIR:-/opt/chartacaeli/web/WEB-INF}
 DAEMON=${DAEMON:-$JAVA_HOME/bin/java}
-DAEMON_CMD=${DAEMON_CMD:-$DAEMON -cp lib/h2-1.4.199.jar org.h2.tools.Server -baseDir /opt/chartacaeli/db -tcp}
+DAEMON_CMD=${DAEMON_CMD:-$DAEMON -cp lib/h2-*.jar org.h2.tools.Server -baseDir /opt/chartacaeli/db -tcp}
 
 PIDFILE=/opt/chartacaeli/$NAME.pid
 LOGFILE=/opt/chartacaeli/$NAME.log

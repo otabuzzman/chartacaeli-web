@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -34,26 +34,16 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType( XmlAccessType.FIELD )
 public class Chart {
 
-	public final static int ST_NONE		= 0 ;
-	public final static int ST_RECEIVED	= 1 ;
-	public final static int ST_ACCEPTED	= 2 ;
-	public final static int ST_REJECTED	= 3 ;
-	public final static int ST_STARTED	= 4 ;
-	public final static int ST_FINISHED	= 5 ;
-	public final static int ST_FAILED	= 6 ;
-	public final static int ST_CLEANED	= 7 ;
-
-	private static List<String> status =
-			Arrays.asList( new String[] {
-					"none",
-					"received",
-					"accepted",
-					"rejected",
-					"started",
-					"finished",
-					"failed",
-					"cleaned"
-			}) ;
+	public enum State {
+		none,
+		received,
+		accepted,
+		rejected,
+		started,
+		finished,
+		failed,
+		cleaned
+	} ;
 
 	@Id
 	@Column( name = "ID", unique = true )
@@ -63,6 +53,7 @@ public class Chart {
 	@Column( name = "CREATED", nullable = false )
 	@XmlElement
 	private long created ;
+
 	@Column( name = "MODIFIED", nullable = false )
 	@XmlElement
 	private long modified ;
@@ -72,9 +63,9 @@ public class Chart {
 	private String name ;
 
 	@Column( name = "STAT", nullable = false )
-	@Access( AccessType.PROPERTY )
 	@XmlTransient
-	private int statNum ;
+	@Enumerated( EnumType.STRING )
+	private State statNum ;
 
 	@Transient
 	@XmlElement( name = "stat" )
@@ -123,31 +114,22 @@ public class Chart {
 		this.name = name ;
 	}
 
-	public int getStatNum() {
+	public State getStatNum() {
 		return statNum ;
 	}
 
-	public void setStatNum( int statNum ) {
-		int stat = Math.abs( statNum )%status.size() ;
-
+	public void setStatNum( State stat ) {
 		this.statNum = stat ;
-		this.statNam = status.get( stat ) ;
+		this.statNam = stat.name() ;
 	}
 
 	public String getStatNam() {
 		return statNam ;
 	}
 
-	public void setStatNam( String statNam ) {
-		int stat = status.indexOf( statNam ) ;
-
-		if ( stat == -1 ) {
-			this.statNam = status.get( ST_NONE ) ;
-			this.statNum = ST_NONE ;
-		} else {
-			this.statNam = status.get( stat ) ;
-			this.statNum = stat ;
-		}
+	public void setStatNam( String name ) {
+		this.statNum = State.valueOf( name ) ;
+		this.statNam = name ;
 	}
 
 	public String getInfo() {

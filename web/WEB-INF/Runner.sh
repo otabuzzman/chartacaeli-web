@@ -22,7 +22,7 @@ trap termrnnr 1 2 3 6 15
 
 doit() {
 	# lookup chart requests in 'accepted' state sorted by oldest first
-	creq=$($JAVA -cp ${CLASSPATH:-lib/h2-*.jar} -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	creq=$($JAVA -cp ${CLASSPATH:-lib/h2-*.jar} org.h2.tools.Shell \
 	-url $DBURL -user $DBUSER -password $DBPASS \
 	-sql "SELECT id, name, stat FROM charts WHERE stat = 'accepted' ORDER BY created ASC" 2>&1 |\
 	gawk --posix '$1~/[0-9A-Za-z]{8}/ {print $1 " " $3}' ; exit ${PIPESTATUS[0]})

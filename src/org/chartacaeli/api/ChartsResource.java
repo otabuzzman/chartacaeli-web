@@ -76,7 +76,7 @@ public class ChartsResource {
 			@FormParam( "chart")  String chart,
 			@FormParam( "prefs" ) String prefs ) {
 		Chart creq ;
-		Link self, next, d8n, p9s ;
+		Link self, next, d8n = null, p9s = null ;
 		URI nextURI, d8nURI, p9sURI ;
 		CompositeResult result ;
 
@@ -85,11 +85,11 @@ public class ChartsResource {
 		creq = new Chart() ;
 		creq.setId( UUID.randomUUID().toString() ) ;
 		creq.setCreated( System.currentTimeMillis() ) ;
-		creq.setStatNum( Chart.ST_RECEIVED ) ;
+		creq.setStatNum( Chart.State.received ) ;
 		creq.setHateoas( self ) ;
 
 		if ( chart == null ) {
-			creq.setStatNum( Chart.ST_REJECTED ) ;
+			creq.setStatNum( Chart.State.rejected ) ;
 			creq.setInfo( MessageCatalog.getMessage( this, MK_ED8NINV, null ) ) ;
 
 			return Response.status( Response.Status.BAD_REQUEST )
@@ -101,7 +101,7 @@ public class ChartsResource {
 
 		try {
 			if ( ! ( result = validateD8N( chart ) ).ok() ) {
-				creq.setStatNum( Chart.ST_REJECTED ) ;
+				creq.setStatNum( Chart.State.rejected ) ;
 				creq.setInfo( result.message() ) ;
 
 				return Response.status( result.getRC() )
@@ -120,7 +120,7 @@ public class ChartsResource {
 			createFile( createFilename( d8nURI, creq.getId() ), chart ) ;
 
 			if ( ! ( result = validateP9S( prefs ) ).ok() ) {
-				creq.setStatNum( Chart.ST_REJECTED ) ;
+				creq.setStatNum( Chart.State.rejected ) ;
 				creq.setInfo( result.message() ) ;
 
 				return Response.status( result.getRC() )
@@ -136,7 +136,7 @@ public class ChartsResource {
 
 			createFile( createFilename( p9sURI, creq.getId() ), prefs ) ;
 
-			creq.setStatNum( Chart.ST_ACCEPTED ) ;
+			creq.setStatNum( Chart.State.accepted ) ;
 			creq.setModified( System.currentTimeMillis() ) ;
 
 			chartDB.insert( creq ) ;
@@ -144,7 +144,7 @@ public class ChartsResource {
 				| IOException e ) {
 			log.info( e.getMessage() ) ;
 
-			creq.setStatNum( Chart.ST_REJECTED ) ;
+			creq.setStatNum( Chart.State.rejected ) ;
 			creq.setInfo( MessageCatalog.getMessage( this, MK_EREQINI, null ) ) ;
 
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
@@ -155,7 +155,7 @@ public class ChartsResource {
 		} catch ( PersistenceException e ) {
 			log.info( e.getMessage() ) ;
 
-			creq.setStatNum( Chart.ST_REJECTED ) ;
+			creq.setStatNum( Chart.State.rejected ) ;
 			creq.setInfo( e.getMessage() ) ;
 
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR )
@@ -168,7 +168,6 @@ public class ChartsResource {
 		nextURI = uri.getAbsolutePathBuilder().path( creq.getId() ).build() ;
 		next = Link.fromUri( nextURI ).rel( "next" ).build() ;
 		creq.setHateoas( next ) ;
-
 
 		return Response.status( Response.Status.ACCEPTED )
 				.links( self, next, d8n, p9s )
@@ -203,7 +202,7 @@ public class ChartsResource {
 			creq.setId( id ) ;
 			creq.setCreated( System.currentTimeMillis() ) ;
 			creq.setModified( creq.getCreated() ) ;
-			creq.setStatNum( Chart.ST_NONE ) ;
+			creq.setStatNum( Chart.State.none ) ;
 			creq.setHateoas( self ) ;
 			creq.setInfo( MessageCatalog.getMessage( this, MK_ENOENT, null ) ) ;
 
@@ -221,8 +220,8 @@ public class ChartsResource {
 		p9s = Link.fromUri( p9sURI ).rel( "related" ).title( L_P9SFIL ).build() ;
 
 		switch ( creq.getStatNum() ) {
-		case Chart.ST_ACCEPTED:
-		case Chart.ST_STARTED:
+		case accepted:
+		case started:
 			next = Link.fromUri( uri.getAbsolutePath() ).rel( "next" ).build() ;
 			creq.setHateoas( next ) ;
 
@@ -234,13 +233,13 @@ public class ChartsResource {
 					.type( accept )
 					.entity( creq )
 					.build() ;
-		case Chart.ST_CLEANED:
+		case cleaned:
 			return Response.status( Response.Status.OK )
 					.links( self )
 					.type( accept )
 					.entity( creq )
 					.build() ;
-		case Chart.ST_FINISHED:
+		case finished:
 			nextURI = uri.getAbsolutePathBuilder().path( creq.getName()+".pdf" ).build() ;
 			next = Link.fromUri( nextURI ).rel( "next" ).build() ;
 			icoURI = uri.getAbsolutePathBuilder().path( creq.getName()+".png" ).build() ;
@@ -275,7 +274,7 @@ public class ChartsResource {
 			}
 
 			return response.build() ;
-		case Chart.ST_FAILED:
+		case failed:
 			logURI = uri.getAbsolutePathBuilder().path( creq.getName()+".log" ).build() ;
 			log = Link.fromUri( logURI ).rel( "related" ).title( L_APPLOG ).build() ;
 			errURI = uri.getAbsolutePathBuilder().path( creq.getName()+".err" ).build() ;
@@ -302,8 +301,8 @@ public class ChartsResource {
 			}
 
 			return response.build() ;
-		case Chart.ST_RECEIVED:
-		case Chart.ST_REJECTED:
+		case received:
+		case rejected:
 		default:
 			creq.setHateoas( d8n ) ;
 			creq.setHateoas( p9s ) ;
@@ -337,7 +336,7 @@ public class ChartsResource {
 			creq.setId( id ) ;
 			creq.setCreated( System.currentTimeMillis() ) ;
 			creq.setModified( creq.getCreated() ) ;
-			creq.setStatNum( Chart.ST_NONE ) ;
+			creq.setStatNum( Chart.State.none ) ;
 			creq.setHateoas( self ) ;
 			creq.setInfo( MessageCatalog.getMessage( this, MK_ENOENT, null ) ) ;
 

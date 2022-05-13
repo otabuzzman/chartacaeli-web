@@ -96,7 +96,7 @@ sudo -u ccaeli -- mkdir -m 0775 ${BASDIR:=/opt/chartacaeli/db}
 
 # initialize database with H2 Shell tool
 sudo -u ccaeli -- bash -c "cd /opt/chartacaeli
-	$JAVA_HOME/bin/java -cp web/WEB-INF/lib/h2-1.4.199.jar -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+	$JAVA_HOME/bin/java -cp web/WEB-INF/lib/h2-2.1.210.jar org.h2.tools.Shell \
 	-url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
 	-sql \"RUNSCRIPT FROM 'ChartDB.sql'\""
 ```
@@ -107,7 +107,7 @@ sudo -u ccaeli -- bash -c "cd /opt/chartacaeli
 mkdir ${BASDIR:=$(cygpath -m /opt/chartacaeli/db)}
 
 # initialize database with H2 Shell tool
-java -cp web/WEB-INF/lib/h2-1.4.199.jar -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+java -cp web/WEB-INF/lib/h2-2.1.210.jar org.h2.tools.Shell \
 	-url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
 	-sql "RUNSCRIPT FROM 'ChartDB.sql'"
 ```
@@ -125,12 +125,12 @@ An alternative way is to use the H2 web console. Omit the `RUNSCRIPT` expression
 mkdir ${BASDIR:=$(cygpath -m /opt/chartacaeli/db)}
 
 # initialize H2 omitting 'RUNSCRIPT'
-java -cp web/WEB-INF/lib/h2-1.4.199.jar -Dh2.baseDir=$BASDIR org.h2.tools.Shell \
+java -cp web/WEB-INF/lib/h2-2.1.210.jar org.h2.tools.Shell \
 	-url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
 	-sql ""
 
 # start H2 server in background
-java -cp web/WEB-INF/lib/h2-1.4.199.jar org.h2.tools.Server \
+java -cp web/WEB-INF/lib/h2-2.1.210.jar org.h2.tools.Server \
 	-baseDir $BASDIR \
 	-tcp \
 	-web &
@@ -238,7 +238,7 @@ BASDIR=/opt/chartacaeli/db
 
 # start H2 database
 sudo -u ccaeli -- bash -c "cd /opt/chartacaeli/web/WEB-INF
-	$JAVA_HOME/bin/java -cp lib/h2-1.4.199.jar org.h2.tools.Server \
+	$JAVA_HOME/bin/java -cp lib/h2-2.1.210.jar org.h2.tools.Server \
 	-baseDir $BASDIR \
 	-tcp &"
 
@@ -289,7 +289,7 @@ export CLASSPATH=$(cygpath -mp lib:classes:lib/*)
 export GS_FONTPATH=$(cygpath -mp /opt/chartacaeli:/opt/chartacaeli/web/lib)
 
 # start H2 database server
-( cd /opt/chartacaeli/web/WEB-INF ; java -cp lib/h2-1.4.199.jar org.h2.tools.Server \
+( cd /opt/chartacaeli/web/WEB-INF ; java -cp lib/h2-2.1.210.jar org.h2.tools.Server \
 	-baseDir $BASDIR \
 	-tcp ) &
 
