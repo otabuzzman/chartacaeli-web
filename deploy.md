@@ -450,6 +450,8 @@ Manual setup on a single Virtual Private Server (VPS) running Ubuntu 18.04. Prov
     patch \
     pkg-config \
     unzip \
+    libxml2 \
+    libxml2-dev \
   "
 
   # stop on error
