@@ -219,7 +219,7 @@ public class ChartsResource {
 		p9sURI = uri.getAbsolutePathBuilder().path( creq.getId() ).path( creq.getName()+".preferences" ).build() ;
 		p9s = Link.fromUri( p9sURI ).rel( "related" ).title( L_P9SFIL ).build() ;
 
-		switch ( creq.getStatNum() ) {
+		switch ( creq.getStat() ) {
 		case accepted:
 		case started:
 			next = Link.fromUri( uri.getAbsolutePath() ).rel( "next" ).build() ;

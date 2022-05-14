@@ -2,7 +2,6 @@
 package org.chartacaeli.api;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -19,8 +18,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @NamedQueries({
@@ -34,15 +34,16 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType( XmlAccessType.FIELD )
 public class Chart {
 
+	@XmlEnum
 	public enum State {
-		none,
-		received,
-		accepted,
-		rejected,
-		started,
-		finished,
-		failed,
-		cleaned
+		@XmlEnumValue("none") none,
+		@XmlEnumValue("received") received,
+		@XmlEnumValue("accepted") accepted,
+		@XmlEnumValue("rejected") rejected,
+		@XmlEnumValue("started") started,
+		@XmlEnumValue("finished") finished,
+		@XmlEnumValue("failed") failed,
+		@XmlEnumValue("cleaned") cleaned
 	} ;
 
 	@Id
@@ -63,13 +64,9 @@ public class Chart {
 	private String name ;
 
 	@Column( name = "STAT", nullable = false )
-	@XmlTransient
-	@Enumerated( EnumType.STRING )
-	private State statNum ;
-
-	@Transient
 	@XmlElement( name = "stat" )
-	private String statNam ;
+	@Enumerated( EnumType.STRING )
+	private State stat ;
 
 	@Transient
 	@XmlElement
@@ -114,22 +111,12 @@ public class Chart {
 		this.name = name ;
 	}
 
-	public State getStatNum() {
-		return statNum ;
+	public State getStat() {
+		return stat ;
 	}
 
 	public void setStatNum( State stat ) {
-		this.statNum = stat ;
-		this.statNam = stat.name() ;
-	}
-
-	public String getStatNam() {
-		return statNam ;
-	}
-
-	public void setStatNam( String name ) {
-		this.statNum = State.valueOf( name ) ;
-		this.statNam = name ;
+		this.stat = stat ;
 	}
 
 	public String getInfo() {
