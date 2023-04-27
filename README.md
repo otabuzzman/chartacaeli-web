@@ -8,7 +8,7 @@ The project depends on the Charta Caeli star chart creation tool. Thus, to setup
 
 ```bash
 # setup environment (sample values)
-export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 export PATH=$JAVA_HOME/bin:$PATH
 
 # Clone Charta Caeli web service
@@ -25,7 +25,7 @@ mvn compile
 
 ```bash
 # setup environment (sample values)
-export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+export JAVA_HOME=/cygdrive/c/program\ files/java/jdk-17
 export PATH=$JAVA_HOME/bin:$PATH
 
 # Clone Charta Caeli web service
@@ -60,7 +60,7 @@ User and group are not required. Just create a folder `%USERPROFILE%\opt\chartac
 
 ```bash
 # setup environment (sample values)
-export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 export PATH=$JAVA_HOME/bin:$PATH
 
 sudo -u ccaeli -- make install
@@ -83,7 +83,7 @@ sudo chkconfig ccws-cleaner on
 
 ```bash
 # setup environment (sample values)
-export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+export JAVA_HOME=/cygdrive/c/program\ files/java/jdk-17
 export PATH=$JAVA_HOME/bin:$PATH
 
 make install
@@ -138,7 +138,7 @@ java -cp web/WEB-INF/lib/h2-2.1.210.jar org.h2.tools.Server \
 
 **Initialize Tomcat**
 
-There are plenty of ways to get Tomcat up and running on Linux and Windows. They differ in TC version, using a tarball or an installer and of course the OS and in case of Linux the derivate in question. Gopher it and ask Google. The [Nanyang Technological University](https://www.ntu.edu.sg/Pages/home.aspx) (Singapore) provides a comprehensive description of [Tomcat installation and configuration](https://www.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) which furthermore provides useful newbie information on setup including a first *Hello World* servlet.
+There are plenty of ways to get Tomcat up and running on Linux and Windows. They differ in TC version, using a tarball or an installer and of course the OS and in case of Linux the derivate in question. Gopher it and ask Google. The [Nanyang Technological University](https://www3.ntu.edu.sg/Pages/home.aspx) (Singapore) provides a comprehensive description of [Tomcat installation and configuration](https://www3.ntu.edu.sg/home/ehchua/programming/howto/tomcat_howto.html) which furthermore provides useful newbie information on setup including a first *Hello World* servlet.
 
 The setup foresees to make the Charta Caeli web service the ROOT application of Tomcat. To achieve this copy `web/META-INF/context.xml.linos` or `web/META-INF/context.xml.winos` from this repository to `${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml`. Update docBase attribute of Context element appropriately (e.g. `/opt/chartacaeli/web` on Linux or `c:\users\<user>\opt\chartacaeli\web` on Windows/ Cygwin if `c:\users\<user>\opt` mounted at `/opt`).
 
@@ -169,7 +169,7 @@ sudo chkconfig tomcat8 on
 chkconfig --list tomcat8
 ```
 
-- Update JAVA_HOME (e.g. `/usr/lib/jvm/java-1.8.0-openjdk`) in `/usr/share/tomcat8/tomcat8.conf`.
+- Update JAVA_HOME (e.g. `/usr/lib/jvm/java-17-openjdk`) in `/usr/share/tomcat8/tomcat8.conf`.
 
 ```bash
 # start Tomcat service
@@ -182,7 +182,7 @@ sudo fuser -v -n tcp 8080
 
 ```bash
 # setup environment (sample values)
-JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 
 # delete Charta Caeli installation
 sudo rm -rf /opt/chartacaeli/*
@@ -233,7 +233,7 @@ A special font (`ARIALUNI.TTF`) is assumed to live in the `/opt/chartacaeli` fol
 
 ```bash
 # setup environment (sample values)
-JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 BASDIR=/opt/chartacaeli/db
 
 # start H2 database
@@ -261,14 +261,14 @@ sudo -u ccaeli -- bash -c "cd /opt/chartacaeli/web/WEB-INF ; unset LANG
 ```cmd
 rem commands to start Tomcat in cmd.exe
 
-set "JAVA_HOME=C:\Program Files\Java\jdk1.8.0_151"
-cd AppData\Local\Apache\apache-tomcat-8.5.37\bin
+set "JAVA_HOME=C:\Program Files\Java\jdk-17"
+cd "C:\Program Files\Apache Software Foundation\Tomcat 8.5\bin"
 startup.bat
 ```
 
 ```bash
 # setup environment (sample values)
-export JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+export JAVA_HOME=/cygdrive/c/program\ files/java/jdk-17
 export PATH=$JAVA_HOME/bin:$PATH
 
 # H2 env
@@ -314,7 +314,7 @@ A special font (`ARIALUNI.TTF`) is assumed to live in the `/opt/chartacaeli` fol
 
 ```bash
 # setup Linux environment (sample values)
-JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 
 # make ~ searchable if user not `ccaeli´
 chmod go+x ~
@@ -333,7 +333,7 @@ make png gng
 
 ```bash
 # setup Windows/ Cygwin environment (sample values)
-JAVA_HOME=/cygdrive/c/program\ files/java/jdk1.8.0_151
+JAVA_HOME=/cygdrive/c/program\ files/java/jdk-17
 export PATH=$JAVA_HOME/bin:$PATH
 
 # make PDF of `general-features-selection´
