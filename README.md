@@ -47,7 +47,8 @@ The web service needs a [Tomcat](https://tomcat.apache.org/index.html) 8.5 servl
 # create Charta Caeli group (if missing)
 sudo groupadd ccaeli
 # create Charta Caeli user (if missing)
-sudo useradd -c "Charta Caeli" -d /opt/chartacaeli -m -s /sbin/nologin -g ccaeli ccaeli
+sudo mkdir -pm 0775 /opt/chartacaeli
+sudo useradd -c "Charta Caeli" -d /opt/chartacaeli -s /sbin/nologin -g ccaeli ccaeli
 
 sudo -u ccaeli -- bash -c "chmod 775 ~"
 ```
