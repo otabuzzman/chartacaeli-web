@@ -47,10 +47,8 @@ The web service needs a [Tomcat](https://tomcat.apache.org/index.html) 8.5 servl
 # create Charta Caeli group (if missing)
 sudo groupadd ccaeli
 # create Charta Caeli user (if missing)
-sudo mkdir -pm 0775 /opt/chartacaeli
-sudo useradd -c "Charta Caeli" -d /opt/chartacaeli -s /sbin/nologin -g ccaeli ccaeli
-
-sudo -u ccaeli -- bash -c "chmod 775 ~"
+sudo useradd -c "Charta Caeli" -d /opt/chartacaeli -m -s /sbin/nologin -g ccaeli ccaeli
+sudo chmod 0775 /opt/chartacaeli
 ```
 
 **Prerequisites setup on Windows/ Cygwin**
@@ -147,35 +145,35 @@ The setup foresees to make the Charta Caeli web service the ROOT application of 
 
 ```bash
 # install Tomcat 8.5
-sudo yum install tomcat8
+sudo yum install tomcat8.5
 
 # add missing JAR (see https://forums.aws.amazon.com/thread.jspa?threadID=231871)
-sudo wget -O /usr/share/tomcat8/lib/tomcat-dbcp.jar \
-	https://repo1.maven.org/maven2/org/apache/tomcat/tomcat-dbcp/8.5.51/tomcat-dbcp-8.5.51.jar
+sudo wget -O /usr/share/tomcat/lib/tomcat-dbcp.jar \
+	https://repo1.maven.org/maven2/org/apache/tomcat/tomcat-dbcp/8.5.79/tomcat-dbcp-8.5.79.jar
 
 # add Tomcat user `tomcat´ to `ccaeli´ group (if missing)
 # so web application can write in `/opt/chartacaeli/db´ folder ceated by setup with GID `ccaeli´
 sudo usermod -a -G ccaeli tomcat
 # set umask to allow group writes
-sudo bash -c "( echo ; echo '# Charta Caeli web service' ; echo umask 0002 ) >>/etc/tomcat8/tomcat8.conf"
+sudo bash -c "( echo ; echo '# Charta Caeli web service' ; echo umask 0002 ) >>/usr/share/tomcat/tomcat.conf"
 
 # add Charta Caeli user `ccaeli´ to `tomcat´ group (if missing)
 # so Runner can write in `/opt/chartacaeli/db/<id>´ folder created by web application with GID `tomcat´
 sudo usermod -a -G tomcat ccaeli
 
 # make service start on boot
-sudo chkconfig --add tomcat8
-sudo chkconfig tomcat8 on
+sudo chkconfig --add tomcat
+sudo chkconfig tomcat on
 # check service start (optional)
-chkconfig --list tomcat8
+chkconfig --list tomcat
 ```
 
-- Update JAVA_HOME (e.g. `/usr/lib/jvm/java-17-openjdk`) in `/usr/share/tomcat8/tomcat8.conf`.
+- Update JAVA_HOME (e.g. `/usr/lib/jvm/java-17-openjdk`) in `/usr/share/tomcat/tomcat.conf`.
 
 ```bash
 # start Tomcat service
-sudo service tomcat8 start
-# check Tomcat service (optinal)
+sudo service tomcat start
+# check Tomcat service (optional)
 sudo fuser -v -n tcp 8080
 ```
 
