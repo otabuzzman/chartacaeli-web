@@ -97,7 +97,7 @@ sudo -u ccaeli -- mkdir -m 0775 ${BASDIR:=/opt/chartacaeli/db}
 # initialize database with H2 Shell tool
 sudo -u ccaeli -- bash -c "cd /opt/chartacaeli
 	$JAVA_HOME/bin/java -cp web/WEB-INF/lib/h2-2.1.210.jar org.h2.tools.Shell \
-	-url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
+	-url jdbc:h2:$BASDIR/ChartDB -user chartacaeli -password chartaca3li \
 	-sql \"RUNSCRIPT FROM 'ChartDB.sql'\""
 ```
 
@@ -108,7 +108,7 @@ mkdir ${BASDIR:=$(cygpath -m /opt/chartacaeli/db)}
 
 # initialize database with H2 Shell tool
 java -cp web/WEB-INF/lib/h2-2.1.210.jar org.h2.tools.Shell \
-	-url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
+	-url jdbc:h2:$BASDIR/ChartDB -user chartacaeli -password chartaca3li \
 	-sql "RUNSCRIPT FROM 'ChartDB.sql'"
 ```
 
@@ -126,7 +126,7 @@ mkdir ${BASDIR:=$(cygpath -m /opt/chartacaeli/db)}
 
 # initialize H2 omitting 'RUNSCRIPT'
 java -cp web/WEB-INF/lib/h2-2.1.210.jar org.h2.tools.Shell \
-	-url jdbc:h2:./ChartDB -user chartacaeli -password chartaca3li \
+	-url jdbc:h2:$BASDIR/ChartDB -user chartacaeli -password chartaca3li \
 	-sql ""
 
 # start H2 server in background
@@ -339,7 +339,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 # make PDF of `general-features-selection´
 make general-features-selection.pdf
 
-# make PDF and PNG files
+# make PDF files
 make pdf
 
 # make PNG files (ImageMagick required)

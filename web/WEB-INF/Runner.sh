@@ -57,7 +57,7 @@ doit() {
 		info "running $APPEXE $xml on request $id ..."
 		# run Charta Caeli app
 		( cd $APPDIR ; CLASSPATH=${CLASSPATH:-lib:classes:lib/*} ./$APPEXE $xml 2>$log |\
-		$GS -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=$pdf -_ >$err 2>&1 ; (( ! (${PIPESTATUS[0]}>0 || ${PIPESTATUS[1]}>0) )) ; exit $? ) \
+		$GS -q -dBATCH -dNOPAUSE -dNOSAFER -sDEVICE=pdfwrite -sOutputFile=$pdf -_ >$err 2>&1 ; (( ! (${PIPESTATUS[0]}>0 || ${PIPESTATUS[1]}>0) )) ; exit $? ) \
 		&& ( info "request $id successfully processed by $APPEXE." ; magick convert $pdf -thumbnail 320x320^ -gravity center -extent 320x320 $png ; dbo=$(updateDB $id finished) && info "$id set to \`finished´ : ${dbo:-null}" || fail "database problem occurred with $id : ${dbo:-null}" ) \
 		|| ( warn "$APPEXE failed to process request $id." ; dbo=$(updateDB $id failed) && info "$id set to \`failed´ : ${dbo:-null}" || fail "database problem occurred with $id : ${dbo:-null}" )
 

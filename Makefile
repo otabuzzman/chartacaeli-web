@@ -46,12 +46,12 @@ ifdef winos
 	export PATH=lib:/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$$PATH ; \
 	export GS_FONTPATH=$$(cygpath -mp $(instdir)) ; \
 	CLASSPATH=$$(cygpath -mp lib:classes:lib/*) ./chartacaeli.sh -k $$(cygpath -m $$cdefs) |\
-	$${GS:-gswin64c.exe} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
+	$${GS:-gswin64c.exe} -q -dBATCH -dNOPAUSE -dNOSAFER -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
 else
 	( unset LANG ; cdefs=$$(realpath $<) ; cd $(instdir)/web/WEB-INF ; \
 	export GS_FONTPATH=$(instdir) ; \
 	JAVA=$$JAVA_HOME/bin/java CLASSPATH=lib:classes:lib/* ./chartacaeli.sh -k $$cdefs |\
-	$${GS:-gs} -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
+	$${GS:-gs} -q -dBATCH -dNOPAUSE -dNOSAFER -sDEVICE=pdfwrite -sOutputFile=- - ) >$@
 endif
 
 .pdf.png:
