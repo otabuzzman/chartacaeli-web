@@ -145,7 +145,7 @@ The setup foresees to make the Charta Caeli web service the ROOT application of 
 
 ```bash
 # install Tomcat 8.5
-sudo yum install tomcat8.5
+sudo amazon-linux-extras install tomcat8.5
 
 # add missing JAR (see https://forums.aws.amazon.com/thread.jspa?threadID=231871)
 sudo wget -O /usr/share/tomcat/lib/tomcat-dbcp.jar \
