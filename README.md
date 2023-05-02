@@ -155,10 +155,19 @@ sudo wget -O /usr/share/tomcat/lib/tomcat-dbcp.jar \
 # so web application can write in `/opt/chartacaeli/db´ folder ceated by setup with GID `ccaeli´
 sudo usermod -a -G ccaeli tomcat
 # set umask to allow group writes
-sudo bash -c "( echo ; echo '# Charta Caeli web service' ; echo umask 0002 ) >>/usr/share/tomcat/tomcat.conf"
+sudo bash -c "( echo ; echo '# Charta Caeli web service' ; echo umask 0002 ) >>/etc/tomcat/tomcat.conf"
+
+# in Tomcat 8.5.79 uncomment the following lines
+# in file /usr/lib/systemd/system/tomcat.service
+# (see https://bugzilla.redhat.com/show_bug.cgi?id=1221896)
+#
+#   EnvironmentFile=/etc/tomcat/tomcat.conf
+#   Environment="NAME="
+#   EnvironmentFile=-/etc/sysconfig/tomcat
 
 # add Charta Caeli user `ccaeli´ to `tomcat´ group (if missing)
-# so Runner can write in `/opt/chartacaeli/db/<id>´ folder created by web application with GID `tomcat´
+# so Runner can write in folder `/opt/chartacaeli/db/<id>´
+# created by web application with GID `tomcat´
 sudo usermod -a -G tomcat ccaeli
 
 # make service start on boot
@@ -168,7 +177,7 @@ sudo chkconfig tomcat on
 chkconfig --list tomcat
 ```
 
-- Update JAVA_HOME (e.g. `/usr/lib/jvm/java-17-openjdk`) in `/usr/share/tomcat/tomcat.conf`.
+- Update JAVA_HOME (e.g. `/usr/lib/jvm/java-17-openjdk`) in `/etc/tomcat/tomcat.conf`.
 
 ```bash
 # start Tomcat service
@@ -245,6 +254,7 @@ sudo -u ccaeli -- bash -c "cd /opt/chartacaeli/web/WEB-INF
 #
 # omit -i <interval> for one-shot
 sudo -u ccaeli -- bash -c "cd /opt/chartacaeli/web/WEB-INF ; unset LANG
+	export PATH=/usr/local/bin:$PATH # ImageMagick 7
 	export GS_FONTPATH=/opt/chartacaeli:/opt/chartacaeli/web/lib
 	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Runner.sh -i 5 &"
 
