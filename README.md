@@ -265,7 +265,7 @@ sudo -u ccaeli -- bash -c "cd /opt/chartacaeli/web/WEB-INF ; unset LANG
 	export JAVA=$JAVA_HOME/bin/java ; LOGLEVEL=3 ./Cleaner.sh -i 5 &"
 ```
 
-**Run web service on Windwos/ Cygwin** (testing)
+**Run web service on Windows/ Cygwin** (testing)
 
 ```cmd
 rem commands to start Tomcat in cmd.exe
@@ -312,6 +312,20 @@ export GS_FONTPATH=$(cygpath -mp /opt/chartacaeli:/opt/chartacaeli/web/lib)
 # omit -i <interval> for one-shot
 ( cd /opt/chartacaeli/web/WEB-INF ; unset LANG ; ./Cleaner.sh -i 5 ) &
 ```
+
+**Run web service on Windows/ Eclipse** (testing)
+
+Set up a new Apache Tomcat Server in Eclipse and add H2 database configuration in XML element `Resource` as a child to the `Context` element in file `server.xml` of the newly created server.
+
+```xml
+<Resource name="jdbc/ChartDB" auth="Container"
+	type="javax.sql.DataSource" driverClassName="org.h2.Driver"
+	url="jdbc:h2:tcp://localhost/./ChartDB;FILE_LOCK=NO"
+	username="chartacaeli" password="chartaca3li" maxTotal="64"
+	maxIdle="16" maxWaitMillis="16364" />
+```
+
+Run the H2 database, Runner, and Cleaner processes as noted in the previous section. Run and debug Charta Caeli web service in Eclipse.
 
 ## Check
 
