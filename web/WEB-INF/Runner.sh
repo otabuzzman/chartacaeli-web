@@ -51,7 +51,7 @@ doit() {
 
 		# set 'started' state
 		dbo=$(updateDB $id started) \
-		&& info "$id set to \`startet´ : ${dbo:-null}" \
+		&& info "$id set to \`started´ : ${dbo:-null}" \
 		|| fail "database problem occurred with $id : ${dbo:-null}"
 
 		info "running $APPEXE $xml on request $id ..."
